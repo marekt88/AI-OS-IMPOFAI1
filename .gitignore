@@ -7,3 +7,8 @@ node_modules/
 .claude/settings.local.json
 audits/
 brainstorms/
+.scratch/
+apps/3d-brain/
+context/emailova-mapa.md
+context/projekty-a-tim.md
+context/clickup-prehlad.md
