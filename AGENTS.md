@@ -18,6 +18,7 @@ Read `references/3ms-framework.md` once. It's how {{Your Name}} thinks about AI 
 - `/link`: Link a project, file, folder, or source into the right operating-manual route or index.
 - `/3d-brain`: Choose a brain name and categories, then build a local 3D knowledge globe with Cinema and interactive growth replay. Uses selected local files and the bundled app template.
 - `/level-up` — Weekly 3Ms interview. Find one automation, scope it, ship it. One per week.
+- `/adhd` — Parallel divergent ideation. ~10 subagents under different cognitive frames, scored and clustered. On demand only. Third-party, MIT, see `.claude/skills/adhd/SOURCE.md`.
 
 ## Where things live
 
@@ -36,6 +37,23 @@ See `EXPANSIONS.md` for what to add as you grow.
 ## Knowledge base
 
 {{Filled by /onboard from Q1 + Q3 — what you do, who you serve, what matters this quarter.}}
+
+## Message shape
+
+Answer first. The recommendation goes in the first two lines, before any reasoning.
+
+- Default under 150 words. Go long only when I ask, or when the output IS the deliverable (a report, a spec, a doc).
+- Commit to one option. Do not list neutral alternatives and make me choose. Pick, then say what would change your mind.
+- Three bullets per section, max. More than that means it needs a header or it needs cutting.
+- Detail goes behind an offer, not inline. End with "want the detail on X?" instead of pre-emptively writing X.
+- No narration. Don't tell me what you are about to do, just do it and report.
+
+Borrowed from the `adhd` skill's anti-patterns: walls of equally-weighted prose, and refusing to commit.
+
+## ADHD mode
+
+`/adhd` runs parallel divergent ideation: ~10 subagents, 30-90s, 5-10x cost.
+Never run it on your own initiative. Only when I type `/adhd` or ask for it by name.
 
 ## Voice
 
