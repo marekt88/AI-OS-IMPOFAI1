@@ -30,7 +30,7 @@ Read `references/3ms-framework.md` once. It's how {{Your Name}} thinks about AI 
 - `brainstorms/` - Dated interview captures and resume points. Read relevant captures on demand; confirmed current context belongs in its canonical page.
 - `audits/` — dated audit reports and finding history; point-in-time evidence, not live business state
 - `archives/` — old stuff. Don't delete. Move here.
-- `apps/3d-brain/` — IMPOFAI Brain, local 3D knowledge globe. From that folder run `node serve.mjs`, then open http://localhost:4640. Setup and generated graph are local only (gitignored). See `apps/3d-brain/README.md`.
+- `apps/3d-brain/` — IMPOFAI Brain, lokálny 3D globus. Appka sa gitom neprenáša, kategórie áno (`data/3d-brain-sources.json`). Na novom stroji: `/3d-brain`, potom `node scripts/brain-local.mjs`, potom `cd apps/3d-brain && node serve.mjs` a http://localhost:4640.
 - `scripts/konkurencia-scan.mjs` + `data/konkurencia/` — tyzdenny monitoring konkurencie. Scheduled task "konkurencia-tyzdenny-sken" bezi v pondelok rano, reporty pristavaju do `context/konkurencia/`. Ako to funguje: `references/konkurencia-monitoring.md`.
 
 See `EXPANSIONS.md` for what to add as you grow.
