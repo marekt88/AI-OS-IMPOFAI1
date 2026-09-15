@@ -1,0 +1,142 @@
+{
+  "_comment": "Smerovanie mailov a hovorov na klienta a projekt. Domena alebo adresa vyhra, nic sa nehada. Bez zhody ide zaznam do 'unrouted' a caka na doplnenie.",
+  "updated": "2026-09-15",
+
+  "deny_senders": [
+    "notifications@tasks.clickup.com",
+    "notifications@clickup.com",
+    "alerts@help.clickup.com",
+    "bridgit@bridgit.one",
+    "do-not-reply@didww.com",
+    "support@clicksend.com",
+    "operator@clicksend.au.intercom-mail.com",
+    "unread-messages@mail.instagram.com",
+    "daniel.avila@aitmpl.com",
+    "team@orchesty-solutions.com"
+  ],
+
+  "deny_subject_prefixes": [
+    "Invitation:",
+    "Updated invitation:",
+    "Accepted:",
+    "Declined:",
+    "Canceled:",
+    "Cancelled:",
+    "Pozvanky:",
+    "Daily Summary",
+    "Bridgit health"
+  ],
+
+  "deny_personal_domains": ["tuke.sk", "lineadirecta.es"],
+
+  "klienti": {
+    "imagewell": {
+      "nazov": "ImageWell / Zacharides",
+      "clickup_folder": "901511447099",
+      "domains": ["imagewell.eu", "printingshop.sk", "datasystem.sk"],
+      "addresses": ["zacharides@gmail.com", "harajfilip.co@gmail.com"],
+      "projekty": {
+        "printingshop": {
+          "clickup_list": "901516842219",
+          "keywords": ["printingshop", "eshop", "objednavk", "filemaker", "n8n", "smsapi"]
+        },
+        "automat-postovanie": {
+          "clickup_list": "901516842234",
+          "keywords": ["postovanie", "automat", "social"]
+        },
+        "iw-2nd-brain": {
+          "clickup_list": null,
+          "keywords": ["2nd brain", "second brain", "know how", "ais-os"]
+        }
+      }
+    },
+
+    "startfin": {
+      "nazov": "StartFin",
+      "clickup_folder": "901517101940",
+      "domains": [],
+      "addresses": [
+        "lubokralo@gmail.com",
+        "kikakralo@gmail.com",
+        "andr13.popovych@gmail.com",
+        "milan.obetko@gmail.com"
+      ],
+      "projekty": {
+        "startfin-app": { "clickup_list": "901524837059", "keywords": [] }
+      }
+    },
+
+    "bridgit": {
+      "nazov": "Bridgit",
+      "clickup_folder": null,
+      "domains": ["bridgit.one", "bridgit.sk", "babetta.sk"],
+      "addresses": ["slebodnik.tomas@gmail.com"],
+      "projekty": {
+        "bridgit-platforma": {
+          "clickup_list": null,
+          "keywords": ["bridgit", "cfo", "erp", "bigquery", "faktura", "rozpis prace"]
+        }
+      }
+    },
+
+    "dubove-parkety": {
+      "nazov": "Dubove Parkety",
+      "clickup_folder": null,
+      "domains": ["dubove-parkety.sk"],
+      "addresses": [],
+      "projekty": {
+        "dubove-parkety-ai": { "clickup_list": null, "keywords": [] }
+      }
+    },
+
+    "plusreality": {
+      "nazov": "Plus Reality",
+      "clickup_folder": "901517180004",
+      "domains": [],
+      "addresses": [],
+      "projekty": {
+        "plusreality-crm": { "clickup_list": "901524938711", "keywords": [] }
+      }
+    },
+
+    "lestero": {
+      "nazov": "Lestero",
+      "clickup_folder": "901517214019",
+      "domains": [],
+      "addresses": [],
+      "projekty": {
+        "lestero-crm": { "clickup_list": "901524984890", "keywords": [] }
+      }
+    },
+
+    "gartner": {
+      "nazov": "Gartner",
+      "clickup_folder": "901517215054",
+      "domains": [],
+      "addresses": [],
+      "projekty": {
+        "gartner-projekt": { "clickup_list": "901524986253", "keywords": [] }
+      }
+    },
+
+    "1plus1": {
+      "nazov": "1plus1",
+      "clickup_folder": "1200230000000759",
+      "domains": [],
+      "addresses": [],
+      "projekty": {
+        "1plus1-crm": { "clickup_list": "1200230000000711", "keywords": [] }
+      }
+    },
+
+    "colorlak": {
+      "nazov": "Colorlak",
+      "clickup_folder": "1200230000000760",
+      "domains": [],
+      "addresses": [],
+      "projekty": {
+        "colorlak-kalkulacka": { "clickup_list": "1200230000000712", "keywords": [] }
+      }
+    }
+  }
+}

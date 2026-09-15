@@ -1,0 +1,94 @@
+{
+  "name": "IMPOFAI Brain",
+  "port": 4640,
+  "sources": [
+    {
+      "id": "klienti",
+      "label": "Klienti",
+      "paths": [
+        "context/klienti/imagewell.md",
+        "context/klienti/startfin.md",
+        "context/klienti/bridgit.md",
+        "context/klienti/dubove-parkety.md"
+      ],
+      "color": "#F87171",
+      "staleDays": null,
+      "type": "markdown"
+    },
+    {
+      "id": "projekty",
+      "label": "Projekty",
+      "paths": [
+        "context/klienti/imagewell/printingshop.md",
+        "context/klienti/imagewell/iw-2nd-brain.md",
+        "context/klienti/startfin/startfin-app.md",
+        "context/klienti/bridgit/bridgit-platforma.md",
+        "context/klienti/dubove-parkety/dubove-parkety-ai.md"
+      ],
+      "color": "#A78BFA",
+      "staleDays": null,
+      "type": "markdown"
+    },
+    {
+      "id": "komunikacia",
+      "label": "Komunikacia",
+      "paths": [
+        "context/klienti"
+      ],
+      "color": "#94A3B8",
+      "staleDays": null,
+      "type": "markdown"
+    },
+    {
+      "id": "kontext",
+      "label": "Kontext firmy",
+      "paths": [
+        "context"
+      ],
+      "exclude": [
+        "klienti"
+      ],
+      "color": "#38BDF8",
+      "staleDays": 90,
+      "type": "markdown"
+    },
+    {
+      "id": "manual",
+      "label": "Operacny manual",
+      "paths": [
+        "CLAUDE.md",
+        "AGENTS.md",
+        "README.md",
+        "EXPANSIONS.md",
+        "connections.md",
+        "aios-intake.md",
+        "decisions"
+      ],
+      "color": "#F472B6",
+      "staleDays": 90,
+      "type": "markdown"
+    },
+    {
+      "id": "referencie",
+      "label": "Referencie",
+      "paths": [
+        "references"
+      ],
+      "color": "#FBBF24",
+      "staleDays": 180,
+      "type": "markdown"
+    },
+    {
+      "id": "konkurencia",
+      "label": "Sken konkurencie",
+      "paths": [
+        "data/konkurencia/snapshots"
+      ],
+      "color": "#34D399",
+      "staleDays": null,
+      "type": "markdown"
+    }
+  ],
+  "maxNodes": 3000,
+  "_comment": "Kategorie a farby pre /3d-brain. Skopiruj do apps/3d-brain/brain.config.json po scaffolde, alebo to sprav rovno pri behu skillu. Poradie zdrojov je dolezite: klienti a projekty musia byt PRED komunikaciou a kontextom, lebo prvy zdroj si subor naroko a dalsie ho preskocia."
+}

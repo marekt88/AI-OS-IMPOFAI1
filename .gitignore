@@ -9,17 +9,31 @@ audits/
 brainstorms/
 .scratch/
 
-# Generovana 3D aplikacia - stavia sa lokalne z template, do cloudu nepatri
+# Generovana 3D aplikacia - stavia sa lokalne z template, do cloudu nepatri.
+# Rozdelenie kategorii a farieb je verzionovane v data/3d-brain-sources.json,
+# aby ho rebuild na inom stroji reprodukoval.
 apps/3d-brain/
 
 # ---------------------------------------------------------------------------
-# SUKROMIE: klientske a osobne data. Nepatria do repozitara ani privatneho -
-# obsahuju prijmy klientov, odpracovane hodiny ludi a emaily tretich stran.
+# SUKROMIE - pravidlo zmenene 2026-09-15.
+#
+# Klientske data UZ SU v repozitari, aby ich videl 3D brain a aby ich vedel
+# citat cloudovy beh. Namiesto vylucenia sa oznacuju priznakom:
+#
+#     private: true    vo frontmatteri kazdeho takeho suboru
+#
+# Pred tym, nez das niekomu pristup do repozitara, spusti:
+#     node scripts/private-scan.mjs
+# vypise presne, ktore subory su citlive.
+#
+# STALE PLATI - do repozitara NIKDY nejde:
+#   - heslo, API kluc, token, pristupovy udaj (maily ich bezne obsahuju!)
+#   - doslovne telo mailu alebo prepis hovoru; zapisuje sa zistenie, nie zdroj
+#   - prijmy klientov a odpracovane hodiny ludi
 # ---------------------------------------------------------------------------
 context/emailova-mapa.md
 context/projekty-a-tim.md
 context/clickup-prehlad.md
-context/klienti/
 
 # ---------------------------------------------------------------------------
 # MONITORING KONKURENCIE

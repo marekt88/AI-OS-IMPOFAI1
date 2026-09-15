@@ -23,6 +23,7 @@ Read `references/3ms-framework.md` once. It's how {{Your Name}} thinks about AI 
 ## Where things live
 
 - `context/` — about you, your business, your priorities (filled by `/onboard`)
+- `context/klienti/` — klienti, ich projekty a komunikácia (maily, meetingy, WhatsApp). Všetko má `private: true`. Pred zdieľaním repozitára spusti `node scripts/private-scan.mjs`. Smerovanie je v `data/klienti/routing.json`.
 - `references/` — frameworks, voice samples, API guides as you connect tools
 - `connections.md` — registry of every system your AIOS can reach
 - `decisions/log.md` — append-only record of decisions and why
@@ -54,6 +55,16 @@ Borrowed from the `adhd` skill's anti-patterns: walls of equally-weighted prose,
 
 `/adhd` runs parallel divergent ideation: ~10 subagents, 30-90s, 5-10x cost.
 Never run it on your own initiative. Only when I type `/adhd` or ask for it by name.
+
+## Klientske data
+
+Klientske dáta sú v repozitári, označené `private: true` vo frontmatteri. Do repozitára ale NIKDY nejde:
+
+- heslo, API kľúč, token ani prístupový údaj (maily ich bežne obsahujú)
+- doslovné telo mailu alebo prepis hovoru — zapisuje sa zistenie a odkaz na zdroj, nie zdroj
+- príjmy klientov a odpracované hodiny ľudí
+
+Pri publikovaní artefaktu nikdy nezahŕňaj súbory s `private: true`.
 
 ## Voice
 
