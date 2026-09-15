@@ -8,7 +8,29 @@ node_modules/
 audits/
 brainstorms/
 .scratch/
+
+# Generovana 3D aplikacia - stavia sa lokalne z template, do cloudu nepatri
 apps/3d-brain/
+
+# ---------------------------------------------------------------------------
+# SUKROMIE: klientske a osobne data. Nepatria do repozitara ani privatneho -
+# obsahuju prijmy klientov, odpracovane hodiny ludi a emaily tretich stran.
+# ---------------------------------------------------------------------------
 context/emailova-mapa.md
 context/projekty-a-tim.md
 context/clickup-prehlad.md
+context/klienti/
+
+# ---------------------------------------------------------------------------
+# MONITORING KONKURENCIE
+# Snapshoty a zoznamy URL su STAV, nie docasne data. Cloudovy beh dostava pri
+# kazdom spusteni cerstvy checkout, takze bez nich by nemal s cim porovnavat
+# a donekonecna by hlasil "baseline". Preto su verzionovane.
+# Obsahuju vyhradne verejne weby cudzich firiem.
+# ---------------------------------------------------------------------------
+# data/konkurencia/snapshots/   <- verzionovane zamerne
+# data/konkurencia/urls/        <- verzionovane zamerne
+# context/konkurencia/          <- tyzdenne reporty, deliverable
+
+# Diffy sa generuju pri kazdom behu nanovo, netreba ich drzat.
+data/konkurencia/diffs/

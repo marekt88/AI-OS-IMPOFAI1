@@ -1,0 +1,125 @@
+{
+  "note": "Watchlist pre monitoring konkurencie IMPOFAI. Kazdy zaznam: slug, nazov, a zoznam stranok (label + url). Pridavaj nove firmy sem, skript sa prisposobi sam.",
+  "competitors": [
+    {
+      "slug": "webize",
+      "name": "WEBIZE",
+      "pages": [
+        {
+          "label": "domov",
+          "url": "https://webize.sk/"
+        },
+        {
+          "label": "hlasovy-asistent",
+          "url": "https://webize.sk/sluzby/ai-hlasovy-asistent-voicebot"
+        }
+      ],
+      "site": "webize.sk"
+    },
+    {
+      "slug": "mrdigital",
+      "name": "MR Digital",
+      "pages": [
+        {
+          "label": "domov",
+          "url": "https://mrdigital.sk/"
+        },
+        {
+          "label": "ai-agenti",
+          "url": "https://mrdigital.sk/ai-agenti-skolenia"
+        },
+        {
+          "label": "n8n",
+          "url": "https://mrdigital.sk/n8n-automatizacia"
+        }
+      ],
+      "site": "mrdigital.sk"
+    },
+    {
+      "slug": "aiai",
+      "name": "AIAI.SK",
+      "pages": [
+        {
+          "label": "domov",
+          "url": "https://aiai.sk/"
+        },
+        {
+          "label": "automatizacia",
+          "url": "https://aiai.sk/automatizacia-procesov"
+        }
+      ],
+      "site": "aiai.sk"
+    },
+    {
+      "slug": "apertia",
+      "name": "Apertia.ai (CZ)",
+      "pages": [
+        {
+          "label": "domov",
+          "url": "https://apertia.ai/sk"
+        }
+      ],
+      "site": "apertia.ai"
+    },
+    {
+      "slug": "chatbotnamieru",
+      "name": "chatbotnamieru.sk",
+      "pages": [
+        {
+          "label": "domov",
+          "url": "https://www.chatbotnamieru.sk/"
+        },
+        {
+          "label": "hlasovy-asistent",
+          "url": "https://www.chatbotnamieru.sk/ai-hlasovy-asistent"
+        }
+      ],
+      "site": "www.chatbotnamieru.sk"
+    },
+    {
+      "slug": "iworker",
+      "name": "iWorker",
+      "pages": [
+        {
+          "label": "domov",
+          "url": "https://iworker.sk/"
+        }
+      ],
+      "site": "iworker.sk"
+    },
+    {
+      "slug": "artemina",
+      "name": "Artemina",
+      "pages": [
+        {
+          "label": "domov",
+          "url": "https://www.artemina.sk/"
+        },
+        {
+          "label": "blog",
+          "url": "https://www.artemina.sk/blog"
+        }
+      ],
+      "site": "www.artemina.sk"
+    },
+    {
+      "slug": "slovensko-ai",
+      "name": "Slovensko.ai (INBOX SK)",
+      "pages": [
+        {
+          "label": "domov",
+          "url": "https://firmy.slovensko.ai/"
+        },
+        {
+          "label": "hlasovy-agent",
+          "url": "https://firmy.slovensko.ai/sluzby/hlasovy-agent/"
+        },
+        {
+          "label": "konzultacie",
+          "url": "https://firmy.slovensko.ai/ai-konzultacie/"
+        }
+      ],
+      "site": "firmy.slovensko.ai"
+    }
+  ]
+}

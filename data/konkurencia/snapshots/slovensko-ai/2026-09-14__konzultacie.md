@@ -1,0 +1,324 @@
+Vážime si vaše súkromie
+Prispôsobiť Odmietnuť Prijať všetko
+Necessary Vždy aktívny
+* Trvanie Never Expires
+* Trvanie session
+* Trvanie 1 year
+* Trvanie session
+Functional
+Analytics
+- [x]
+* Trvanie session
+* Trvanie 1 hour
+Performance
+Advertisement
+Uncategorised
+- [x]
+* Trvanie 1 year 1 month 4 days
+* Popis Description is currently not available.
+* Trvanie 1 year 1 month 4 days
+* Popis Description is currently not available.
+* Trvanie 1 day
+* Popis Description is currently not available.
+Odmietnuť Uložiť moje predvoľby Prijať všetko
+[![Image 5](https://firmy.slovensko.ai/wp-content/uploads/2025/02/firmy-logo-new-1-1024x248.png)](https://firmy.slovensko.ai/ "Hľadáte AI pre firmu? Nasadíme AI chatboty, hlasového asistenta, AI servery aj riešenia na mieru. Rýchla implementácia, jasné výsledky. Dohodnite si konzultáciu")
+* [AI služby](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
+* [Všetky AI služby](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
+* [AI hlasový agent](https://firmy.slovensko.ai/sluzby/hlasovy-agent/ "Zefektívnite firemnú komunikáciu s AI hlasovým asistentom. Volá s klientom, odpovedá nonstop a šetrí váš čas. Riešenie šité na mieru pre firmy.")
+* [AI Automatizácia procesov](https://firmy.slovensko.ai/sluzby/ai-automatizacia-procesov/ "Zefektívnite firemné procesy pomocou AI riešení na mieru. Menej chýb, nižšie náklady a vyšší výkon pre vašu firmu.")
+* [AI server](https://firmy.slovensko.ai/ai-server/ "Hľadáte spoľahlivý AI server? Ponúkame výkonné, škálovateľné a bezpečné servery pre AI, strojové učenie a dátové analýzy. Získajte riešenie na mieru ešte dnes!")
+* [AI Chatbot](https://firmy.slovensko.ai/chatbot/ "Využite AI chatbot od Slovensko.ai na zlepšenie zákazníckeho servisu a automatizáciu komunikácie. Rýchle, presné a dostupné riešenia pre moderné firmy.")
+* [AI konzultácie](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [AI CRM systém](https://firmy.slovensko.ai/sluzby/ai-crm/ "AI CRM systémna mieru Získajte prehľad o zákazníkoch a firemných dátach v jednom inteligentnom CRM systéme. AI CRM prispôsobíme vašim procesom,")
+* [E-mailový AI agent](https://firmy.slovensko.ai/e-mailovy-ai-agent/ "Zjednodušte e-mailovú komunikáciu s naším E-mailovým AI agentom. Využite AI na automatické spracovanie, analýzu a odpovedanie na e-maily.")
+* [AI kurzy](https://www.slovensko.ai/kurzy-ai/ "Zlepšite svoje zručnosti s prezenčnými a online kurzami o umelej inteligencii. Naučte sa, ako využiť AI technológie v praxi. Začnite ešte dnes s Slovensko.ai!")
+* [Všetky kurzy](https://www.slovensko.ai/kurzy-ai/ "Zlepšite svoje zručnosti s prezenčnými a online kurzami o umelej inteligencii. Naučte sa, ako využiť AI technológie v praxi. Začnite ešte dnes s Slovensko.ai!")
+* [Termíny kurzov](https://www.slovensko.ai/terminy-kurzov/ "Vyberte si z našej ponuky AI kurzov od Slovensko.AI a zlepšite vaše schopnosti v oblasti umelej inteligencie.")
+* [Umelá inteligencia](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/ "Zúčastnite sa kurzov o umelej inteligencii. Získajte praktické zručnosti na automatizáciu, zvýšenie produktivity a riešenie reálnych firemných problémov.")
+* [Všetky AI kurzy](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/ "Zúčastnite sa kurzov o umelej inteligencii. Získajte praktické zručnosti na automatizáciu, zvýšenie produktivity a riešenie reálnych firemných problémov.")
+* [Umelá Inteligencia **I**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-i/ "Naučte sa základy umelej inteligencie, efektívne písanie promptov a AI nástroje za 1 deň. Prezenčný & online kurz s praktickými ukážkami len za 150 € bez DPH.")
+* [Umelá Inteligencia **II**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-ii/ "Prehĺbte si AI zručnosti na našom kurze. Naučíte sa pokročilé techniky s ChatGPT, automatizáciu, právne regulácie AI a využitie nástrojov ako Gemini, Claude a Copilot.")
+* [Umelá Inteligencia **III**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-nadstavba-3/ "Pokročilý prezenčný kurz AI: dokumenty, dáta, produktivita. Naučte sa reporting v Exceli, tvorbu AI agenta a automatizáciu.")
+* [Umelá Inteligencia **IV**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/prezencny-umela-inteligencia-iv/ "Pokročilý 1-dňový AI kurz zameraný na marketing, SEO, tvorbu webu, prototypovanie, Claude, Lovable a jednoduché aplikácie bez programovania.")
+* [Umelá Inteligencia **I + II**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-komplet/ "Komplexné školenie AI od základov po pokročilé techniky. Pre firmy, tímy aj jednotlivcov. Praktické ukážky, AI nástroje, prompty a automatizácia.")
+* [Umelá Inteligencia **I + II + III**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/prezencny-umela-inteligencia-komplexny-ai-kurz/ "Naučte sa prakticky využívať AI pri práci, tvorbe obsahu, dokumentoch, plánovaní a automatizáciách. 3-dňový kurz pre firmy, manažérov aj zamestnancov.")
+* [Umelá Inteligencia **I + II + III + IV**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/prezencny-umela-inteligencia-i-iv/ "4-dňový AI kurz od základov po pokročilú prax. Naučte sa promptovať, pracovať s dokumentmi, dátami, AI agentmi, automatizáciami, SEO a webmi.")
+* [AI nástroje (LLM)](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [Microsoft Copilot](https://www.slovensko.ai/kurzy-ai/microsoft-copilot/ "Za jeden deň sa naučíte používať Copilot Chat aj Copilota v Microsoft 365. Email, porady, dokumenty, prezentácie, dáta, agenti a automatizácie.")
+* [Microsoft Copilot Studio](https://www.slovensko.ai/kurzy-ai/microsoft-copilot-studio/ "Praktický kurz Microsoft Copilot Studio. Naučte sa vytvárať AI agentov, prepájať zdroje, automatizovať procesy a publikovať ich v Teams.")
+* [Google GEMINI](https://www.slovensko.ai/kurzy-ai/google-gemini/ "Praktický kurz Google Gemini pre začiatočníkov aj firmy. Naučte sa využívať Gemini a Google Workspace v praxi. Online aj prezenčne v Bratislave.")
+* [Claude Anthropic](https://www.slovensko.ai/kurzy-ai/claude/ "Praktický AI kurz Claude vás naučí pracovať s Claude AI, promptmi, artefaktmi, projektmi, automatizáciami bez programovania a bezpečným využitím AI vo firme.")
+* [Claude Code](https://www.slovensko.ai/kurzy-ai/claude-code/ "Naučte sa používať Claude Code pri programovaní, úprave kódu, testovaní, refaktoringu a automatizácii vývoja. Praktický dvojdňový kurz.")
+* [ChatGPT](https://www.slovensko.ai/kurzy-ai/chatgpt/ "Praktický jednodňový kurz ChatGPT pre začiatočníkov aj firmy. Naučte sa promptovanie, prácu so súbormi, obrázkami, projektmi a tvorbu Custom GPT.")
+* [Špecializované AI kurzy](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [AI v Marketingu](https://www.slovensko.ai/kurzy-ai/ai-marketing/ "Praktický kurz pre marketérov a firmy, ktoré chcú používať AI na rýchlejšiu tvorbu výstupov, lepšie rozhodovanie a efektívnejšiu marketingovú prácu.")
+* [Ako sa dostať do AI odpovedí](https://www.slovensko.ai/kurzy-ai/kurz-ai-v-seo/ "Naučte sa, ako dostať svoj web, firmu a obsah do AI nástrojov a moderného vyhľadávania. Praktický kurz zameraný na viditeľnosť v AI.")
+* [AI grafika a videá](https://www.slovensko.ai/kurzy-ai/ai-grafika-a-videa/ "Praktický jednodňový kurz AI grafiky a videa. Naučte sa vytvárať obrázky, reklamné vizuály, videá, animácie a AI avatarov pre web a sociálne siete.")
+* [AI transformácia firiem](https://www.slovensko.ai/kurzy-ai/ai-transformacia-firiem/ "Dvojdňový praktický kurz AI transformácie firiem. Zmapujte procesy, nastavte AI stratégiu a vytvorte konkrétnu roadmapu zavádzania AI vo firme.")
+* [AI developer](https://www.slovensko.ai/kurzy-ai/ai-developer-kurz/ "Praktický kurz AI Developer ťa naučí budovať vlastné aplikácie s umelou inteligenciou. Získaj zručnosti v práci s modelmi, API a AI frameworkami | Slovensko.ai")
+* [Firemné školenia](https://www.slovensko.ai/firemne-kurzy/ "Naučte svoj tím pracovať s umelou inteligenciou bez zložitej teórie. Firemné školenia AI, ChatGPT a ďalších nástrojov zamerané na konkrétne výsledky vo vašej firme.")
+* [Granty](https://www.slovensko.ai/granty-ai-kurzy/ "Získajte štátne granty na AI kurzy s preplatením až do 100 %. Kompletnú administratívu s Úradom práce aj systémom ITMS21+ vybavíme kompletne za vás.")
+* [Zručnosti pre trh práce](https://www.slovensko.ai/zrucnosti-pre-trh-prace/ "Získajte AI kurzy zadarmo cez projekt Zručnosti pre trh práce. Naučte sa umelú inteligenciu od základov po pokročilé a získajte praktické zručnosti.")
+* [Online kurzy](https://www.slovensko.ai/kurzy/ "Kurzy - Slovensko.AI")
+* [AI Zdroje](https://firmy.slovensko.ai/vyuzitie-ai-vo-firmach/ "Zlepšite efektivitu vašej firmy s AI riešeniami na mieru! Ponúkame AI chatboty, emailových agentov, AI servery a konzultácie pre firemné inovácie.")
+* [Newsletter](https://www.slovensko.ai/newsletter/ "Prihláste sa do nášho newslettera \"AI týždeň so Slovensko.AI\" a získajte každý týždeň čerstvé informácie, novinky a inšpirácie zo sveta umelej inteligencie. Objavte, ako AI mení svet a buďte vždy o krok vpred.")
+* [Webinár](https://firmy.slovensko.ai/webinar/ "Zistite, ako si automatizácia rutinných administratívnych úloh pomocou AI. Pridajte sa na bezplatný online webinár 11.6.2026 o 17:00.")
+* [E-book](https://www.slovensko.ai/e-book/ "Stiahnite si zdarma e-knihu \"Sprievodca svetom umelej inteligencie\" a odhaľte základy AI, jej možnosti a trendy v budúcnosti. Táto e-kniha vám poskytne praktické rady a príklady, ako využiť umelú inteligenciu v každodennom živote aj v práci. Ideálny sprievodca pre začiatočníkov a technických nadšencov!")
+* [E-shop](https://firmy.slovensko.ai/e-shop/ "Nakupujte profesionálne grafické karty Nvidia Tesla A100 a servery optimalizované pre AI výpočty. Špecializovaný e-shop pre firmy a vývojárov umelej inteligencie.")
+* [AI vo firmách](https://firmy.slovensko.ai/vyuzitie-ai-vo-firmach/ "Zlepšite efektivitu vašej firmy s AI riešeniami na mieru! Ponúkame AI chatboty, emailových agentov, AI servery a konzultácie pre firemné inovácie.")
+* [AI nástroje](https://firmy.slovensko.ai/ai-nastroje/ "Objavte AI nástroje, ktoré vám pomôžu zlepšiť produktivitu, automatizovať procesy a transformovať podnikanie. Slovensko.ai prináša praktické riešenia pre firmy.")
+* [Blog](https://firmy.slovensko.ai/ai-blog/ "Objavte najnovšie články, novinky a trendy v oblasti umelej inteligencie na blogu Slovensko.ai. Inšpirujte sa príbehmi a riešeniami, ktoré formujú budúcnosť technológií.")
+* [Use cases](https://firmy.slovensko.ai/sluzby/use-cases/ "Inšpirujte sa konkrétnymi príkladmi, ako naše AI riešenia – chatboty, hlasoví asistenti, automatizácia a e-mailoví agenti.")
+* [O nás](https://firmy.slovensko.ai/o-nas/ "Slovensko.ai je AI partner pre firmy. Navrhujeme a nasadzujeme AI riešenia na mieru, AI chatboty, automatizáciu procesov, školenia a podporu po nasadení.")
+* [Kontakt](https://firmy.slovensko.ai/kontakt/ "Máte otázky k AI riešeniam pre firmy? Kontaktujte Slovensko.ai telefonicky alebo e mailom. Ponúkame aj bezplatné 30 min AI poradenstvo.")
+* [Partneri](https://firmy.slovensko.ai/nasipartneri/ "Pridajte sa k Slovensko.ai ako strategický partner a podieľajte sa na formovaní budúcnosti umelej inteligencie. Vytvárajme inovatívne riešenia a posúvajme hranice technológií spoločne.")
+* [Stať sa partnerom](https://firmy.slovensko.ai/nasipartneri/ "Pridajte sa k Slovensko.ai ako strategický partner a podieľajte sa na formovaní budúcnosti umelej inteligencie. Vytvárajme inovatívne riešenia a posúvajme hranice technológií spoločne.")
+* [Naši partneri](https://firmy.slovensko.ai/companies/ "Spoznajte partnerov Slovensko.ai, ktorí s nami spolupracujú na tvorbe inovatívnych riešení umelej inteligencie. Spoločne budujeme moderné technológie a posúvame hranice inovácií.")
+* [Kariéra](https://www.slovensko.ai/ai-kariera/ "Chceš pracovať na AI projektoch, ktoré pomáhajú slovenským firmám? Pozri si otvorené pozície v Slovensko.ai a prihlás sa do tímu.")
+Menu
+* [AI služby](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
+* [Všetky AI služby](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
+* [AI hlasový agent](https://firmy.slovensko.ai/sluzby/hlasovy-agent/ "Zefektívnite firemnú komunikáciu s AI hlasovým asistentom. Volá s klientom, odpovedá nonstop a šetrí váš čas. Riešenie šité na mieru pre firmy.")
+* [AI Automatizácia procesov](https://firmy.slovensko.ai/sluzby/ai-automatizacia-procesov/ "Zefektívnite firemné procesy pomocou AI riešení na mieru. Menej chýb, nižšie náklady a vyšší výkon pre vašu firmu.")
+* [AI server](https://firmy.slovensko.ai/ai-server/ "Hľadáte spoľahlivý AI server? Ponúkame výkonné, škálovateľné a bezpečné servery pre AI, strojové učenie a dátové analýzy. Získajte riešenie na mieru ešte dnes!")
+* [AI Chatbot](https://firmy.slovensko.ai/chatbot/ "Využite AI chatbot od Slovensko.ai na zlepšenie zákazníckeho servisu a automatizáciu komunikácie. Rýchle, presné a dostupné riešenia pre moderné firmy.")
+* [AI konzultácie](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [AI CRM systém](https://firmy.slovensko.ai/sluzby/ai-crm/ "AI CRM systémna mieru Získajte prehľad o zákazníkoch a firemných dátach v jednom inteligentnom CRM systéme. AI CRM prispôsobíme vašim procesom,")
+* [E-mailový AI agent](https://firmy.slovensko.ai/e-mailovy-ai-agent/ "Zjednodušte e-mailovú komunikáciu s naším E-mailovým AI agentom. Využite AI na automatické spracovanie, analýzu a odpovedanie na e-maily.")
+* [AI kurzy](https://www.slovensko.ai/kurzy-ai/ "Zlepšite svoje zručnosti s prezenčnými a online kurzami o umelej inteligencii. Naučte sa, ako využiť AI technológie v praxi. Začnite ešte dnes s Slovensko.ai!")
+* [Všetky kurzy](https://www.slovensko.ai/kurzy-ai/ "Zlepšite svoje zručnosti s prezenčnými a online kurzami o umelej inteligencii. Naučte sa, ako využiť AI technológie v praxi. Začnite ešte dnes s Slovensko.ai!")
+* [Termíny kurzov](https://www.slovensko.ai/terminy-kurzov/ "Vyberte si z našej ponuky AI kurzov od Slovensko.AI a zlepšite vaše schopnosti v oblasti umelej inteligencie.")
+* [Umelá inteligencia](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/ "Zúčastnite sa kurzov o umelej inteligencii. Získajte praktické zručnosti na automatizáciu, zvýšenie produktivity a riešenie reálnych firemných problémov.")
+* [Všetky AI kurzy](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/ "Zúčastnite sa kurzov o umelej inteligencii. Získajte praktické zručnosti na automatizáciu, zvýšenie produktivity a riešenie reálnych firemných problémov.")
+* [Umelá Inteligencia **I**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-i/ "Naučte sa základy umelej inteligencie, efektívne písanie promptov a AI nástroje za 1 deň. Prezenčný & online kurz s praktickými ukážkami len za 150 € bez DPH.")
+* [Umelá Inteligencia **II**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-ii/ "Prehĺbte si AI zručnosti na našom kurze. Naučíte sa pokročilé techniky s ChatGPT, automatizáciu, právne regulácie AI a využitie nástrojov ako Gemini, Claude a Copilot.")
+* [Umelá Inteligencia **III**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-nadstavba-3/ "Pokročilý prezenčný kurz AI: dokumenty, dáta, produktivita. Naučte sa reporting v Exceli, tvorbu AI agenta a automatizáciu.")
+* [Umelá Inteligencia **IV**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/prezencny-umela-inteligencia-iv/ "Pokročilý 1-dňový AI kurz zameraný na marketing, SEO, tvorbu webu, prototypovanie, Claude, Lovable a jednoduché aplikácie bez programovania.")
+* [Umelá Inteligencia **I + II**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-komplet/ "Komplexné školenie AI od základov po pokročilé techniky. Pre firmy, tímy aj jednotlivcov. Praktické ukážky, AI nástroje, prompty a automatizácia.")
+* [Umelá Inteligencia **I + II + III**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/prezencny-umela-inteligencia-komplexny-ai-kurz/ "Naučte sa prakticky využívať AI pri práci, tvorbe obsahu, dokumentoch, plánovaní a automatizáciách. 3-dňový kurz pre firmy, manažérov aj zamestnancov.")
+* [Umelá Inteligencia **I + II + III + IV**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/prezencny-umela-inteligencia-i-iv/ "4-dňový AI kurz od základov po pokročilú prax. Naučte sa promptovať, pracovať s dokumentmi, dátami, AI agentmi, automatizáciami, SEO a webmi.")
+* [AI nástroje (LLM)](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [Microsoft Copilot](https://www.slovensko.ai/kurzy-ai/microsoft-copilot/ "Za jeden deň sa naučíte používať Copilot Chat aj Copilota v Microsoft 365. Email, porady, dokumenty, prezentácie, dáta, agenti a automatizácie.")
+* [Microsoft Copilot Studio](https://www.slovensko.ai/kurzy-ai/microsoft-copilot-studio/ "Praktický kurz Microsoft Copilot Studio. Naučte sa vytvárať AI agentov, prepájať zdroje, automatizovať procesy a publikovať ich v Teams.")
+* [Google GEMINI](https://www.slovensko.ai/kurzy-ai/google-gemini/ "Praktický kurz Google Gemini pre začiatočníkov aj firmy. Naučte sa využívať Gemini a Google Workspace v praxi. Online aj prezenčne v Bratislave.")
+* [Claude Anthropic](https://www.slovensko.ai/kurzy-ai/claude/ "Praktický AI kurz Claude vás naučí pracovať s Claude AI, promptmi, artefaktmi, projektmi, automatizáciami bez programovania a bezpečným využitím AI vo firme.")
+* [Claude Code](https://www.slovensko.ai/kurzy-ai/claude-code/ "Naučte sa používať Claude Code pri programovaní, úprave kódu, testovaní, refaktoringu a automatizácii vývoja. Praktický dvojdňový kurz.")
+* [ChatGPT](https://www.slovensko.ai/kurzy-ai/chatgpt/ "Praktický jednodňový kurz ChatGPT pre začiatočníkov aj firmy. Naučte sa promptovanie, prácu so súbormi, obrázkami, projektmi a tvorbu Custom GPT.")
+* [Špecializované AI kurzy](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [AI v Marketingu](https://www.slovensko.ai/kurzy-ai/ai-marketing/ "Praktický kurz pre marketérov a firmy, ktoré chcú používať AI na rýchlejšiu tvorbu výstupov, lepšie rozhodovanie a efektívnejšiu marketingovú prácu.")
+* [Ako sa dostať do AI odpovedí](https://www.slovensko.ai/kurzy-ai/kurz-ai-v-seo/ "Naučte sa, ako dostať svoj web, firmu a obsah do AI nástrojov a moderného vyhľadávania. Praktický kurz zameraný na viditeľnosť v AI.")
+* [AI grafika a videá](https://www.slovensko.ai/kurzy-ai/ai-grafika-a-videa/ "Praktický jednodňový kurz AI grafiky a videa. Naučte sa vytvárať obrázky, reklamné vizuály, videá, animácie a AI avatarov pre web a sociálne siete.")
+* [AI transformácia firiem](https://www.slovensko.ai/kurzy-ai/ai-transformacia-firiem/ "Dvojdňový praktický kurz AI transformácie firiem. Zmapujte procesy, nastavte AI stratégiu a vytvorte konkrétnu roadmapu zavádzania AI vo firme.")
+* [AI developer](https://www.slovensko.ai/kurzy-ai/ai-developer-kurz/ "Praktický kurz AI Developer ťa naučí budovať vlastné aplikácie s umelou inteligenciou. Získaj zručnosti v práci s modelmi, API a AI frameworkami | Slovensko.ai")
+* [Firemné školenia](https://www.slovensko.ai/firemne-kurzy/ "Naučte svoj tím pracovať s umelou inteligenciou bez zložitej teórie. Firemné školenia AI, ChatGPT a ďalších nástrojov zamerané na konkrétne výsledky vo vašej firme.")
+* [Granty](https://www.slovensko.ai/granty-ai-kurzy/ "Získajte štátne granty na AI kurzy s preplatením až do 100 %. Kompletnú administratívu s Úradom práce aj systémom ITMS21+ vybavíme kompletne za vás.")
+* [Zručnosti pre trh práce](https://www.slovensko.ai/zrucnosti-pre-trh-prace/ "Získajte AI kurzy zadarmo cez projekt Zručnosti pre trh práce. Naučte sa umelú inteligenciu od základov po pokročilé a získajte praktické zručnosti.")
+* [Online kurzy](https://www.slovensko.ai/kurzy/ "Kurzy - Slovensko.AI")
+* [AI Zdroje](https://firmy.slovensko.ai/vyuzitie-ai-vo-firmach/ "Zlepšite efektivitu vašej firmy s AI riešeniami na mieru! Ponúkame AI chatboty, emailových agentov, AI servery a konzultácie pre firemné inovácie.")
+* [Newsletter](https://www.slovensko.ai/newsletter/ "Prihláste sa do nášho newslettera \"AI týždeň so Slovensko.AI\" a získajte každý týždeň čerstvé informácie, novinky a inšpirácie zo sveta umelej inteligencie. Objavte, ako AI mení svet a buďte vždy o krok vpred.")
+* [Webinár](https://firmy.slovensko.ai/webinar/ "Zistite, ako si automatizácia rutinných administratívnych úloh pomocou AI. Pridajte sa na bezplatný online webinár 11.6.2026 o 17:00.")
+* [E-book](https://www.slovensko.ai/e-book/ "Stiahnite si zdarma e-knihu \"Sprievodca svetom umelej inteligencie\" a odhaľte základy AI, jej možnosti a trendy v budúcnosti. Táto e-kniha vám poskytne praktické rady a príklady, ako využiť umelú inteligenciu v každodennom živote aj v práci. Ideálny sprievodca pre začiatočníkov a technických nadšencov!")
+* [E-shop](https://firmy.slovensko.ai/e-shop/ "Nakupujte profesionálne grafické karty Nvidia Tesla A100 a servery optimalizované pre AI výpočty. Špecializovaný e-shop pre firmy a vývojárov umelej inteligencie.")
+* [AI vo firmách](https://firmy.slovensko.ai/vyuzitie-ai-vo-firmach/ "Zlepšite efektivitu vašej firmy s AI riešeniami na mieru! Ponúkame AI chatboty, emailových agentov, AI servery a konzultácie pre firemné inovácie.")
+* [AI nástroje](https://firmy.slovensko.ai/ai-nastroje/ "Objavte AI nástroje, ktoré vám pomôžu zlepšiť produktivitu, automatizovať procesy a transformovať podnikanie. Slovensko.ai prináša praktické riešenia pre firmy.")
+* [Blog](https://firmy.slovensko.ai/ai-blog/ "Objavte najnovšie články, novinky a trendy v oblasti umelej inteligencie na blogu Slovensko.ai. Inšpirujte sa príbehmi a riešeniami, ktoré formujú budúcnosť technológií.")
+* [Use cases](https://firmy.slovensko.ai/sluzby/use-cases/ "Inšpirujte sa konkrétnymi príkladmi, ako naše AI riešenia – chatboty, hlasoví asistenti, automatizácia a e-mailoví agenti.")
+* [O nás](https://firmy.slovensko.ai/o-nas/ "Slovensko.ai je AI partner pre firmy. Navrhujeme a nasadzujeme AI riešenia na mieru, AI chatboty, automatizáciu procesov, školenia a podporu po nasadení.")
+* [Kontakt](https://firmy.slovensko.ai/kontakt/ "Máte otázky k AI riešeniam pre firmy? Kontaktujte Slovensko.ai telefonicky alebo e mailom. Ponúkame aj bezplatné 30 min AI poradenstvo.")
+* [Partneri](https://firmy.slovensko.ai/nasipartneri/ "Pridajte sa k Slovensko.ai ako strategický partner a podieľajte sa na formovaní budúcnosti umelej inteligencie. Vytvárajme inovatívne riešenia a posúvajme hranice technológií spoločne.")
+* [Stať sa partnerom](https://firmy.slovensko.ai/nasipartneri/ "Pridajte sa k Slovensko.ai ako strategický partner a podieľajte sa na formovaní budúcnosti umelej inteligencie. Vytvárajme inovatívne riešenia a posúvajme hranice technológií spoločne.")
+* [Naši partneri](https://firmy.slovensko.ai/companies/ "Spoznajte partnerov Slovensko.ai, ktorí s nami spolupracujú na tvorbe inovatívnych riešení umelej inteligencie. Spoločne budujeme moderné technológie a posúvame hranice inovácií.")
+* [Kariéra](https://www.slovensko.ai/ai-kariera/ "Chceš pracovať na AI projektoch, ktoré pomáhajú slovenským firmám? Pozri si otvorené pozície v Slovensko.ai a prihlás sa do tímu.")
+* [Slovensko.AI](https://www.slovensko.ai/ "Objavte kurzy o umelej inteligencii, AI chatboty a nástroje na dosah ruky. Naučte sa pracovať s modernými technológiami a využite AI vo svojom živote či podnikaní.")
+Menu
+* [Slovensko.AI](https://www.slovensko.ai/ "Objavte kurzy o umelej inteligencii, AI chatboty a nástroje na dosah ruky. Naučte sa pracovať s modernými technológiami a využite AI vo svojom živote či podnikaní.")
+[Kontaktujte nás](https://firmy.slovensko.ai/kontakt/ "Máte otázky k AI riešeniam pre firmy? Kontaktujte Slovensko.ai telefonicky alebo e mailom. Ponúkame aj bezplatné 30 min AI poradenstvo.")
+* [Prihlásiť](https://firmy.slovensko.ai/login/ "Prihlásenie")
+* [Registrácia](https://firmy.slovensko.ai/partners/ "Partner registrácia")
+Menu
+* [Prihlásiť](https://firmy.slovensko.ai/login/ "Prihlásenie")
+* [Registrácia](https://firmy.slovensko.ai/partners/ "Partner registrácia")
+[![Image 6](https://firmy.slovensko.ai/wp-content/uploads/2025/02/firmy-logo-new-1-1024x248.png)](https://firmy.slovensko.ai/ "Hľadáte AI pre firmu? Nasadíme AI chatboty, hlasového asistenta, AI servery aj riešenia na mieru. Rýchla implementácia, jasné výsledky. Dohodnite si konzultáciu")
+* [AI služby](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
+* [Všetky AI služby](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
+* [AI hlasový agent](https://firmy.slovensko.ai/sluzby/hlasovy-agent/ "Zefektívnite firemnú komunikáciu s AI hlasovým asistentom. Volá s klientom, odpovedá nonstop a šetrí váš čas. Riešenie šité na mieru pre firmy.")
+* [AI Automatizácia procesov](https://firmy.slovensko.ai/sluzby/ai-automatizacia-procesov/ "Zefektívnite firemné procesy pomocou AI riešení na mieru. Menej chýb, nižšie náklady a vyšší výkon pre vašu firmu.")
+* [AI server](https://firmy.slovensko.ai/ai-server/ "Hľadáte spoľahlivý AI server? Ponúkame výkonné, škálovateľné a bezpečné servery pre AI, strojové učenie a dátové analýzy. Získajte riešenie na mieru ešte dnes!")
+* [AI Chatbot](https://firmy.slovensko.ai/chatbot/ "Využite AI chatbot od Slovensko.ai na zlepšenie zákazníckeho servisu a automatizáciu komunikácie. Rýchle, presné a dostupné riešenia pre moderné firmy.")
+* [AI konzultácie](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [AI CRM systém](https://firmy.slovensko.ai/sluzby/ai-crm/ "AI CRM systémna mieru Získajte prehľad o zákazníkoch a firemných dátach v jednom inteligentnom CRM systéme. AI CRM prispôsobíme vašim procesom,")
+* [E-mailový AI agent](https://firmy.slovensko.ai/e-mailovy-ai-agent/ "Zjednodušte e-mailovú komunikáciu s naším E-mailovým AI agentom. Využite AI na automatické spracovanie, analýzu a odpovedanie na e-maily.")
+* [AI kurzy](https://www.slovensko.ai/kurzy-ai/ "Zlepšite svoje zručnosti s prezenčnými a online kurzami o umelej inteligencii. Naučte sa, ako využiť AI technológie v praxi. Začnite ešte dnes s Slovensko.ai!")
+* [Všetky kurzy](https://www.slovensko.ai/kurzy-ai/ "Zlepšite svoje zručnosti s prezenčnými a online kurzami o umelej inteligencii. Naučte sa, ako využiť AI technológie v praxi. Začnite ešte dnes s Slovensko.ai!")
+* [Termíny kurzov](https://www.slovensko.ai/terminy-kurzov/ "Vyberte si z našej ponuky AI kurzov od Slovensko.AI a zlepšite vaše schopnosti v oblasti umelej inteligencie.")
+* [Umelá inteligencia](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/ "Zúčastnite sa kurzov o umelej inteligencii. Získajte praktické zručnosti na automatizáciu, zvýšenie produktivity a riešenie reálnych firemných problémov.")
+* [Všetky AI kurzy](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/ "Zúčastnite sa kurzov o umelej inteligencii. Získajte praktické zručnosti na automatizáciu, zvýšenie produktivity a riešenie reálnych firemných problémov.")
+* [Umelá Inteligencia **I**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-i/ "Naučte sa základy umelej inteligencie, efektívne písanie promptov a AI nástroje za 1 deň. Prezenčný & online kurz s praktickými ukážkami len za 150 € bez DPH.")
+* [Umelá Inteligencia **II**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-ii/ "Prehĺbte si AI zručnosti na našom kurze. Naučíte sa pokročilé techniky s ChatGPT, automatizáciu, právne regulácie AI a využitie nástrojov ako Gemini, Claude a Copilot.")
+* [Umelá Inteligencia **III**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-nadstavba-3/ "Pokročilý prezenčný kurz AI: dokumenty, dáta, produktivita. Naučte sa reporting v Exceli, tvorbu AI agenta a automatizáciu.")
+* [Umelá Inteligencia **IV**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/prezencny-umela-inteligencia-iv/ "Pokročilý 1-dňový AI kurz zameraný na marketing, SEO, tvorbu webu, prototypovanie, Claude, Lovable a jednoduché aplikácie bez programovania.")
+* [Umelá Inteligencia **I + II**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-komplet/ "Komplexné školenie AI od základov po pokročilé techniky. Pre firmy, tímy aj jednotlivcov. Praktické ukážky, AI nástroje, prompty a automatizácia.")
+* [Umelá Inteligencia **I + II + III**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/prezencny-umela-inteligencia-komplexny-ai-kurz/ "Naučte sa prakticky využívať AI pri práci, tvorbe obsahu, dokumentoch, plánovaní a automatizáciách. 3-dňový kurz pre firmy, manažérov aj zamestnancov.")
+* [Umelá Inteligencia **I + II + III + IV**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/prezencny-umela-inteligencia-i-iv/ "4-dňový AI kurz od základov po pokročilú prax. Naučte sa promptovať, pracovať s dokumentmi, dátami, AI agentmi, automatizáciami, SEO a webmi.")
+* [AI nástroje (LLM)](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [Microsoft Copilot](https://www.slovensko.ai/kurzy-ai/microsoft-copilot/ "Za jeden deň sa naučíte používať Copilot Chat aj Copilota v Microsoft 365. Email, porady, dokumenty, prezentácie, dáta, agenti a automatizácie.")
+* [Microsoft Copilot Studio](https://www.slovensko.ai/kurzy-ai/microsoft-copilot-studio/ "Praktický kurz Microsoft Copilot Studio. Naučte sa vytvárať AI agentov, prepájať zdroje, automatizovať procesy a publikovať ich v Teams.")
+* [Google GEMINI](https://www.slovensko.ai/kurzy-ai/google-gemini/ "Praktický kurz Google Gemini pre začiatočníkov aj firmy. Naučte sa využívať Gemini a Google Workspace v praxi. Online aj prezenčne v Bratislave.")
+* [Claude Anthropic](https://www.slovensko.ai/kurzy-ai/claude/ "Praktický AI kurz Claude vás naučí pracovať s Claude AI, promptmi, artefaktmi, projektmi, automatizáciami bez programovania a bezpečným využitím AI vo firme.")
+* [Claude Code](https://www.slovensko.ai/kurzy-ai/claude-code/ "Naučte sa používať Claude Code pri programovaní, úprave kódu, testovaní, refaktoringu a automatizácii vývoja. Praktický dvojdňový kurz.")
+* [ChatGPT](https://www.slovensko.ai/kurzy-ai/chatgpt/ "Praktický jednodňový kurz ChatGPT pre začiatočníkov aj firmy. Naučte sa promptovanie, prácu so súbormi, obrázkami, projektmi a tvorbu Custom GPT.")
+* [Špecializované AI kurzy](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [AI v Marketingu](https://www.slovensko.ai/kurzy-ai/ai-marketing/ "Praktický kurz pre marketérov a firmy, ktoré chcú používať AI na rýchlejšiu tvorbu výstupov, lepšie rozhodovanie a efektívnejšiu marketingovú prácu.")
+* [Ako sa dostať do AI odpovedí](https://www.slovensko.ai/kurzy-ai/kurz-ai-v-seo/ "Naučte sa, ako dostať svoj web, firmu a obsah do AI nástrojov a moderného vyhľadávania. Praktický kurz zameraný na viditeľnosť v AI.")
+* [AI grafika a videá](https://www.slovensko.ai/kurzy-ai/ai-grafika-a-videa/ "Praktický jednodňový kurz AI grafiky a videa. Naučte sa vytvárať obrázky, reklamné vizuály, videá, animácie a AI avatarov pre web a sociálne siete.")
+* [AI transformácia firiem](https://www.slovensko.ai/kurzy-ai/ai-transformacia-firiem/ "Dvojdňový praktický kurz AI transformácie firiem. Zmapujte procesy, nastavte AI stratégiu a vytvorte konkrétnu roadmapu zavádzania AI vo firme.")
+* [AI developer](https://www.slovensko.ai/kurzy-ai/ai-developer-kurz/ "Praktický kurz AI Developer ťa naučí budovať vlastné aplikácie s umelou inteligenciou. Získaj zručnosti v práci s modelmi, API a AI frameworkami | Slovensko.ai")
+* [Firemné školenia](https://www.slovensko.ai/firemne-kurzy/ "Naučte svoj tím pracovať s umelou inteligenciou bez zložitej teórie. Firemné školenia AI, ChatGPT a ďalších nástrojov zamerané na konkrétne výsledky vo vašej firme.")
+* [Granty](https://www.slovensko.ai/granty-ai-kurzy/ "Získajte štátne granty na AI kurzy s preplatením až do 100 %. Kompletnú administratívu s Úradom práce aj systémom ITMS21+ vybavíme kompletne za vás.")
+* [Zručnosti pre trh práce](https://www.slovensko.ai/zrucnosti-pre-trh-prace/ "Získajte AI kurzy zadarmo cez projekt Zručnosti pre trh práce. Naučte sa umelú inteligenciu od základov po pokročilé a získajte praktické zručnosti.")
+* [Online kurzy](https://www.slovensko.ai/kurzy/ "Kurzy - Slovensko.AI")
+* [AI Zdroje](https://firmy.slovensko.ai/vyuzitie-ai-vo-firmach/ "Zlepšite efektivitu vašej firmy s AI riešeniami na mieru! Ponúkame AI chatboty, emailových agentov, AI servery a konzultácie pre firemné inovácie.")
+* [Newsletter](https://www.slovensko.ai/newsletter/ "Prihláste sa do nášho newslettera \"AI týždeň so Slovensko.AI\" a získajte každý týždeň čerstvé informácie, novinky a inšpirácie zo sveta umelej inteligencie. Objavte, ako AI mení svet a buďte vždy o krok vpred.")
+* [Webinár](https://firmy.slovensko.ai/webinar/ "Zistite, ako si automatizácia rutinných administratívnych úloh pomocou AI. Pridajte sa na bezplatný online webinár 11.6.2026 o 17:00.")
+* [E-book](https://www.slovensko.ai/e-book/ "Stiahnite si zdarma e-knihu \"Sprievodca svetom umelej inteligencie\" a odhaľte základy AI, jej možnosti a trendy v budúcnosti. Táto e-kniha vám poskytne praktické rady a príklady, ako využiť umelú inteligenciu v každodennom živote aj v práci. Ideálny sprievodca pre začiatočníkov a technických nadšencov!")
+* [E-shop](https://firmy.slovensko.ai/e-shop/ "Nakupujte profesionálne grafické karty Nvidia Tesla A100 a servery optimalizované pre AI výpočty. Špecializovaný e-shop pre firmy a vývojárov umelej inteligencie.")
+* [AI vo firmách](https://firmy.slovensko.ai/vyuzitie-ai-vo-firmach/ "Zlepšite efektivitu vašej firmy s AI riešeniami na mieru! Ponúkame AI chatboty, emailových agentov, AI servery a konzultácie pre firemné inovácie.")
+* [AI nástroje](https://firmy.slovensko.ai/ai-nastroje/ "Objavte AI nástroje, ktoré vám pomôžu zlepšiť produktivitu, automatizovať procesy a transformovať podnikanie. Slovensko.ai prináša praktické riešenia pre firmy.")
+* [Blog](https://firmy.slovensko.ai/ai-blog/ "Objavte najnovšie články, novinky a trendy v oblasti umelej inteligencie na blogu Slovensko.ai. Inšpirujte sa príbehmi a riešeniami, ktoré formujú budúcnosť technológií.")
+* [Use cases](https://firmy.slovensko.ai/sluzby/use-cases/ "Inšpirujte sa konkrétnymi príkladmi, ako naše AI riešenia – chatboty, hlasoví asistenti, automatizácia a e-mailoví agenti.")
+* [O nás](https://firmy.slovensko.ai/o-nas/ "Slovensko.ai je AI partner pre firmy. Navrhujeme a nasadzujeme AI riešenia na mieru, AI chatboty, automatizáciu procesov, školenia a podporu po nasadení.")
+* [Kontakt](https://firmy.slovensko.ai/kontakt/ "Máte otázky k AI riešeniam pre firmy? Kontaktujte Slovensko.ai telefonicky alebo e mailom. Ponúkame aj bezplatné 30 min AI poradenstvo.")
+* [Partneri](https://firmy.slovensko.ai/nasipartneri/ "Pridajte sa k Slovensko.ai ako strategický partner a podieľajte sa na formovaní budúcnosti umelej inteligencie. Vytvárajme inovatívne riešenia a posúvajme hranice technológií spoločne.")
+* [Stať sa partnerom](https://firmy.slovensko.ai/nasipartneri/ "Pridajte sa k Slovensko.ai ako strategický partner a podieľajte sa na formovaní budúcnosti umelej inteligencie. Vytvárajme inovatívne riešenia a posúvajme hranice technológií spoločne.")
+* [Naši partneri](https://firmy.slovensko.ai/companies/ "Spoznajte partnerov Slovensko.ai, ktorí s nami spolupracujú na tvorbe inovatívnych riešení umelej inteligencie. Spoločne budujeme moderné technológie a posúvame hranice inovácií.")
+* [Kariéra](https://www.slovensko.ai/ai-kariera/ "Chceš pracovať na AI projektoch, ktoré pomáhajú slovenským firmám? Pozri si otvorené pozície v Slovensko.ai a prihlás sa do tímu.")
+Menu
+* [AI služby](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
+* [Všetky AI služby](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
+* [AI hlasový agent](https://firmy.slovensko.ai/sluzby/hlasovy-agent/ "Zefektívnite firemnú komunikáciu s AI hlasovým asistentom. Volá s klientom, odpovedá nonstop a šetrí váš čas. Riešenie šité na mieru pre firmy.")
+* [AI Automatizácia procesov](https://firmy.slovensko.ai/sluzby/ai-automatizacia-procesov/ "Zefektívnite firemné procesy pomocou AI riešení na mieru. Menej chýb, nižšie náklady a vyšší výkon pre vašu firmu.")
+* [AI server](https://firmy.slovensko.ai/ai-server/ "Hľadáte spoľahlivý AI server? Ponúkame výkonné, škálovateľné a bezpečné servery pre AI, strojové učenie a dátové analýzy. Získajte riešenie na mieru ešte dnes!")
+* [AI Chatbot](https://firmy.slovensko.ai/chatbot/ "Využite AI chatbot od Slovensko.ai na zlepšenie zákazníckeho servisu a automatizáciu komunikácie. Rýchle, presné a dostupné riešenia pre moderné firmy.")
+* [AI konzultácie](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [AI CRM systém](https://firmy.slovensko.ai/sluzby/ai-crm/ "AI CRM systémna mieru Získajte prehľad o zákazníkoch a firemných dátach v jednom inteligentnom CRM systéme. AI CRM prispôsobíme vašim procesom,")
+* [E-mailový AI agent](https://firmy.slovensko.ai/e-mailovy-ai-agent/ "Zjednodušte e-mailovú komunikáciu s naším E-mailovým AI agentom. Využite AI na automatické spracovanie, analýzu a odpovedanie na e-maily.")
+* [AI kurzy](https://www.slovensko.ai/kurzy-ai/ "Zlepšite svoje zručnosti s prezenčnými a online kurzami o umelej inteligencii. Naučte sa, ako využiť AI technológie v praxi. Začnite ešte dnes s Slovensko.ai!")
+* [Všetky kurzy](https://www.slovensko.ai/kurzy-ai/ "Zlepšite svoje zručnosti s prezenčnými a online kurzami o umelej inteligencii. Naučte sa, ako využiť AI technológie v praxi. Začnite ešte dnes s Slovensko.ai!")
+* [Termíny kurzov](https://www.slovensko.ai/terminy-kurzov/ "Vyberte si z našej ponuky AI kurzov od Slovensko.AI a zlepšite vaše schopnosti v oblasti umelej inteligencie.")
+* [Umelá inteligencia](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/ "Zúčastnite sa kurzov o umelej inteligencii. Získajte praktické zručnosti na automatizáciu, zvýšenie produktivity a riešenie reálnych firemných problémov.")
+* [Všetky AI kurzy](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/ "Zúčastnite sa kurzov o umelej inteligencii. Získajte praktické zručnosti na automatizáciu, zvýšenie produktivity a riešenie reálnych firemných problémov.")
+* [Umelá Inteligencia **I**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-i/ "Naučte sa základy umelej inteligencie, efektívne písanie promptov a AI nástroje za 1 deň. Prezenčný & online kurz s praktickými ukážkami len za 150 € bez DPH.")
+* [Umelá Inteligencia **II**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-ii/ "Prehĺbte si AI zručnosti na našom kurze. Naučíte sa pokročilé techniky s ChatGPT, automatizáciu, právne regulácie AI a využitie nástrojov ako Gemini, Claude a Copilot.")
+* [Umelá Inteligencia **III**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-nadstavba-3/ "Pokročilý prezenčný kurz AI: dokumenty, dáta, produktivita. Naučte sa reporting v Exceli, tvorbu AI agenta a automatizáciu.")
+* [Umelá Inteligencia **IV**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/prezencny-umela-inteligencia-iv/ "Pokročilý 1-dňový AI kurz zameraný na marketing, SEO, tvorbu webu, prototypovanie, Claude, Lovable a jednoduché aplikácie bez programovania.")
+* [Umelá Inteligencia **I + II**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/umela-inteligencia-komplet/ "Komplexné školenie AI od základov po pokročilé techniky. Pre firmy, tímy aj jednotlivcov. Praktické ukážky, AI nástroje, prompty a automatizácia.")
+* [Umelá Inteligencia **I + II + III**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/prezencny-umela-inteligencia-komplexny-ai-kurz/ "Naučte sa prakticky využívať AI pri práci, tvorbe obsahu, dokumentoch, plánovaní a automatizáciách. 3-dňový kurz pre firmy, manažérov aj zamestnancov.")
+* [Umelá Inteligencia **I + II + III + IV**](https://www.slovensko.ai/kurzy-ai/kurzy-umela-inteligencia/prezencny-umela-inteligencia-i-iv/ "4-dňový AI kurz od základov po pokročilú prax. Naučte sa promptovať, pracovať s dokumentmi, dátami, AI agentmi, automatizáciami, SEO a webmi.")
+* [AI nástroje (LLM)](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [Microsoft Copilot](https://www.slovensko.ai/kurzy-ai/microsoft-copilot/ "Za jeden deň sa naučíte používať Copilot Chat aj Copilota v Microsoft 365. Email, porady, dokumenty, prezentácie, dáta, agenti a automatizácie.")
+* [Microsoft Copilot Studio](https://www.slovensko.ai/kurzy-ai/microsoft-copilot-studio/ "Praktický kurz Microsoft Copilot Studio. Naučte sa vytvárať AI agentov, prepájať zdroje, automatizovať procesy a publikovať ich v Teams.")
+* [Google GEMINI](https://www.slovensko.ai/kurzy-ai/google-gemini/ "Praktický kurz Google Gemini pre začiatočníkov aj firmy. Naučte sa využívať Gemini a Google Workspace v praxi. Online aj prezenčne v Bratislave.")
+* [Claude Anthropic](https://www.slovensko.ai/kurzy-ai/claude/ "Praktický AI kurz Claude vás naučí pracovať s Claude AI, promptmi, artefaktmi, projektmi, automatizáciami bez programovania a bezpečným využitím AI vo firme.")
+* [Claude Code](https://www.slovensko.ai/kurzy-ai/claude-code/ "Naučte sa používať Claude Code pri programovaní, úprave kódu, testovaní, refaktoringu a automatizácii vývoja. Praktický dvojdňový kurz.")
+* [ChatGPT](https://www.slovensko.ai/kurzy-ai/chatgpt/ "Praktický jednodňový kurz ChatGPT pre začiatočníkov aj firmy. Naučte sa promptovanie, prácu so súbormi, obrázkami, projektmi a tvorbu Custom GPT.")
+* [Špecializované AI kurzy](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [AI v Marketingu](https://www.slovensko.ai/kurzy-ai/ai-marketing/ "Praktický kurz pre marketérov a firmy, ktoré chcú používať AI na rýchlejšiu tvorbu výstupov, lepšie rozhodovanie a efektívnejšiu marketingovú prácu.")
+* [Ako sa dostať do AI odpovedí](https://www.slovensko.ai/kurzy-ai/kurz-ai-v-seo/ "Naučte sa, ako dostať svoj web, firmu a obsah do AI nástrojov a moderného vyhľadávania. Praktický kurz zameraný na viditeľnosť v AI.")
+* [AI grafika a videá](https://www.slovensko.ai/kurzy-ai/ai-grafika-a-videa/ "Praktický jednodňový kurz AI grafiky a videa. Naučte sa vytvárať obrázky, reklamné vizuály, videá, animácie a AI avatarov pre web a sociálne siete.")
+* [AI transformácia firiem](https://www.slovensko.ai/kurzy-ai/ai-transformacia-firiem/ "Dvojdňový praktický kurz AI transformácie firiem. Zmapujte procesy, nastavte AI stratégiu a vytvorte konkrétnu roadmapu zavádzania AI vo firme.")
+* [AI developer](https://www.slovensko.ai/kurzy-ai/ai-developer-kurz/ "Praktický kurz AI Developer ťa naučí budovať vlastné aplikácie s umelou inteligenciou. Získaj zručnosti v práci s modelmi, API a AI frameworkami | Slovensko.ai")
+* [Firemné školenia](https://www.slovensko.ai/firemne-kurzy/ "Naučte svoj tím pracovať s umelou inteligenciou bez zložitej teórie. Firemné školenia AI, ChatGPT a ďalších nástrojov zamerané na konkrétne výsledky vo vašej firme.")
+* [Granty](https://www.slovensko.ai/granty-ai-kurzy/ "Získajte štátne granty na AI kurzy s preplatením až do 100 %. Kompletnú administratívu s Úradom práce aj systémom ITMS21+ vybavíme kompletne za vás.")
+* [Zručnosti pre trh práce](https://www.slovensko.ai/zrucnosti-pre-trh-prace/ "Získajte AI kurzy zadarmo cez projekt Zručnosti pre trh práce. Naučte sa umelú inteligenciu od základov po pokročilé a získajte praktické zručnosti.")
+* [Online kurzy](https://www.slovensko.ai/kurzy/ "Kurzy - Slovensko.AI")
+* [AI Zdroje](https://firmy.slovensko.ai/vyuzitie-ai-vo-firmach/ "Zlepšite efektivitu vašej firmy s AI riešeniami na mieru! Ponúkame AI chatboty, emailových agentov, AI servery a konzultácie pre firemné inovácie.")
+* [Newsletter](https://www.slovensko.ai/newsletter/ "Prihláste sa do nášho newslettera \"AI týždeň so Slovensko.AI\" a získajte každý týždeň čerstvé informácie, novinky a inšpirácie zo sveta umelej inteligencie. Objavte, ako AI mení svet a buďte vždy o krok vpred.")
+* [Webinár](https://firmy.slovensko.ai/webinar/ "Zistite, ako si automatizácia rutinných administratívnych úloh pomocou AI. Pridajte sa na bezplatný online webinár 11.6.2026 o 17:00.")
+* [E-book](https://www.slovensko.ai/e-book/ "Stiahnite si zdarma e-knihu \"Sprievodca svetom umelej inteligencie\" a odhaľte základy AI, jej možnosti a trendy v budúcnosti. Táto e-kniha vám poskytne praktické rady a príklady, ako využiť umelú inteligenciu v každodennom živote aj v práci. Ideálny sprievodca pre začiatočníkov a technických nadšencov!")
+* [E-shop](https://firmy.slovensko.ai/e-shop/ "Nakupujte profesionálne grafické karty Nvidia Tesla A100 a servery optimalizované pre AI výpočty. Špecializovaný e-shop pre firmy a vývojárov umelej inteligencie.")
+* [AI vo firmách](https://firmy.slovensko.ai/vyuzitie-ai-vo-firmach/ "Zlepšite efektivitu vašej firmy s AI riešeniami na mieru! Ponúkame AI chatboty, emailových agentov, AI servery a konzultácie pre firemné inovácie.")
+* [AI nástroje](https://firmy.slovensko.ai/ai-nastroje/ "Objavte AI nástroje, ktoré vám pomôžu zlepšiť produktivitu, automatizovať procesy a transformovať podnikanie. Slovensko.ai prináša praktické riešenia pre firmy.")
+* [Blog](https://firmy.slovensko.ai/ai-blog/ "Objavte najnovšie články, novinky a trendy v oblasti umelej inteligencie na blogu Slovensko.ai. Inšpirujte sa príbehmi a riešeniami, ktoré formujú budúcnosť technológií.")
+* [Use cases](https://firmy.slovensko.ai/sluzby/use-cases/ "Inšpirujte sa konkrétnymi príkladmi, ako naše AI riešenia – chatboty, hlasoví asistenti, automatizácia a e-mailoví agenti.")
+* [O nás](https://firmy.slovensko.ai/o-nas/ "Slovensko.ai je AI partner pre firmy. Navrhujeme a nasadzujeme AI riešenia na mieru, AI chatboty, automatizáciu procesov, školenia a podporu po nasadení.")
+* [Kontakt](https://firmy.slovensko.ai/kontakt/ "Máte otázky k AI riešeniam pre firmy? Kontaktujte Slovensko.ai telefonicky alebo e mailom. Ponúkame aj bezplatné 30 min AI poradenstvo.")
+* [Partneri](https://firmy.slovensko.ai/nasipartneri/ "Pridajte sa k Slovensko.ai ako strategický partner a podieľajte sa na formovaní budúcnosti umelej inteligencie. Vytvárajme inovatívne riešenia a posúvajme hranice technológií spoločne.")
+* [Stať sa partnerom](https://firmy.slovensko.ai/nasipartneri/ "Pridajte sa k Slovensko.ai ako strategický partner a podieľajte sa na formovaní budúcnosti umelej inteligencie. Vytvárajme inovatívne riešenia a posúvajme hranice technológií spoločne.")
+* [Naši partneri](https://firmy.slovensko.ai/companies/ "Spoznajte partnerov Slovensko.ai, ktorí s nami spolupracujú na tvorbe inovatívnych riešení umelej inteligencie. Spoločne budujeme moderné technológie a posúvame hranice inovácií.")
+* [Kariéra](https://www.slovensko.ai/ai-kariera/ "Chceš pracovať na AI projektoch, ktoré pomáhajú slovenským firmám? Pozri si otvorené pozície v Slovensko.ai a prihlás sa do tímu.")
+# **AI konzultácie**
+pre firmy
+Pomôžeme vám vybrať správne AI riešenia pre vaše procesy, tím aj zákazníkov. Vysvetlíme možnosti, riziká aj ďalšie kroky tak, aby ste sa vedeli rozhodnúť rýchlo a s istotou.
+[Rezervovať 30 min zdarma](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+[Cenník](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+[Kontaktujte nás](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+![Image 7](https://firmy.slovensko.ai/wp-content/uploads/2024/09/JUSTLOGO.png)
+### [ZADARMO](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+##### 30 min AI konzultácia
+Bez záväzku. Online.
+[REZERVOVAŤ TERMÍN](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+## **Čo zahŕňajú**
+naše konzultácie?
+Na základe analýzy vašich procesov a dát poskytujeme **AI poradenstvo** a pripravíme plán, ako zaviesť umelú inteligenciu vo firme s merateľným prínosom. Naše **konzultačné služby pre umelú inteligenciu** zahŕňajú výber najlepších use caseov, odporúčanie vhodných AI nástrojov a návrh integrácie do vašich systémov. Nastavíme ciele, KPI a ďalšie kroky tak, aby sa riešenie dalo rýchlo otestovať a následne škálovať.
+* AI poradenstvo a plán
+* Odporúčanie AI nástrojov
+* Integrácia do systémov
+* Pilotné nasadenie
+[Rezervovať bezplatnú kozultáciu](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+## **Prečo si vybrať naše**
+AI poradenstvo
+Naše **AI poradenstvo** je zamerané na výsledky, nie na teóriu. Pomôžeme vám vybrať správne použitia umelej inteligencie, nastaviť jasné ciele a pripraviť konkrétne kroky, aby sa AI vo firme reálne využívala. Vďaka našim **konzultačným službám pre umelú inteligenciu** získate rýchly štart, bezpečný prístup k dátam a riešenie, ktoré sa dá postupne rozširovať.
+[Rezervovať bezplatnú kozultáciu](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+### Cenník našich konzultácií
+Vyberte si službu, ktorá vyhovuje vaším potrebám
+* [Bezplatná konzultácia 0€/30min. 30 minút zdarma. Ujasníme si vaše ciele a prejdeme, kde vám AI vie pomôcť najrýchlejšie.](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [Telefonická konzultácia 0€ - 80€/hod. Pre komplexnejšie otázky vám radi pripravíme podrobný návrh riešení.](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [Osobná / Online konzultácia 70€ - 80€/hod. Osobné alebo online konzultácie umožňujú detailnú analýzu vašich potrieb a navrhnutie riešení priamo na mieru.](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [V priestoroch zákazníka 80€ - 100€/hod. Poskytujeme konzultácie priamo vo vašej firme, aby sme lepšie porozumeli vašim potrebám a navrhli riešenia prispôsobené vašim procesom. Cestovné náklady do 50 km sú zahrnuté v cene.](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [* * Do ceny sa započítava aj príprava na stretnutie, ak nám vopred poskytnete podklady, ktoré je potrebné naštudovať.](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+## Bezplatné AI poradenstvo - 30 minút
+Bez záväzkov prejdeme ciele, dáta a použitie AI v praxi pre váš tím.
+Máte záujem o koplexné AI konzultácie?
+- [x] Súhlasím so spracovaním osobných údajov.
+Δ
+Alebo nás kontaktujte na e-mail [firmy@slovensko.ai](mailto:example@example.com)
+## FAQ **AI poradenstvo a konzultácie**
+Najčastejšie otázky o AI konzultáciách, implementácii AI a praktickom využití umelej inteligencie vo firme
+[Rezervovať kozultáciu](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+[Čo je AI poradenstvo a čo zahŕňajú AI konzultácie?](https://firmy.slovensko.ai/ai-konzultacie/)
+AI poradenstvo je odborné vedenie pri výbere a nasadení umelej inteligencie do vašej firmy. AI konzultácie zahŕňajú analýzu procesov, návrh AI riešení, výber AI nástrojov, plán implementácie AI a nastavenie merania výsledkov.
+[Pre koho sú konzultačné služby pre umelú inteligenciu vhodné?](https://firmy.slovensko.ai/ai-konzultacie/)
+Sú vhodné pre firmy, ktoré chcú zaviesť AI do praxe, zefektívniť procesy, znížiť náklady alebo zrýchliť prácu tímov. Najčastejšie ide o marketing, predaj, zákaznícku podporu, HR, administratívu a manažment.
+[Ako prebieha implementácia AI po konzultácii?](https://firmy.slovensko.ai/ai-konzultacie/)
+Najprv nastavíme ciele a vyberieme najlepší use case. Potom pripravíme plán nasadenia, integrácie do existujúcich systémov a pilotné testovanie. Následne dolaďujeme riešenie podľa výsledkov a nastavíme škálovanie.
+[Viete navrhnúť AI riešenia na mieru alebo aj integráciu do systémov?](https://firmy.slovensko.ai/ai-konzultacie/)
+Áno. Konzultačné služby pre umelú inteligenciu môžu zahŕňať návrh integrácie do CRM, webu, e-shopu, helpdesku alebo interných nástrojov, aby AI riešenie zapadlo do procesov.
+[![Image 8: AI riešenia pre firmy – AI servery, chatboty, online kurzy a konzultácie od Slovensko.ai](https://firmy.slovensko.ai/wp-content/uploads/2025/03/banner-sluzby4-1024x128.png)](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
+## Kontaktujte nás
+Neváhajte nás kontaktovať!
+Seberíniho 1, 821 03 Bratislava
++421 950 608 326
+[firmy@slovensko.ai](mailto:firmy@slovensko.ai)
+[Facebook](https://www.facebook.com/people/SlovenskoAI/61560894913244/)[Instagram](https://www.instagram.com/slovenskoai/)[Linkedin](https://www.linkedin.com/company/slovensko-ai/)[Youtube](https://consent.youtube.com/m "M")[Whatsapp](https://wa.me/421950608326)
+## Informácie
+* [Kontakt](https://firmy.slovensko.ai/kontakt/ "Máte otázky k AI riešeniam pre firmy? Kontaktujte Slovensko.ai telefonicky alebo e mailom. Ponúkame aj bezplatné 30 min AI poradenstvo.")
+* [Kariéra](https://www.slovensko.ai/ai-kariera/ "Chceš pracovať na AI projektoch, ktoré pomáhajú slovenským firmám? Pozri si otvorené pozície v Slovensko.ai a prihlás sa do tímu.")
+* [Newsletter](https://www.slovensko.ai/newsletter/ "Prihláste sa do nášho newslettera \"AI týždeň so Slovensko.AI\" a získajte každý týždeň čerstvé informácie, novinky a inšpirácie zo sveta umelej inteligencie. Objavte, ako AI mení svet a buďte vždy o krok vpred.")
+* [Webinár](https://firmy.slovensko.ai/webinar/ "Zistite, ako si automatizácia rutinných administratívnych úloh pomocou AI. Pridajte sa na bezplatný online webinár 11.6.2026 o 17:00.")
+* [Ochrana osobných údajov](https://firmy.slovensko.ai/zasady-ochrany-osobnych-udajov/ "Prehlásenie o ochrane osobných údajov Slovensko.ai 1. Cieľ Spoločnosť INBOX SK, s. r. o., so sídlom Seberíniho 1, 821 03 Bratislava, IČO: 44813295,")
+* [Všeobecné obchodné podmienky](https://www.slovensko.ai/wp-content/uploads/2026/02/Vseobecne-obchodne-podmienky-SlovenskoAI_v1.pdf "Wp Content - Uploads - 2026 - 02 - Vseobecne Obchodne Podmienky SlovenskoAI V1.pdf")
+## Naše služby
+* [Naše služby](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
+* [AI Hlasový agent](https://firmy.slovensko.ai/sluzby/hlasovy-agent/ "Zefektívnite firemnú komunikáciu s AI hlasovým asistentom. Volá s klientom, odpovedá nonstop a šetrí váš čas. Riešenie šité na mieru pre firmy.")
+* [Automatizácia procesov](https://firmy.slovensko.ai/sluzby/ai-automatizacia-procesov/ "Zefektívnite firemné procesy pomocou AI riešení na mieru. Menej chýb, nižšie náklady a vyšší výkon pre vašu firmu.")
+* [AI Server](https://firmy.slovensko.ai/ai-server/ "Hľadáte spoľahlivý AI server? Ponúkame výkonné, škálovateľné a bezpečné servery pre AI, strojové učenie a dátové analýzy. Získajte riešenie na mieru ešte dnes!")
+* [AI Chatbot](https://firmy.slovensko.ai/chatbot/ "Využite AI chatbot od Slovensko.ai na zlepšenie zákazníckeho servisu a automatizáciu komunikácie. Rýchle, presné a dostupné riešenia pre moderné firmy.")
+* [AI konzultácie](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
+* [AI kurzy](https://www.slovensko.ai/kurzy-ai/ "Zlepšite svoje zručnosti s prezenčnými a online kurzami o umelej inteligencii. Naučte sa, ako využiť AI technológie v praxi. Začnite ešte dnes s Slovensko.ai!")
+[![Image 9](https://firmy.slovensko.ai/wp-content/uploads/2025/02/firmy-logo-new-1-1024x248.png)](https://firmy.slovensko.ai/ "Hľadáte AI pre firmu? Nasadíme AI chatboty, hlasového asistenta, AI servery aj riešenia na mieru. Rýchla implementácia, jasné výsledky. Dohodnite si konzultáciu")
+5.0
+![Image 10: TrustMate logo](blob:http://localhost/62e951366d1dc68c1795f4662012a134)
+Na základe 19 recenzií zo všetkých čias
+[](javascript:void(0);)
+@media (min-width: 1025px) { .menu-only-dropdown.dropdown-open > .sub-menu, .menu-only-dropdown.dropdown-open > .elementor-nav-menu--dropdown { display: block !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; } .menu-only-dropdown > a { cursor: pointer; } }
+✕
