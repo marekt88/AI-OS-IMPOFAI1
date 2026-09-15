@@ -52,8 +52,8 @@ Borrowed from the `adhd` skill's anti-patterns: walls of equally-weighted prose,
 
 ## ADHD mode
 
-`/adhd` runs parallel divergent ideation: ~10 subagents, 30-90s, 5-10x cost. On demand only, not automatic.
-Offer it in one line when a question is open-ended and high-stakes (architecture, naming, positioning). Never for lookups or status.
+`/adhd` runs parallel divergent ideation: ~10 subagents, 30-90s, 5-10x cost.
+Never run it on your own initiative. Only when I type `/adhd` or ask for it by name.
 
 ## Voice
 
