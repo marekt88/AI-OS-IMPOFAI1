@@ -1,0 +1,57 @@
+{
+  "_comment": "Korekcie prepisov z Fireflies. Slovenska transkripcia komoli odborne terminy a mena, teda presne to, z coho sa robia zistenia. Overene na prepise 01KZQVC5M62WRYFX7VD9XQS1BE zo 18.8.2026. Pouziva sa pri zapise meetingu: najprv sa aplikuje slovnik, az potom sa pise zistenie.",
+  "updated": "2026-09-15",
+
+  "systemy": {
+    "farmaker": "FileMaker",
+    "farmakeru": "FileMaker",
+    "farmakera": "FileMaker",
+    "Superbase": "Supabase",
+    "SuperBase": "Supabase",
+    "Super base": "Supabase",
+    "vercel": "Vercel",
+    "dota na vyber": "bota na Viber",
+    "na vyber": "na Viber",
+    "Vibers": "Viber",
+    "Eleven Labs": "ElevenLabs",
+    "klik ap": "ClickUp",
+    "Power BI copilot": "Power BI Copilot"
+  },
+
+  "mena": {
+    "Lebodnik": "Slebodnik",
+    "Lebodnikom": "Slebodnikom",
+    "Slobodnik": "Slebodnik",
+    "Slobodnikom": "Slebodnikom",
+    "Gardner": "Gartner",
+    "Gardneru": "Gartneru",
+    "Gardnera": "Gartnera",
+    "Horty": "Horti",
+    "Matasovsky": "Matas",
+    "Masek": "Marek",
+    "Marko": "Marek",
+    "Andre": "Andrii",
+    "Andriho": "Andriiho"
+  },
+
+  "pravne": {
+    "zimnost": "zivnost",
+    "zinu": "zivnost",
+    "serocka": "s.r.o.",
+    "serocku": "s.r.o.",
+    "sarocka": "s.r.o.",
+    "trubanka": "Tatra banka",
+    "Tatrbanka": "Tatra banka"
+  },
+
+  "neisté": {
+    "_comment": "Nerozlustene. Nepis ich do zistenia bez overenia v zdroji.",
+    "Akuzapi": "? platobne API, meno neoverene",
+    "Prepros attack": "? pravdepodobne pre-prod setup",
+    "BLE pass": "? neoverene",
+    "EIKO": "? nastroj alebo skratka",
+    "Krovacku": "? pravdepodobne Chorvatsku"
+  },
+
+  "pravidlo": "Ak termin nie je v slovniku a znie ako nezmysel, NEHADAJ. Napis ho do zistenia v uvodzovkach s poznamkou, ze je z prepisu neovereny, alebo ho vynechaj. Vymysleny nazov systemu je horsi nez chybajuci."
+}

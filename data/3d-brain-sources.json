@@ -9,7 +9,9 @@
         "context/klienti/imagewell.md",
         "context/klienti/startfin.md",
         "context/klienti/bridgit.md",
-        "context/klienti/dubove-parkety.md"
+        "context/klienti/dubove-parkety.md",
+        "context/klienti/vellgard.md",
+        "context/klienti/gartner.md"
       ],
       "color": "#F87171",
       "staleDays": null,
@@ -23,7 +25,9 @@
         "context/klienti/imagewell/iw-2nd-brain.md",
         "context/klienti/startfin/startfin-app.md",
         "context/klienti/bridgit/bridgit-platforma.md",
-        "context/klienti/dubove-parkety/dubove-parkety-ai.md"
+        "context/klienti/dubove-parkety/dubove-parkety-ai.md",
+        "context/klienti/vellgard/vellgard-platforma.md",
+        "context/klienti/gartner/gartner-projekt.md"
       ],
       "color": "#A78BFA",
       "staleDays": null,
