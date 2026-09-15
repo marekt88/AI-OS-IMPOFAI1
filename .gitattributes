@@ -1,0 +1,10 @@
+# Repozitar sa pouziva z Windows (lokalne) aj z Linuxu (cloudovy scheduled task).
+# Bez tohto suboru git na Windows prepisuje LF na CRLF pri checkoute, co rozbije
+# porovnavanie snapshotov konkurencie - diff potom hlasi cely web ako zmeneny.
+# Zistene 2026-09-15: zo 135 riadkov ostal po konverzii jediny zhodny.
+
+* text=auto eol=lf
+
+# Data monitoringu sa porovnavaju bajt po bajte. Ziadna konverzia, nikdy.
+data/konkurencia/** -text
+context/konkurencia/** -text

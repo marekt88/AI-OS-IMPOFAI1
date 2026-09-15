@@ -1,4 +1,27 @@
-[![Image 4](https://firmy.slovensko.ai/wp-content/uploads/2025/02/firmy-logo-new-1-1024x248.png)](https://firmy.slovensko.ai/ "Hľadáte AI pre firmu? Nasadíme AI chatboty, hlasového asistenta, AI servery aj riešenia na mieru. Rýchla implementácia, jasné výsledky. Dohodnite si konzultáciu")
+Vážime si vaše súkromie
+Prispôsobiť Odmietnuť Prijať všetko
+Necessary Vždy aktívny
+* Trvanie Never Expires
+* Trvanie session
+* Trvanie 1 year
+* Trvanie session
+Functional
+Analytics
+- [x]
+* Trvanie session
+* Trvanie 1 hour
+Performance
+Advertisement
+Uncategorised
+- [x]
+* Trvanie 1 year 1 month 4 days
+* Popis Description is currently not available.
+* Trvanie 1 year 1 month 4 days
+* Popis Description is currently not available.
+* Trvanie 1 day
+* Popis Description is currently not available.
+Odmietnuť Uložiť moje predvoľby Prijať všetko
+[![Image 5](https://firmy.slovensko.ai/wp-content/uploads/2025/02/firmy-logo-new-1-1024x248.png)](https://firmy.slovensko.ai/ "Hľadáte AI pre firmu? Nasadíme AI chatboty, hlasového asistenta, AI servery aj riešenia na mieru. Rýchla implementácia, jasné výsledky. Dohodnite si konzultáciu")
 * [AI služby](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
 * [Všetky AI služby](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
 * [AI hlasový agent](https://firmy.slovensko.ai/sluzby/hlasovy-agent/ "Zefektívnite firemnú komunikáciu s AI hlasovým asistentom. Volá s klientom, odpovedá nonstop a šetrí váš čas. Riešenie šité na mieru pre firmy.")
@@ -168,7 +191,7 @@ Menu
 Menu
 * [Prihlásiť](https://firmy.slovensko.ai/login/ "Prihlásenie")
 * [Registrácia](https://firmy.slovensko.ai/partners/ "Partner registrácia")
-[![Image 5](https://firmy.slovensko.ai/wp-content/uploads/2025/02/firmy-logo-new-1-1024x248.png)](https://firmy.slovensko.ai/ "Hľadáte AI pre firmu? Nasadíme AI chatboty, hlasového asistenta, AI servery aj riešenia na mieru. Rýchla implementácia, jasné výsledky. Dohodnite si konzultáciu")
+[![Image 6](https://firmy.slovensko.ai/wp-content/uploads/2025/02/firmy-logo-new-1-1024x248.png)](https://firmy.slovensko.ai/ "Hľadáte AI pre firmu? Nasadíme AI chatboty, hlasového asistenta, AI servery aj riešenia na mieru. Rýchla implementácia, jasné výsledky. Dohodnite si konzultáciu")
 * [AI služby](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
 * [Všetky AI služby](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
 * [AI hlasový agent](https://firmy.slovensko.ai/sluzby/hlasovy-agent/ "Zefektívnite firemnú komunikáciu s AI hlasovým asistentom. Volá s klientom, odpovedá nonstop a šetrí váš čas. Riešenie šité na mieru pre firmy.")
@@ -282,7 +305,7 @@ Pomôžeme vám vybrať správne AI riešenia pre vaše procesy, tím aj zákazn
 [Rezervovať 30 min zdarma](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
 [Cenník](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
 [Kontaktujte nás](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
-![Image 6](https://firmy.slovensko.ai/wp-content/uploads/2024/09/JUSTLOGO.png)
+![Image 7](https://firmy.slovensko.ai/wp-content/uploads/2024/09/JUSTLOGO.png)
 ### [ZADARMO](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
 ##### 30 min AI konzultácia
 Bez záväzku. Online.
@@ -323,7 +346,7 @@ Sú vhodné pre firmy, ktoré chcú zaviesť AI do praxe, zefektívniť procesy,
 Najprv nastavíme ciele a vyberieme najlepší use case. Potom pripravíme plán nasadenia, integrácie do existujúcich systémov a pilotné testovanie. Následne dolaďujeme riešenie podľa výsledkov a nastavíme škálovanie.
 [Viete navrhnúť AI riešenia na mieru alebo aj integráciu do systémov?](https://firmy.slovensko.ai/ai-konzultacie/)
 Áno. Konzultačné služby pre umelú inteligenciu môžu zahŕňať návrh integrácie do CRM, webu, e-shopu, helpdesku alebo interných nástrojov, aby AI riešenie zapadlo do procesov.
-[![Image 7: AI riešenia pre firmy – AI servery, chatboty, online kurzy a konzultácie od Slovensko.ai](https://firmy.slovensko.ai/wp-content/uploads/2025/03/banner-sluzby4-1024x128.png)](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
+[![Image 8: AI riešenia pre firmy – AI servery, chatboty, online kurzy a konzultácie od Slovensko.ai](https://firmy.slovensko.ai/wp-content/uploads/2025/03/banner-sluzby4-1024x128.png)](https://firmy.slovensko.ai/sluzby/ "Vyberte si AI služby od Slovensko.ai. Hlasový asistent, AI chatbot, AI server a automatizácia procesov, ktoré šetria čas a zvyšujú výkon. Dohodnite si konzultáciu.")
 ## Kontaktujte nás
 Neváhajte nás kontaktovať!
 Seberíniho 1, 821 03 Bratislava
@@ -345,9 +368,9 @@ Seberíniho 1, 821 03 Bratislava
 * [AI Chatbot](https://firmy.slovensko.ai/chatbot/ "Využite AI chatbot od Slovensko.ai na zlepšenie zákazníckeho servisu a automatizáciu komunikácie. Rýchle, presné a dostupné riešenia pre moderné firmy.")
 * [AI konzultácie](https://firmy.slovensko.ai/ai-konzultacie/ "Rezervujte si bezplatnú 30 min AI konzultáciu. Zistíte, kde vám AI ušetrí čas a peniaze a dostanete jasné odporúčania pre firmu.")
 * [AI kurzy](https://www.slovensko.ai/kurzy-ai/ "Zlepšite svoje zručnosti s prezenčnými a online kurzami o umelej inteligencii. Naučte sa, ako využiť AI technológie v praxi. Začnite ešte dnes s Slovensko.ai!")
-[![Image 8](https://firmy.slovensko.ai/wp-content/uploads/2025/02/firmy-logo-new-1-1024x248.png)](https://firmy.slovensko.ai/ "Hľadáte AI pre firmu? Nasadíme AI chatboty, hlasového asistenta, AI servery aj riešenia na mieru. Rýchla implementácia, jasné výsledky. Dohodnite si konzultáciu")
+[![Image 9](https://firmy.slovensko.ai/wp-content/uploads/2025/02/firmy-logo-new-1-1024x248.png)](https://firmy.slovensko.ai/ "Hľadáte AI pre firmu? Nasadíme AI chatboty, hlasového asistenta, AI servery aj riešenia na mieru. Rýchla implementácia, jasné výsledky. Dohodnite si konzultáciu")
 5.0
-![Image 9: TrustMate logo](blob:http://localhost/62e951366d1dc68c1795f4662012a134)
+![Image 10: TrustMate logo](blob:http://localhost/62e951366d1dc68c1795f4662012a134)
 Na základe 19 recenzií zo všetkých čias
 [](javascript:void(0);)
 @media (min-width: 1025px) { .menu-only-dropdown.dropdown-open > .sub-menu, .menu-only-dropdown.dropdown-open > .elementor-nav-menu--dropdown { display: block !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; } .menu-only-dropdown > a { cursor: pointer; } }

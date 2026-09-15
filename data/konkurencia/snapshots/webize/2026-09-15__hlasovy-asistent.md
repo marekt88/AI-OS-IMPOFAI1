@@ -86,16 +86,12 @@ Porovnanie
 | Zákazník čaká vo fronte | Zdvihne okamžite — žiadne čakanie |
 Postup spolupráce
 ## Od prvého hovoru k funkčnému riešeniu v 4 krokoch
-01
 ### Bezplatná konzultácia a analýza
 Prejdeme si, aké hovory prijímate alebo uskutočňujete, ciele voicebotu (podpora, screening, potvrdenia) a systémy, do ktorých má zapisovať výsledky.
-02
 ### Príprava scenárov a hlasu
 Navrhneme štruktúru konverzácie, otázky a vetvy dialógu. Vyberieme hlas agenta a nastavíme tón komunikácie podľa vašej značky.
-03
 ### Napojenie na systémy a testovanie
 Voicebota prepojíme s vaším CRM, tabuľkami alebo automatizáciami. Otestujeme reálne scenáre vrátane hraničných situácií a presmerovaní na živého operátora.
-04
 ### Spustenie a priebežná optimalizácia
 Po spustení na telefónnu linku sledujeme výsledky hovorov a agenta pravidelne vylepšujeme na základe reálnych prepísov a spätnej väzby.
 Výhody

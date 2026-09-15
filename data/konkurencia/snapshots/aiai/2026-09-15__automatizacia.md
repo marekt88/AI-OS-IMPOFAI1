@@ -16,16 +16,12 @@ Automatické vytvorenie účtov, prístupy, mentor, školenia, 30/60/90 checkpoi
 Plánovanie, generovanie obsahu, publikovanie naprieč platformami, analytika.
 02 / Postup nasadenia
 ## Ako automatizujeme procesy.
-01
 ### Audit procesov
 Zmapujeme, kde tím trávi najviac času opakovanou prácou. Vyčíslime úsporu — počet úloh × čas × hodinová sadzba.
-02
 ### Pilot v shadow móde
 AI agent beží paralelne s človekom. Návrhy sa schvaľujú jedným klikom, nikdy sa nič neodošle bez kontroly.
-03
 ### Postupné zdvíhanie autonómie
 Tam, kde má agent >95 % istotu, zapneme auto-send. Človek rieši len výnimky a okrajové prípady.
-04
 ### Meranie a iterácia
 Pre každý proces metriky pred / po. Bez čísel nie je dôkaz. Iterujeme prompty a integrácie podľa dát.
 04 / FAQ

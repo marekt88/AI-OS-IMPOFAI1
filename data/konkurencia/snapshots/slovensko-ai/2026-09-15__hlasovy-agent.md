@@ -331,17 +331,11 @@ AI voicebota
 Nastavenie hlasového asistenta zvládneme rýchlo a bez zbytočnej záťaže na váš tím. Pripravíme scenáre hovorov podľa toho, čo ľudia volajú najčastejšie, nastavíme prívetivý hlasový tón a pravidlá, kedy má agent odpovedať a kedy má hovor prepojiť na človeka.
 [Chcem telefonického asistenta](https://firmy.slovensko.ai/sluzby/hlasovy-agent/ "Zefektívnite firemnú komunikáciu s AI hlasovým asistentom. Volá s klientom, odpovedá nonstop a šetrí váš čas. Riešenie šité na mieru pre firmy.")
 ## Kde sa dá **AI hlasový agent** využiť?
-1
 #### Call centrá a zákaznícke linky
-2
 #### E-shopy
-3
 #### Realitné kancelárie
-4
 #### Služby a servis
-5
 #### Interné systémy a procesy
-6
 #### Logistika a doprava
 ## Vyberte si **plán**, pre vášho telefónneho AI asistenta
 16,6% zľava

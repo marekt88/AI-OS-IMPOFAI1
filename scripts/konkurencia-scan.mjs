@@ -39,6 +39,13 @@ const VOLATILE = [
   /^\s*\d{1,2}[.:]\d{2}\s*$/,
   /^\s*(\d{4}-\d{2}-\d{2}|\d{1,2}\.\s*\d{1,2}\.\s*\d{4})\s*$/,
   /^\s*(copyright|©|all rights reserved|vsetky prava vyhradene)/i,
+  // Animovane pocitadla ("300+ projektov") sa pri kazdom scrape zachytia v inom
+  // stave a vyrabaju falosne zmeny. Prvy realny beh 2026-09-15 nahlasil styri
+  // take na piatich strankach. Holé cislo bez jednotky nie je obsah - cena ma
+  // vzdy menu, takze o nu neprideme.
+  // Percenta zamerne NEfiltrujeme - "80 %" byva realny claim o uspore, nie pocitadlo.
+  /^\s*\d{1,6}\s*[+★]?\s*$/,
+  /^\s*[★]{1,5}\s*$/,
 ];
 
 function normalize(raw) {
