@@ -19,6 +19,7 @@ Read `references/3ms-framework.md` once. It's how {{Your Name}} thinks about AI 
 - `/3d-brain`: Choose a brain name and categories, then build a local 3D knowledge globe with Cinema and interactive growth replay. Uses selected local files and the bundled app template.
 - `/level-up` — Weekly 3Ms interview. Find one automation, scope it, ship it. One per week.
 - `/adhd` — Parallel divergent ideation. ~10 subagents under different cognitive frames, scored and clustered. On demand only. Third-party, MIT, see `.claude/skills/adhd/SOURCE.md`.
+- `/swarm-prompt` — Writes a long multi-agent orchestration brief to paste into Claude Code. Decomposes a goal into 3-6 workstreams, fans out subagents, makes them cross-review and converge. Use when a goal has several genuinely parallel parts; it will push back when the goal is sequential.
 
 ## Where things live
 
