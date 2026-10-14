@@ -19,6 +19,8 @@ Read `references/3ms-framework.md` once. It's how {{Your Name}} thinks about AI 
 - `/3d-brain`: Choose a brain name and categories, then build a local 3D knowledge globe with Cinema and interactive growth replay. Uses selected local files and the bundled app template.
 - `/level-up` — Weekly 3Ms interview. Find one automation, scope it, ship it. One per week.
 - `/adhd` — Parallel divergent ideation. ~10 subagents under different cognitive frames, scored and clustered. On demand only. Third-party, MIT, see `.claude/skills/adhd/SOURCE.md`.
+- `/swarm-prompt` — Writes a long multi-agent orchestration brief to paste into Claude Code. Decomposes a goal into 3-6 workstreams, fans out subagents, makes them cross-review and converge. Use when a goal has several genuinely parallel parts; it will push back when the goal is sequential.
+- `/mcp-builder` — Builds MCP servers end to end: protocol research, tool design with Zod or Pydantic schemas, implementation, and a 10-question evaluation suite with a harness to run it. Third-party, see `.claude/skills/mcp-builder/SOURCE.md`.
 
 ## Where things live
 
@@ -30,6 +32,7 @@ Read `references/3ms-framework.md` once. It's how {{Your Name}} thinks about AI 
 - `audits/` — dated audit reports and finding history; point-in-time evidence, not live business state
 - `archives/` — old stuff. Don't delete. Move here.
 - `apps/3d-brain/` — IMPOFAI Brain, local 3D knowledge globe. From that folder run `node serve.mjs`, then open http://localhost:4640. Setup and generated graph are local only (gitignored). See `apps/3d-brain/README.md`.
+- `.mcp.json` — Fireflies MCP konektor, prepisy a action items z hovorov. Prve spustenie: `/mcp` a autorizacia cez OAuth. Nastroje, dopyty a limity: `references/fireflies-api.md`.
 - `scripts/konkurencia-scan.mjs` + `data/konkurencia/` — tyzdenny monitoring konkurencie. Scheduled task "konkurencia-tyzdenny-sken" bezi v pondelok rano, reporty pristavaju do `context/konkurencia/`. Ako to funguje: `references/konkurencia-monitoring.md`.
 
 See `EXPANSIONS.md` for what to add as you grow.

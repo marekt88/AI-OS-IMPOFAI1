@@ -11,7 +11,7 @@ Registry of every system your AIOS can reach. Naplnené 2026-09-14 z dôkazov v 
 | 3 | Calendar | Google Calendar (pozvánky chodia z `impofai.ai@gmail.com`) + Calendly `calendly.com/impofai` | not yet connected | — | — |
 | 4 | Communication | Gmail + Google Meet (ad-hoc linky) | **mcp** (len Gmail) | OAuth | 2026-09-14 |
 | 5 | Project / task tracking | **ClickUp** — workspace „IMPOFAI team" `90151789670`, 3 priestory, 8 klientov, 227 úloh, 8 členov | **mcp** | OAuth | 2026-09-14 |
-| 6 | Meeting intelligence | Fireflies.ai — **neoverené**, jediný dôkaz je e-mail od `fred@fireflies.ai` z 08.09.2026 | neistý | — | — |
+| 6 | Meeting intelligence | **Fireflies.ai** — overené 2026-10-14, že služba beží a bot Fred je na všetkých Meet hovoroch. Konektor repa cieli na účet **`impofai.ai@gmail.com`**, čaká na OAuth. Bez kanálov a bez integrácií. | **mcp** (`.mcp.json`, `references/fireflies-api.md`) | OAuth, neautorizované | 2026-10-14 |
 | 7 | Knowledge / files | Google Drive | not yet connected | — | — |
 
 ## Prevádzkové systémy doložené v pošte
@@ -36,7 +36,7 @@ Registry of every system your AIOS can reach. Naplnené 2026-09-14 z dôkazov v 
 ## Čo chýba a čo prekáža
 
 - **Doména 1 nie je systém, je to zvyk.** Faktúry sú PDF prílohy, podklady Drive linky. Žiadny účtovný softvér, žiadne bankové napojenie.
-- **Doména 6 je neistá.** Hovory bežia cez Google Meet. Či sa nahrávajú a prepisujú, z pošty overiť neviem.
+- **Doména 6 je zapojená, ale slepá do oboch strán.** Prepisy existujú a sú prístupné cez MCP, Fireflies však nemá ani jednu integráciu. Action items z hovorov do ClickUpu dnes prenáša človek.
 - **monday.com je pravdepodobne mŕtvy.** Objavoval sa len cez Make scenár, ktorý spadol v apríli 2026. Riadenie prešlo do ClickUp.
 - **Polovica inboxu je strojový šum.** ClickUp posiela jeden mail na každú zmenu statusu úlohy, k tomu Instagram, newslettre a marketing. 1 335 neprečítaných, nula štítkov.
 

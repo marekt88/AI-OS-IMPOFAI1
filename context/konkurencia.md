@@ -22,6 +22,10 @@ AI agenti, **n8n automatizácie** (rovnaký stack ako IMPOFAI), AI školenia pre
 
 **Aktualizácia 2026-09-28.** Zverejnili samostatnú cenníkovú stránku [cena-ai-agenta](https://mrdigital.sk/cena-ai-agenta): AI chatbot pre web **1 500 – 4 000 €**, AI agent s integráciami **5 000 – 12 000 €**, RAG systém a multi-agent **od 12 000 €**, jednotlivé n8n workflow **800 – 3 000 €**, prevádzka bežného chatbotu **80 – 200 € mesačne**. Neuvádzajú, či s DPH. Zároveň do ponuky aj do školení pridali **MCP servery, RAG, LangChain a LangGraph** — prvý konkurent na MCP území. Školenia odčlenili do vlastnej stránky (**od 500 € bez DPH**). Čísla o firme prepísali z „300+ projektov · 14 rokov“ na **„600+ projektov od 2012“** a z troch pobočiek na **5 pobočiek na Slovensku a v Česku**.
 
+**Aktualizácia 2026-10-05.** MCP server už nie je zmienka, ale samostatná produktová karta s cenou **od 5 000 € bez DPH** priamo na stránke AI agentov (spolu s agentom na mieru, n8n automatizáciou a AI aplikáciou); **AI chatbot pre firmu od 1 500 € bez DPH**. Ako referenciu uvádzajú vlastný **Proon.Business s AI asistentom a MCP serverom ovládateľným z Claude a ChatGPT**, a v blogu majú doručený **e-shop s MCP konektorom pre Art by Lucia**. Hlavný claim prepísali na „V jadre máme umelú inteligenciu — AI agentov, implementácie a školenia pre firmy", územie rozšírili na **Slovensko, Česko a Rakúsko**. Nová služba **E-faktúra & Peppol** (EN 16931, povinná e-faktúra od 2027) a **Microsoft Partner** odznak k existujúcemu Google Partner. Hodnotenie uvádzajú ako 4,9★ z 62 recenzií Google.
+
+**Aktualizácia 2026-10-12 — zníženie ceny.** Cenník má teraz **setup 1 500 – 3 500 € podľa rozsahu** (prvýkrát zverejnené číslo), **prichádzajúce ~0,04 €/min**, **odchádzajúce 0,10 €/min** a **číslo 3,20 €/mesiac**. Predtým sme mali zaznamenanú jednu zmiešanú sadzbu ~0,08 €/min a číslo ~3,50 €. Mesačný paušál je 0 €, 1 000 prichádzajúcich minút ≈ 43,20 €. DPH neuvádzajú a staré čísla ostali v sekcii Prevádzka aj v FAQ, čiže zľava nie je dotiahnutá všade. K tomu štyri SEO články zo 6. 10. mierené na „ai agent cena 2026", „ai agent slovensko", „hlasový asistent pre firmy" a „automatizácia telefonátov", a piata vertikála **finančné služby**.
+
 ### 3. AIAI.SK — `aiai.sk`
 Bratislava, cieli aj na ČR a Rakúsko. AI agenti, automatizácia procesov, e-shopy, CRM, mobilné a skladové aplikácie na mieru — takmer identický záber ako IMPOFAI.
 
@@ -37,6 +41,8 @@ Má **katalóg 35+ hotových agentov**, medzi nimi „Monitoring cien" a **„An
 Sľuby: „ušetríte až 70 % času", „klienti v priemere ušetria 120 hodín mesačne", „nasadenie v priebehu dní, nie mesiacov". Ceny nezverejňuje.
 
 **2026-09-21:** pribudol produkt **„Stroj, který prodává"** — autonómny obchodný systém, AI agenti vedú reťazec od dodávateľskej ponuky cez zákaznícku ponuku po objednávku, 24/7. Zároveň spustila **lead magnet `/knihy`**: dve bezplatné e-knihy od Davida Strejca výmenou za e-mail — „Datové říznutí" (60 s., centralizácia firemných informácií) a „Řekni to jednou" (55 s.). Obe stránky majú SK mutáciu. Apertia už nezbiera len dopyty, buduje e-mailový zoznam.
+
+**2026-10-12:** katalóg agentov dostal vlastné URL `/ai-agenti/*` — 15 produktizovaných agentov s use casom na stránku (hotelová recepčná, nemocničný asistent, CNC programovanie, správa firemných dát, web scraper a ďalšie), pri správe firemných dát **pilot zdarma**. Spustili aj **platenú konferenciu „Jak dostat AI do firmy správně a pod kontrolou"** (Apertia Robotics s.r.o., 25.–29. 1. 2027, **3 500 Kč/osoba**, nie sú plátcami DPH) — druhá príjmová linka vedľa zákazkového vývoja. Slovenskú mutáciu prelokalizovali: 144 URL prepísali z českých slugov na slovenské.
 
 ### 5. chatbotnamieru.sk
 Produktizovaný chatbot, nie zákazková agentúra — ale berie ten istý dopyt. Chatboti a hlasoví asistenti.
@@ -71,17 +77,20 @@ Sľub: „zdvihne každý hovor do dvoch zazvonení", 95 % úspešnosť, na webe
 
 **Cenový model je najagresívnejší na trhu:** jednorazový setup + prevádzka **~0,08 € za minútu** a **~3,50 € mesačne za číslo**. Explicitne sa vymedzuje voči paušálom: 500 minút ≈ 43,50 € oproti „typickým 99–149 €".
 
+**Aktualizácia 2026-10-05.** Domovskú stránku prepísali na tvrdé čísla z nasadení: stavebná firma **386 hovorov, 120 stretnutí a 70 uzavretých obchodov za mesiac oproti pôvodným 20–30**; wellness 212 rezervácií a ~30 h mesačne bez zásahu recepcie; poradenstvo 264 kvalifikovaných hovorov a +35 % stretnutí. Ponuku rozdelili na štyri vertikály (**stavebné firmy, reality, wellness, autoservis**) s ukážkou hovoru a kalkulačkou stratených dopytov. Demo sľubujú **do 12 hodín** (predtým do 24).
+
 ### 8. Slovensko.ai / firmy.slovensko.ai
 Prevádzkuje **INBOX SK, s.r.o.**, IČO 44813295, Seberíniho 1, Bratislava, +421 950 608 326. Chatboti, hlasový agent, e-mailový AI agent, **AI servery**, automatizácie, školenia. AI kurz za **150 € bez DPH**.
 
 ## Čo z prvého skenu vyplýva pre IMPOFAI
 
-1. **Päť z ôsmich konkurentov zverejňuje ceny. IMPOFAI ani jednu.** Podľa [[produkty-cennik]] nemá web ani cenovú kotvu. Trh má pritom jasné pásma: chatbot od 1 500 €, pilot 600–2 400 €, audit 490–1 890 €, hlasový agent 0,08 €/min.
+1. **Päť z ôsmich konkurentov zverejňuje ceny. IMPOFAI ani jednu.** Podľa [[produkty-cennik]] nemá web ani cenovú kotvu. Trh má pritom jasné pásma: chatbot od 1 500 €, pilot 600–2 400 €, audit 490–1 890 €, hlasový agent **0,04 €/min + setup 1 500–3 500 €** (Artemina znížila k 2026-10-12 z 0,08 €/min).
 2. **Audit ako platený produkt je overený model.** iWorker ho predáva od 490 €, a k 2026-09-21 zdvihol top balík na 1 890 € — druhé zdraženie za dva týždne, bez pridaného obsahu. IMPOFAI dáva „analýzu podniku úplne ZADARMO" a bez ohraničenia rozsahu.
 3. **Apertia predáva „Analýzu konkurencie" ako hotového agenta.** To, čo tu staviame ako interný nástroj, niekto ponúka ako produkt.
 4. **MR Digital je najväčšia hrozba na referencie.** K 2026-09-28 už 600+ projektov od 2012, päť pobočiek v SK a CZ, rovnaký n8n stack a navyše vlastný kód v LangChain/LangGraph. IMPOFAI má 16 prípadových štúdií a žiadny údaj o veku firmy.
-5. **Nikto z nich nemá „AI OS".** Ani jeden watchlist neponúka osobný AI operačný systém ani second brain. To je zatiaľ nezabraté územie. **Ale k 2026-09-28 už MR Digital predáva MCP servery** — prepojenie ChatGPT a Claude na firemné systémy — aj ich školí. Konektory už nie sú náš rozdiel, rozdiel je osobný znalostný systém nad nimi.
-6. **Self-hosted a GDPR ako argument** používa MR Digital explicitne. IMPOFAI má n8n na vlastnom serveri, ale nikde to nepredáva.
+5. **Nikto z nich nemá „AI OS".** Ani jeden watchlist neponúka osobný AI operačný systém ani second brain. To je zatiaľ nezabraté územie. **Ale konektory sú k 2026-10-05 definitívne zabraté.** MR Digital na MCP server má cenu (od 5 000 € bez DPH), produktovú kartu, vlastný referenčný systém (Proon.Business s MCP serverom pre Claude a ChatGPT) aj doručený klientsky e-shop. Rozdiel IMPOFAI je už len osobný znalostný systém nad konektormi — a ten na webe nie je pomenovaný.
+6. **Artemina ukázala, ako vyzerá doložený ROI hlasového agenta.** Menované nasadenia s číslami (70 obchodov mesačne oproti 20–30), štyri vertikály a kalkulačka stratených dopytov. IMPOFAI má tri vlastné nasadenia hlasového agenta a ani jedno číslo o výsledku na webe. **K 2026-10-12 si navyše obsadila aj obsahový dopyt na cenu** — štyri články o tom, koľko AI agent stojí a ako si vybrať dodávateľa. MR Digital robí to isté pre „ako nasadiť agenta". IMPOFAI nemá v tomto lieviku ani jednu stránku.
+7. **Self-hosted a GDPR ako argument** používa MR Digital explicitne. IMPOFAI má n8n na vlastnom serveri, ale nikde to nepredáva.
 
 ---
 
