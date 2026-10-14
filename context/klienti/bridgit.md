@@ -30,6 +30,8 @@ Najužší vzťah zo všetkých. Beží denný automatický report `bridgit@brid
 
 Podľa `connections.md` je Bridgit jediný zdroj hodinovej fakturácie mimo 740 € MRR z ClickUpu.
 
-## Otvorené
+## Pozicioning
 
-Web aj intake sa nezhodujú v tom, kto Bridgit vlastní a ako sa pozicionuje. Web hovorí „AI CFO", intake „slovenská B2B analytická platforma". To isté je otvorené v [[firma]] ako otázka 6 a 7 a stále to nie je rozhodnuté.
+Rozobraté 14.10.2026 v [[pozicioning]]. Záver: „AI CFO" zahodiť, skutočná výhoda je dátová vrstva, nie AI funkcie. Odporúčaná pozícia je „Bridgit robí z vášho ERP dáta, na ktoré sa dá pýtať".
+
+**Rozhodnutie zatiaľ nepadlo.** Web aj intake stále nesú staré a navzájom si odporujúce príbehy. To isté je otvorené v [[firma]] ako otázka 6 a 7 od 13.9.2026.

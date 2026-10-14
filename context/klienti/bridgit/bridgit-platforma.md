@@ -30,9 +30,15 @@ Cenová kotva, ktorá k tomu padla: 20 bridgit tokenov stojí 8,70 €. **Na web
 
 - vytváranie organizácie cez ERP
 - nahrávanie vlastných dát a vytvorenie databázy v BigQuery
-- MCP nad BigQuery a jeho pripojenie pre agentov
+- ~~MCP nad BigQuery a jeho pripojenie pre agentov~~ **hotové, viď nižšie**
 - sprievodca pre nového používateľa
 - úvodná analýza dát a personalizované návrhy
+
+## MCP server beží
+
+K 14.10.2026 je Bridgit MCP pripojený a funkčný (organizácia „Nový s.r.o. (Master)"). Sprístupňuje tri oddelené enginy: **Power BI** cez DAX, **BigQuery** cez SQL a **znalostnú bázu** cez fulltext. Join naprieč Power BI a BigQuery nie je možný, každý dotaz stojí tokeny.
+
+Znamená to, že tretia vrstva z [[pozicioning]] nie je plán, ale dodaná vec. Web ani intake to zatiaľ nereflektujú.
 
 ## Prevádzka
 
