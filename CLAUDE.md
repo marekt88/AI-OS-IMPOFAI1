@@ -35,8 +35,20 @@ Read `references/3ms-framework.md` once. It's how {{Your Name}} thinks about AI 
 - `.mcp.json` — Fireflies MCP konektor, prepisy a action items z hovorov. Prve spustenie: `/mcp` a autorizacia cez OAuth. Nastroje, dopyty a limity: `references/fireflies-api.md`.
 - `.mcp.json` — ElevenLabs MCP konektor (hostovaný, `https://api.elevenlabs.io/v1/mcp`), správa hlasových agentov. Prvé spustenie: `/mcp` a autorizácia cez OAuth, žiadny API kľúč v repe. Čo vie a čo nie (telefónne čísla): `references/elevenlabs-api.md`.
 - `scripts/konkurencia-scan.mjs` + `data/konkurencia/` — tyzdenny monitoring konkurencie. Scheduled task "konkurencia-tyzdenny-sken" bezi v pondelok rano, reporty pristavaju do `context/konkurencia/`. Ako to funguje: `references/konkurencia-monitoring.md`.
+- `runner/` + `processes/` — spúšťač opakovaných AI procesov na serveri (`claude -p` na predplatnom, cron tick každých 5 min, chyby do PM listu AI Bugs). Nový proces = nový priečinok v `processes/`. Návod: `references/ai-runner.md`.
 
 See `EXPANSIONS.md` for what to add as you grow.
+
+## Second brain cez MCP
+
+Firemný second brain (Karpathyho wiki: zdroje, poznámky, schéma) žije v IMPOFAI PM a je dostupný len cez PM MCP (`pm_*` nástroje, konektor „Projekt manazment - IMPOFAI“). V PM nebeží žiadne AI, všetku prácu robí agent cez MCP.
+
+- Začni `pm_get_brain_schema` (pravidlá a štruktúra), potom `pm_get_brain_index`.
+- Hľadanie: `pm_search_brain` (úryvky s riadkom a časom), čítanie po častiach `pm_read_brain_note`, odkazy `pm_get_brain_note_links`.
+- Čo sa zmenilo od nejakého času: `pm_list_brain_log`; nové hovory `pm_list_brain_calls` a fronta na spracovanie `pm_list_brain_call_queue`.
+- Firma a ľudia: `pm_get_company_map`, `pm_get_person`, `pm_find_contact`.
+- Zápis (`pm_update_brain_note`, `pm_append_brain_section`, `pm_save_brain_call_summary`) len keď o to používateľ požiada. Opakované procesy v `processes/` second brain iba čítajú.
+- Token vidí len poznámky, na ktoré má rozsah. Prázdny výsledok nemusí znamenať, že poznámka neexistuje.
 
 ## Knowledge base
 

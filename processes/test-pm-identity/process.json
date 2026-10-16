@@ -1,0 +1,13 @@
+{
+  "description": "Testovací proces spúšťača: prečíta identitu cez PM MCP a zapíše ju do logu. Len ručne.",
+  "schedule": null,
+  "model": "haiku",
+  "maxTurns": 4,
+  "timeoutMin": 5,
+  "allowedTools": [
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_current_identity"
+  ],
+  "requireTools": [
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_current_identity"
+  ]
+}

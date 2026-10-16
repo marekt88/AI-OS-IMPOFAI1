@@ -1,0 +1,1 @@
+{"type":"object","properties":{"ok":{"type":"boolean"},"organization":{"type":"string"},"scope":{"type":"string"},"user":{"type":"string"},"error":{"type":"string"}},"required":["ok"],"additionalProperties":false}
