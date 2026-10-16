@@ -27,6 +27,7 @@ Registry of every system your AIOS can reach. Naplnené 2026-09-14 z dôkazov v 
 | n8n (self-hosted) `n8n.srv903244.hstgr.cloud` | workflow „Agent tool - Price Calculator", hlasový asistent Imagewell | not yet connected | 03/2026 |
 | Make.com `eu1.make.com` | scenár „Integration Webhooks, monday com" — **spadol 30.04.2026** | not yet connected | 04/2026 |
 | FileMaker / DataSystem | API pre ImageWell: Projects, Orders, Orders_lines, konto dataOne | not yet connected | 05/2026 |
+| **ElevenLabs** | hlasoví agenti (ElevenAgents), odchádzajúce hovory cez importovaný SIP trunk Linphone (`sip.linphone.org`), overené z UI | **mcp** (`.mcp.json`, hostovaný `https://api.elevenlabs.io/v1/mcp`, `references/elevenlabs-api.md`), OAuth, neautorizované | 16.10.2026 |
 | DIDWW | SMS a DID pre hlasového asistenta, číslo `+420 518 888 042`, A2P kampane SK/CZ | not yet connected | 06/2026 |
 | OpenAI API | GPT-4.1 nano (uvedené GFelektru pri GDPR previerke) | not yet connected | 03/2026 |
 | Namecheap | doména a Private Email pre `rewardly.online`, účet „Markot88" | not yet connected | 04/2026 |

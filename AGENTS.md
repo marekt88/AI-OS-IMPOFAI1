@@ -33,6 +33,7 @@ Read `references/3ms-framework.md` once. It's how {{Your Name}} thinks about AI 
 - `archives/` — old stuff. Don't delete. Move here.
 - `apps/3d-brain/` — IMPOFAI Brain, local 3D knowledge globe. From that folder run `node serve.mjs`, then open http://localhost:4640. Setup and generated graph are local only (gitignored). See `apps/3d-brain/README.md`.
 - `.mcp.json` — Fireflies MCP konektor, prepisy a action items z hovorov. Prve spustenie: `/mcp` a autorizacia cez OAuth. Nastroje, dopyty a limity: `references/fireflies-api.md`.
+- `.mcp.json` — ElevenLabs MCP konektor (hostovaný, `https://api.elevenlabs.io/v1/mcp`), správa hlasových agentov. Prvé spustenie: `/mcp` a autorizácia cez OAuth, žiadny API kľúč v repe. Čo vie a čo nie (telefónne čísla): `references/elevenlabs-api.md`.
 - `scripts/konkurencia-scan.mjs` + `data/konkurencia/` — tyzdenny monitoring konkurencie. Scheduled task "konkurencia-tyzdenny-sken" bezi v pondelok rano, reporty pristavaju do `context/konkurencia/`. Ako to funguje: `references/konkurencia-monitoring.md`.
 
 See `EXPANSIONS.md` for what to add as you grow.

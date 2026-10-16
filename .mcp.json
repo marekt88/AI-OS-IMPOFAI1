@@ -3,6 +3,10 @@
     "fireflies": {
       "type": "http",
       "url": "https://api.fireflies.ai/mcp"
+    },
+    "elevenlabs": {
+      "type": "http",
+      "url": "https://api.elevenlabs.io/v1/mcp"
     }
   }
 }
