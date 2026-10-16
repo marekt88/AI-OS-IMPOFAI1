@@ -19,6 +19,7 @@ async function tick() {
   const release = acquireLock("tick");
   if (!release) return;
   try {
+    writeState("_runner", { lastTickAt: new Date().toISOString() });
     // 1. deploy: fast-forward the server checkout to origin/main
     const pull = spawnSync("git", ["-C", REPO, "pull", "--ff-only", "--quiet"], { encoding: "utf8", timeout: 120_000 });
     if (pull.status !== 0) {
