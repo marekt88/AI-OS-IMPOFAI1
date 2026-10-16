@@ -36,6 +36,7 @@ Read `references/3ms-framework.md` once. It's how {{Your Name}} thinks about AI 
 - `.mcp.json` — ElevenLabs MCP konektor (hostovaný, `https://api.elevenlabs.io/v1/mcp`), správa hlasových agentov. Prvé spustenie: `/mcp` a autorizácia cez OAuth, žiadny API kľúč v repe. Čo vie a čo nie (telefónne čísla): `references/elevenlabs-api.md`.
 - `scripts/konkurencia-scan.mjs` + `data/konkurencia/` — tyzdenny monitoring konkurencie. Scheduled task "konkurencia-tyzdenny-sken" bezi v pondelok rano, reporty pristavaju do `context/konkurencia/`. Ako to funguje: `references/konkurencia-monitoring.md`.
 - `runner/` + `processes/` — spúšťač opakovaných AI procesov na serveri (`claude -p` na predplatnom, cron tick každých 5 min, chyby do PM listu AI Bugs). Nový proces = nový priečinok v `processes/`. Návod: `references/ai-runner.md`.
+- `processes/morning-brief/` — ranný brief: o 9:00 hlasový agent ElevenLabs zavolá na Linphone `mtoth` so zmenami od posledného briefu. Ako funguje a odkiaľ sú informácie: `references/ranny-brief.md`.
 
 See `EXPANSIONS.md` for what to add as you grow.
 
