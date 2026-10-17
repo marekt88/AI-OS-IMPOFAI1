@@ -1,0 +1,14 @@
+{
+  "description": "Po hlasovom hovore: zaindexuje, čo Marek povedal, do second brainu a vykoná úlohy, ktoré v hovore potvrdil (všetky PM nástroje podľa jeho práv). Spúšťa ho after.mjs hovoru s --input.",
+  "enabled": true,
+  "schedule": null,
+  "model": "sonnet",
+  "maxTurns": 120,
+  "timeoutMin": 30,
+  "allowedTools": [
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI"
+  ],
+  "requireTools": [
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_brain_schema"
+  ]
+}

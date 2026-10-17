@@ -2,7 +2,8 @@
 // AI process runner (headless `claude -p` on the claude.ai subscription). See references/ai-runner.md.
 //
 //   node runner/run.mjs tick            cron entry point (every 5 min): git pull, start due processes, retry queued reports
-//   node runner/run.mjs run <name>      run one process now (manual: no waiting for deliverAt)
+//   node runner/run.mjs run <name> [--input file.json]   run one process now (manual: no waiting for deliverAt);
+//                                       the input is available as {{input}} in prompt.md and as RUN_INPUT in after.mjs
 //   node runner/run.mjs list            definitions, schedules and last results
 //   node runner/run.mjs report-test     create a test issue in AI Bugs (checks the PM token)
 import fs from "node:fs";
@@ -68,7 +69,7 @@ async function reportOnce(fingerprint, title, details, proc = null) {
   await reportIssue({ fingerprint, title, details, process: proc });
 }
 
-async function run(name, { manual, slot }) {
+async function run(name, { manual, slot, inputFile = null }) {
   const p = loadProcess(name);
   const release = acquireLock(`process-${name}`);
   if (!release) {
@@ -77,7 +78,7 @@ async function run(name, { manual, slot }) {
     return 2;
   }
   try {
-    const log = await runProcess(p, { manual, slot });
+    const log = await runProcess(p, { manual, slot, inputFile });
     console.log(JSON.stringify({ process: name, runId: log.runId, ok: log.ok, ms: log.durationMs, error: log.error ?? null }));
     if (log.ok) {
       await noteRecovered(`process:${name}:`, `Obnovené: proces \`${name}\` znova prebehol úspešne (beh \`${log.runId}\`).`);
@@ -121,10 +122,13 @@ function list() {
 
 async function main() {
   ensureDirs();
-  const [cmd, a, b] = process.argv.slice(2);
+  const argv = process.argv.slice(2);
+  const inputAt = argv.indexOf("--input");
+  const inputFile = inputAt >= 0 ? argv.splice(inputAt, 2)[1] : null;
+  const [cmd, a, b] = argv;
   try {
     if (cmd === "tick") await tick();
-    else if (cmd === "run" && a) process.exitCode = await run(a, { manual: true, slot: null });
+    else if (cmd === "run" && a) process.exitCode = await run(a, { manual: true, slot: null, inputFile });
     else if (cmd === "run-scheduled" && a) process.exitCode = await run(a, { manual: false, slot: b });
     else if (cmd === "list") list();
     else if (cmd === "report-test") {

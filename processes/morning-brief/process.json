@@ -1,16 +1,17 @@
 {
-  "description": "Ranný brief: zber zmien od posledného briefu cez MCP (PM, Gmail, Calendar, Fireflies), o 9:00 hovor cez ElevenLabs na Linphone mtoth.",
+  "description": "Ranný brief: zber zmien od posledného briefu (PM po projektoch, AI Bugs, nové úlohy, e-maily s obsahom, kalendár, otázky), o 9:00 hovor na Linphone mtoth, po hovore call-followup.",
   "enabled": true,
   "schedule": "30 8 * * *",
   "tz": "Europe/Bratislava",
   "deliverAt": "09:00",
   "model": "sonnet",
-  "maxTurns": 80,
+  "maxTurns": 150,
   "timeoutMin": 25,
-  "afterTimeoutMin": 40,
+  "afterTimeoutMin": 60,
   "catchUpMin": 20,
   "firstSinceHours": 24,
   "allowedTools": [
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_current_identity",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_brain_log",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_brain_calls",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_brain_call_queue",
@@ -18,11 +19,19 @@
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_search_brain",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_brain_index",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_brain_client",
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_company_map",
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_person",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_notifications",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_my_tasks",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_tasks",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_task",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_task_activity",
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_task_lists",
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_task_list",
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_search",
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_workspace_tree",
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_spaces",
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_members",
     "mcp__claude_ai_Fireflies__fireflies_get_transcripts",
     "mcp__claude_ai_Fireflies__fireflies_get_summary",
     "mcp__claude_ai_Gmail__search_threads",
@@ -31,18 +40,16 @@
     "mcp__claude_ai_Google_Calendar__list_calendars"
   ],
   "requireTools": [
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_brain_log",
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_tasks",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_notifications",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_my_tasks",
     "mcp__claude_ai_Gmail__search_threads",
     "mcp__claude_ai_Google_Calendar__list_events"
   ],
-  "call": {
-    "agentId": "agent_7701m5254wcqektavn4skbrdn86n",
-    "phoneNumberId": "phnum_1901m4zry0ehf5gtm609k8p4yqak",
-    "toNumber": "mtoth",
-    "ringingTimeoutSecs": 60,
-    "retryAfterMin": 10,
-    "retries": 1
-  }
+  "context": [
+    {
+      "var": "last_followup",
+      "process": "call-followup"
+    }
+  ]
 }

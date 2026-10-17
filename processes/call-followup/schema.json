@@ -1,0 +1,95 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ok",
+    "summary",
+    "notes_written",
+    "actions_done",
+    "actions_skipped",
+    "open_questions"
+  ],
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string",
+      "description": "2–4 vety po slovensky: čo sa v hovore dohodlo a čo sa po ňom urobilo"
+    },
+    "notes_written": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "what"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "what": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "actions_done": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "what",
+          "ref",
+          "quote"
+        ],
+        "properties": {
+          "what": {
+            "type": "string",
+            "description": "čo sa urobilo, po slovensky"
+          },
+          "ref": {
+            "type": "string",
+            "description": "kľúč úlohy, cesta poznámky, id"
+          },
+          "quote": {
+            "type": "string",
+            "description": "Marekova veta z hovoru, na ktorú sa akcia opiera"
+          }
+        }
+      }
+    },
+    "actions_skipped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "request",
+          "reason"
+        ],
+        "properties": {
+          "request": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "open_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "čo treba nabudúce dopýtať"
+    }
+  }
+}

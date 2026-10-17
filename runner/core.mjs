@@ -82,12 +82,14 @@ export function loadProcess(name) {
     deliverAt: def.deliverAt ?? null, // "HH:MM" in tz: the after-step waits until then (scheduled runs only)
     afterTimeoutMin: def.afterTimeoutMin ?? 15,
     keepRuns: def.keepRuns ?? 30,
+    claude: def.claude !== false, // false = no claude -p step, the (JSON) input is the output
+    context: def.context ?? [], // [{ "var": "last_followup", "process": "call-followup" }] → last successful output
     prompt: file("prompt.md"),
     system: file("system.md"),
     schema: file("schema.json"),
     after: file("after.mjs"),
   };
-  if (!p.prompt) throw new Error(`process ${name}: prompt.md missing`);
+  if (p.claude && !p.prompt) throw new Error(`process ${name}: prompt.md missing`);
   if (!Array.isArray(p.allowedTools)) throw new Error(`process ${name}: allowedTools must be an array`);
   return p;
 }
@@ -172,7 +174,18 @@ class RunError extends Error {
  * Runs one process end to end. Returns the run log object. Throws nothing: failures are recorded
  * in the log and returned with ok=false (the caller reports them).
  */
-export async function runProcess(p, { manual = false, slot = null, noDeliverWait = false } = {}) {
+/** Last successful output.json of a process (for `context` and later runs), or null. */
+export function lastOutput(name) {
+  const st = readState(name);
+  if (!st.lastSuccessRunId) return null;
+  try {
+    return JSON.parse(fs.readFileSync(path.join(DIRS.runs, name, st.lastSuccessRunId, "output.json"), "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+export async function runProcess(p, { manual = false, slot = null, noDeliverWait = false, inputFile = null } = {}) {
   const started = new Date();
   const runId = started.toISOString().replace(/[:.]/g, "-");
   const runDir = path.join(DIRS.runs, p.name, runId);
@@ -180,22 +193,37 @@ export async function runProcess(p, { manual = false, slot = null, noDeliverWait
   fs.mkdirSync(p.cwd, { recursive: true });
   const state = readState(p.name);
   const since = state.lastSuccessAt ? new Date(state.lastSuccessAt) : new Date(started.getTime() - p.firstSinceHours * 3600e3);
-  const log = { process: p.name, runId, manual, slot, startedAt: started.toISOString(), since: since.toISOString(), ok: false, steps: {} };
+  const input = inputFile ? fs.readFileSync(inputFile, "utf8") : "";
+  if (inputFile) fs.copyFileSync(inputFile, path.join(runDir, "input.json"));
+  const log = { process: p.name, runId, manual, slot, inputFile, startedAt: started.toISOString(), since: since.toISOString(), ok: false, steps: {} };
   const save = () => fs.writeFileSync(path.join(runDir, "run.json"), JSON.stringify(log, null, 2));
 
   try {
+    const vars = {
+      since: since.toISOString(),
+      now: started.toISOString(),
+      tz: p.tz,
+      today: new Intl.DateTimeFormat("sk-SK", { timeZone: p.tz, dateStyle: "full" }).format(started),
+      input,
+    };
+    for (const c of p.context) {
+      const o = lastOutput(c.process);
+      vars[c.var] = o ? JSON.stringify(o.output, null, 1) : "(žiadny predchádzajúci výstup)";
+    }
+    let output;
+    if (!p.claude) {
+      try {
+        output = JSON.parse(input || "{}");
+      } catch {
+        throw new RunError("input", "input is not valid JSON");
+      }
+    } else {
     // 1. login
     const auth = checkAuth();
     log.steps.auth = auth;
     if (!auth.ok) throw new RunError("auth", auth.reason);
 
     // 2. claude -p
-    const vars = {
-      since: since.toISOString(),
-      now: started.toISOString(),
-      tz: p.tz,
-      today: new Intl.DateTimeFormat("sk-SK", { timeZone: p.tz, dateStyle: "full" }).format(started),
-    };
     const prompt = render(fs.readFileSync(p.prompt, "utf8"), vars);
     const args = ["-p", "--output-format", "stream-json", "--verbose", "--no-session-persistence",
       "--model", p.model, "--max-turns", String(p.maxTurns), "--permission-mode", "dontAsk",
@@ -220,15 +248,16 @@ export async function runProcess(p, { manual = false, slot = null, noDeliverWait
     }
     if (out.exitCode !== 0) throw new RunError("claude-error", `claude -p exit code ${out.exitCode}`);
     if (/^Prompt is too long/i.test(String(out.result.result ?? ""))) throw new RunError("claude-error", redact(out.result.result).slice(0, 300));
-    const failedTools = new Set(out.toolErrors.map((e) => e.tool));
-    const missing = p.requireTools.filter((t) => !out.toolCalls.includes(t) || failedTools.has(t));
+    // a required tool counts once at least one of its calls succeeded (a failed retry before is fine)
+    const missing = p.requireTools.filter((t) => !out.toolOk.includes(t));
     if (missing.length) throw new RunError("required-tools", `required tools not called successfully: ${missing.join(", ")}`);
-    let output = out.result.result;
+    output = out.result.result;
     if (p.schema) {
       output = out.result.structured_output;
       if (output == null) throw new RunError("schema", "no structured output matching schema.json");
       // convention: a process reports its own failure with { "ok": false, "error": "..." }
       if (output.ok === false) throw new RunError("process-reported", `process reported failure: ${redact(output.error ?? "").slice(0, 500)}`);
+    }
     }
     fs.writeFileSync(path.join(runDir, "output.json"), JSON.stringify({ output, since: vars.since, now: vars.now }, null, 2));
     log.steps.output = { file: "output.json" };
@@ -252,7 +281,7 @@ export async function runProcess(p, { manual = false, slot = null, noDeliverWait
     }
 
     log.ok = true;
-    writeState(p.name, { lastSuccessAt: started.toISOString(), lastRunAt: started.toISOString(), lastStatus: "ok", lastRunId: runId });
+    writeState(p.name, { lastSuccessAt: started.toISOString(), lastRunAt: started.toISOString(), lastStatus: "ok", lastRunId: runId, lastSuccessRunId: runId });
   } catch (err) {
     log.ok = false;
     log.error = { kind: err.kind ?? "crash", message: redact(err.message ?? String(err)) };
@@ -273,7 +302,7 @@ function runClaude(args, p, transcriptFile) {
     const child = spawn(CLAUDE_BIN, args, { cwd: p.cwd, env: claudeEnv(), stdio: ["ignore", "pipe", "pipe"] });
     const transcript = fs.createWriteStream(transcriptFile, { mode: 0o600 });
     let buf = "", stderr = "", result = null, timedOut = false;
-    const toolNames = new Map(), toolCalls = [], toolErrors = [];
+    const toolNames = new Map(), toolCalls = [], toolErrors = [], toolOk = [];
     const onLine = (line) => {
       if (!line.trim()) return;
       transcript.write(line + "\n");
@@ -287,6 +316,7 @@ function runClaude(args, p, transcriptFile) {
         for (const c of m.message?.content ?? []) if (c.type === "tool_use") { toolNames.set(c.id, c.name); toolCalls.push(c.name); }
       } else if (m.type === "user") {
         for (const c of m.message?.content ?? []) {
+          if (c.type === "tool_result" && !c.is_error) toolOk.push(toolNames.get(c.tool_use_id) ?? "?");
           if (c.type === "tool_result" && c.is_error) {
             const text = Array.isArray(c.content) ? c.content.map((x) => x.text ?? "").join(" ") : String(c.content ?? "");
             toolErrors.push({ tool: toolNames.get(c.tool_use_id) ?? "?", text });
@@ -312,19 +342,19 @@ function runClaude(args, p, transcriptFile) {
       clearTimeout(timer);
       if (buf) onLine(buf);
       transcript.end();
-      resolve({ exitCode: code, timedOut, result, stderr, toolCalls, toolErrors });
+      resolve({ exitCode: code, timedOut, result, stderr, toolCalls, toolErrors, toolOk });
     });
     child.on("error", (err) => {
       clearTimeout(timer);
       transcript.end();
-      resolve({ exitCode: -1, timedOut, result: null, stderr: String(err.message), toolCalls, toolErrors });
+      resolve({ exitCode: -1, timedOut, result: null, stderr: String(err.message), toolCalls, toolErrors, toolOk });
     });
   });
 }
 
 function runAfter(p, runDir, { manual, since }) {
   return new Promise((resolve) => {
-    const env = { ...process.env, ...secrets(), RUN_DIR: runDir, RUN_OUTPUT: path.join(runDir, "output.json"), RUN_MANUAL: manual ? "1" : "0", RUN_SINCE: since, RUN_PROCESS: p.name };
+    const env = { ...process.env, ...secrets(), RUN_DIR: runDir, RUN_OUTPUT: path.join(runDir, "output.json"), RUN_MANUAL: manual ? "1" : "0", RUN_INPUT: path.join(runDir, "input.json"), RUN_SINCE: since, RUN_PROCESS: p.name, RUN_ID: path.basename(runDir), RUNNER: path.join(REPO, "runner", "run.mjs") };
     const child = spawn(process.execPath, [p.after], { cwd: p.dir, env, stdio: ["ignore", "pipe", "pipe"] });
     let stdout = "", stderr = "", timedOut = false;
     child.stdout.on("data", (d) => (stdout += d));

@@ -5,10 +5,15 @@
     "ok",
     "period_label",
     "nothing_new",
-    "new",
+    "followup_report",
+    "bugs",
+    "new_tasks",
+    "projects",
+    "emails",
     "today",
     "ideas",
     "comms",
+    "questions",
     "sources_checked"
   ],
   "properties": {
@@ -19,30 +24,55 @@
       "type": "string"
     },
     "period_label": {
-      "type": "string",
-      "description": "napr. od včera 9:00 do dnes 8:30"
+      "type": "string"
     },
     "nothing_new": {
       "type": "boolean"
     },
-    "new": {
+    "followup_report": {
+      "type": "string",
+      "description": "čo sa urobilo po poslednom hovore (z last_followup), prázdne ak nič"
+    },
+    "bugs": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "text",
-          "why",
+          "key",
+          "name",
+          "change",
+          "status",
+          "assignee",
+          "description",
           "sources"
         ],
         "properties": {
-          "text": {
-            "type": "string",
-            "description": "jedna veta po slovensky, ako sa povie do telefónu"
+          "key": {
+            "type": "string"
           },
-          "why": {
+          "name": {
+            "type": "string"
+          },
+          "change": {
             "type": "string",
-            "description": "prečo je to dôležité, z čoho to vyplýva"
+            "description": "čo sa stalo: vytvorená, dokončená, presunutá z X do Y, nový komentár…"
+          },
+          "status": {
+            "type": "string"
+          },
+          "assignee": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "due": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "description": "skrátený popis úlohy (max 400 znakov), prázdny ak úloha popis nemá"
           },
           "sources": {
             "type": "array",
@@ -63,21 +93,459 @@
                     "pm-call",
                     "pm-task",
                     "pm-notification",
+                    "pm-company-map",
                     "gmail",
                     "calendar",
-                    "fireflies"
+                    "fireflies",
+                    "call-followup"
                   ]
                 },
                 "ref": {
                   "type": "string",
-                  "description": "identifikátor: kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
                 },
                 "url": {
                   "type": "string"
                 },
                 "at": {
                   "type": "string",
-                  "description": "čas udalosti ISO"
+                  "description": "čas udalosti, ISO s časovou zónou"
+                }
+              }
+            }
+          }
+        }
+      },
+      "description": "nové a otvorené bugy zo všetkých task listov AI Bugs"
+    },
+    "new_tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "name",
+          "change",
+          "status",
+          "assignee",
+          "description",
+          "sources"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "change": {
+            "type": "string",
+            "description": "čo sa stalo: vytvorená, dokončená, presunutá z X do Y, nový komentár…"
+          },
+          "status": {
+            "type": "string"
+          },
+          "assignee": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "due": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "description": "skrátený popis úlohy (max 400 znakov), prázdny ak úloha popis nemá"
+          },
+          "sources": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "system",
+                "ref"
+              ],
+              "properties": {
+                "system": {
+                  "type": "string",
+                  "enum": [
+                    "pm-brain-log",
+                    "pm-brain-note",
+                    "pm-call",
+                    "pm-task",
+                    "pm-notification",
+                    "pm-company-map",
+                    "gmail",
+                    "calendar",
+                    "fireflies",
+                    "call-followup"
+                  ]
+                },
+                "ref": {
+                  "type": "string",
+                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "at": {
+                  "type": "string",
+                  "description": "čas udalosti, ISO s časovou zónou"
+                }
+              }
+            }
+          }
+        }
+      },
+      "description": "všetky úlohy vytvorené v okne naprieč projektmi"
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "path",
+          "people",
+          "summary",
+          "changed_tasks",
+          "in_progress",
+          "today"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string",
+            "description": "cesta v PM (space / folder)"
+          },
+          "people": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "kto je priradený k úlohám projektu (podľa PM)"
+          },
+          "summary": {
+            "type": "string",
+            "description": "2–3 vety: čo je nové a čo sa rieši"
+          },
+          "changed_tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "key",
+                "name",
+                "change",
+                "status",
+                "assignee",
+                "description",
+                "sources"
+              ],
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "change": {
+                  "type": "string",
+                  "description": "čo sa stalo: vytvorená, dokončená, presunutá z X do Y, nový komentár…"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "assignee": {
+                  "type": "string"
+                },
+                "priority": {
+                  "type": "string"
+                },
+                "due": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "skrátený popis úlohy (max 400 znakov), prázdny ak úloha popis nemá"
+                },
+                "sources": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "system",
+                      "ref"
+                    ],
+                    "properties": {
+                      "system": {
+                        "type": "string",
+                        "enum": [
+                          "pm-brain-log",
+                          "pm-brain-note",
+                          "pm-call",
+                          "pm-task",
+                          "pm-notification",
+                          "pm-company-map",
+                          "gmail",
+                          "calendar",
+                          "fireflies",
+                          "call-followup"
+                        ]
+                      },
+                      "ref": {
+                        "type": "string",
+                        "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                      },
+                      "url": {
+                        "type": "string"
+                      },
+                      "at": {
+                        "type": "string",
+                        "description": "čas udalosti, ISO s časovou zónou"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "VŠETKY úlohy projektu, ktoré sa v okne zmenili"
+          },
+          "in_progress": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "key",
+                "name",
+                "change",
+                "status",
+                "assignee",
+                "description",
+                "sources"
+              ],
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "change": {
+                  "type": "string",
+                  "description": "čo sa stalo: vytvorená, dokončená, presunutá z X do Y, nový komentár…"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "assignee": {
+                  "type": "string"
+                },
+                "priority": {
+                  "type": "string"
+                },
+                "due": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "skrátený popis úlohy (max 400 znakov), prázdny ak úloha popis nemá"
+                },
+                "sources": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "system",
+                      "ref"
+                    ],
+                    "properties": {
+                      "system": {
+                        "type": "string",
+                        "enum": [
+                          "pm-brain-log",
+                          "pm-brain-note",
+                          "pm-call",
+                          "pm-task",
+                          "pm-notification",
+                          "pm-company-map",
+                          "gmail",
+                          "calendar",
+                          "fireflies",
+                          "call-followup"
+                        ]
+                      },
+                      "ref": {
+                        "type": "string",
+                        "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                      },
+                      "url": {
+                        "type": "string"
+                      },
+                      "at": {
+                        "type": "string",
+                        "description": "čas udalosti, ISO s časovou zónou"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "today": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "text",
+                "who",
+                "why",
+                "sources"
+              ],
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "who": {
+                  "type": "string",
+                  "description": "kto by to mal dnes riešiť; meno z PM alebo 'Marek'"
+                },
+                "task_key": {
+                  "type": "string"
+                },
+                "why": {
+                  "type": "string"
+                },
+                "sources": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "system",
+                      "ref"
+                    ],
+                    "properties": {
+                      "system": {
+                        "type": "string",
+                        "enum": [
+                          "pm-brain-log",
+                          "pm-brain-note",
+                          "pm-call",
+                          "pm-task",
+                          "pm-notification",
+                          "pm-company-map",
+                          "gmail",
+                          "calendar",
+                          "fireflies",
+                          "call-followup"
+                        ]
+                      },
+                      "ref": {
+                        "type": "string",
+                        "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                      },
+                      "url": {
+                        "type": "string"
+                      },
+                      "at": {
+                        "type": "string",
+                        "description": "čas udalosti, ISO s časovou zónou"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "emails": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "from",
+          "subject",
+          "received_at",
+          "content",
+          "why",
+          "needs_reply",
+          "sources"
+        ],
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "received_at": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "description": "vecný obsah mailu: požiadavky, čísla, termíny, mená (max 1500 znakov)"
+          },
+          "why": {
+            "type": "string"
+          },
+          "needs_reply": {
+            "type": "boolean"
+          },
+          "sources": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "system",
+                "ref"
+              ],
+              "properties": {
+                "system": {
+                  "type": "string",
+                  "enum": [
+                    "pm-brain-log",
+                    "pm-brain-note",
+                    "pm-call",
+                    "pm-task",
+                    "pm-notification",
+                    "pm-company-map",
+                    "gmail",
+                    "calendar",
+                    "fireflies",
+                    "call-followup"
+                  ]
+                },
+                "ref": {
+                  "type": "string",
+                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "at": {
+                  "type": "string",
+                  "description": "čas udalosti, ISO s časovou zónou"
                 }
               }
             }
@@ -92,6 +560,7 @@
         "additionalProperties": false,
         "required": [
           "text",
+          "details",
           "why",
           "sources"
         ],
@@ -100,9 +569,12 @@
             "type": "string",
             "description": "jedna veta po slovensky, ako sa povie do telefónu"
           },
-          "why": {
+          "details": {
             "type": "string",
-            "description": "prečo je to dôležité, z čoho to vyplýva"
+            "description": "podrobnosti pre doplňujúce otázky: názvy, popisy, čísla, kto, kedy"
+          },
+          "why": {
+            "type": "string"
           },
           "sources": {
             "type": "array",
@@ -123,27 +595,30 @@
                     "pm-call",
                     "pm-task",
                     "pm-notification",
+                    "pm-company-map",
                     "gmail",
                     "calendar",
-                    "fireflies"
+                    "fireflies",
+                    "call-followup"
                   ]
                 },
                 "ref": {
                   "type": "string",
-                  "description": "identifikátor: kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
                 },
                 "url": {
                   "type": "string"
                 },
                 "at": {
                   "type": "string",
-                  "description": "čas udalosti ISO"
+                  "description": "čas udalosti, ISO s časovou zónou"
                 }
               }
             }
           }
         }
-      }
+      },
+      "description": "Marekove vlastné úlohy na dnes"
     },
     "ideas": {
       "type": "array",
@@ -152,6 +627,7 @@
         "additionalProperties": false,
         "required": [
           "text",
+          "details",
           "why",
           "sources"
         ],
@@ -160,9 +636,12 @@
             "type": "string",
             "description": "jedna veta po slovensky, ako sa povie do telefónu"
           },
-          "why": {
+          "details": {
             "type": "string",
-            "description": "prečo je to dôležité, z čoho to vyplýva"
+            "description": "podrobnosti pre doplňujúce otázky: názvy, popisy, čísla, kto, kedy"
+          },
+          "why": {
+            "type": "string"
           },
           "sources": {
             "type": "array",
@@ -183,21 +662,23 @@
                     "pm-call",
                     "pm-task",
                     "pm-notification",
+                    "pm-company-map",
                     "gmail",
                     "calendar",
-                    "fireflies"
+                    "fireflies",
+                    "call-followup"
                   ]
                 },
                 "ref": {
                   "type": "string",
-                  "description": "identifikátor: kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
                 },
                 "url": {
                   "type": "string"
                 },
                 "at": {
                   "type": "string",
-                  "description": "čas udalosti ISO"
+                  "description": "čas udalosti, ISO s časovou zónou"
                 }
               }
             }
@@ -212,6 +693,7 @@
         "additionalProperties": false,
         "required": [
           "text",
+          "details",
           "why",
           "sources"
         ],
@@ -220,9 +702,12 @@
             "type": "string",
             "description": "jedna veta po slovensky, ako sa povie do telefónu"
           },
-          "why": {
+          "details": {
             "type": "string",
-            "description": "prečo je to dôležité, z čoho to vyplýva"
+            "description": "podrobnosti pre doplňujúce otázky: názvy, popisy, čísla, kto, kedy"
+          },
+          "why": {
+            "type": "string"
           },
           "sources": {
             "type": "array",
@@ -243,24 +728,51 @@
                     "pm-call",
                     "pm-task",
                     "pm-notification",
+                    "pm-company-map",
                     "gmail",
                     "calendar",
-                    "fireflies"
+                    "fireflies",
+                    "call-followup"
                   ]
                 },
                 "ref": {
                   "type": "string",
-                  "description": "identifikátor: kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
                 },
                 "url": {
                   "type": "string"
                 },
                 "at": {
                   "type": "string",
-                  "description": "čas udalosti ISO"
+                  "description": "čas udalosti, ISO s časovou zónou"
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "question",
+          "why",
+          "topic"
+        ],
+        "properties": {
+          "question": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string",
+            "description": "na čo odpoveď použijem"
+          },
+          "topic": {
+            "type": "string",
+            "description": "projekt alebo téma"
           }
         }
       }

@@ -1,0 +1,7 @@
+{
+  "description": "Rozhovor s Marekom cez hlasového asistenta: otázky prídu ako --input JSON {topic, intro, questions[{question, why}]}, po hovore call-followup zapíše odpovede do second brainu. Len ručne.",
+  "enabled": true,
+  "schedule": null,
+  "claude": false,
+  "afterTimeoutMin": 60
+}

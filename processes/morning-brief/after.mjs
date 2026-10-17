@@ -1,131 +1,67 @@
-// Morning brief, step 2: turn the structured brief into call variables, place the outbound call through
-// the ElevenLabs SIP trunk (Linphone) and wait for the call to finish. Writes call.json + transcript to RUN_DIR.
+// Morning brief, step 2: structured brief → call variables → call on Linphone → call-followup (after the call).
 // Exit 0 = the call was placed and finished (answered or not); non-zero = the call could not be placed.
 import fs from "node:fs";
-import path from "node:path";
+import { localTime, placeCallAndWait, startFollowup } from "../../runner/voice-call.mjs";
 
-const def = JSON.parse(fs.readFileSync(new URL("./process.json", import.meta.url), "utf8")).call;
-const { output } = JSON.parse(fs.readFileSync(process.env.RUN_OUTPUT, "utf8"));
 const RUN_DIR = process.env.RUN_DIR;
-const KEY = process.env.ELEVENLABS_API_KEY;
-const API = "https://api.elevenlabs.io";
-if (!KEY) {
-  console.error("ELEVENLABS_API_KEY missing in ~/.aios-runner/secrets.env");
-  process.exit(3);
+const { output: o } = JSON.parse(fs.readFileSync(process.env.RUN_OUTPUT, "utf8"));
+
+const WORD = { "pm-brain-log": "second brain", "pm-brain-note": "second brain", "pm-call": "hovor", "pm-task": "úlohy v PM", "pm-notification": "notifikácie v PM", "pm-company-map": "mapa firmy", gmail: "e-mail", calendar: "kalendár", fireflies: "Fireflies", "call-followup": "spracovanie hovoru" };
+const from = (sources = []) => [...new Set(sources.map((s) => WORD[s.system] ?? s.system))].join(", ");
+const src = (sources = []) => sources.map((s) => `${WORD[s.system] ?? s.system} ${s.ref}${s.at ? ` (${localTime(s.at)})` : ""}`).join("; ");
+const taskLine = (t) => `${t.key} „${t.name}“: ${t.change}; stav ${t.status}; rieši ${t.assignee || "nikto"}${t.priority ? `; priorita ${t.priority}` : ""}${t.due ? `; termín ${t.due}` : ""}`;
+
+// --- what the agent says (in this order) ---
+const say = [];
+if (o.followup_report) say.push(`## Po poslednom hovore\n${o.followup_report}`);
+if (o.nothing_new) say.push("Za toto obdobie nie je nič nové.");
+say.push(`## Bugy (AI Bugs)\n${o.bugs.length ? o.bugs.map((b) => `- ${b.name} (${b.change}; rieši ${b.assignee || "nikto"})`).join("\n") : "Žiadne otvorené bugy."}`);
+for (const p of o.projects) {
+  say.push(`## Projekt ${p.name}\nNové a čo sa rieši: ${p.summary}\nZmenených úloh: ${p.changed_tasks.length}.\nPriority na dnes:\n${p.today.map((t) => `- ${t.text} → ${t.who}`).join("\n") || "- (bez priority)"}`);
 }
+if (o.new_tasks.length) say.push(`## Nové úlohy (${o.new_tasks.length})\n${o.new_tasks.map((t) => `- ${t.name} (${t.assignee || "bez riešiteľa"})`).join("\n")}`);
+say.push(`## Dôležité e-maily\n${o.emails.length ? o.emails.map((e) => `- od ${e.from}: ${e.subject}${e.needs_reply ? " (čaká na odpoveď)" : ""}`).join("\n") : "Nič dôležité."}`);
+say.push(`## Tvoje úlohy na dnes\n${o.today.map((i) => `- ${i.text} (zdroj: ${from(i.sources)})`).join("\n") || "(nič)"}`);
+if (o.ideas.length) say.push(`## Nápady\n${o.ideas.map((i) => `- ${i.text}`).join("\n")}`);
+if (o.comms.length) say.push(`## Navrhované e-maily a meetingy\n${o.comms.map((i) => `- ${i.text}`).join("\n")}`);
+say.push(`## Otázky pre Mareka\n${o.questions.map((q, i) => `${i + 1}. ${q.question}`).join("\n") || "(žiadne)"}`);
 
-const SOURCE_WORD = {
-  "pm-brain-log": "second brain", "pm-brain-note": "second brain", "pm-call": "hovor", "pm-task": "úlohy v PM",
-  "pm-notification": "notifikácie v PM", gmail: "e-mail", calendar: "kalendár", fireflies: "Fireflies",
-};
-const SECTIONS = [
-  ["new", "Čo je nové"],
-  ["today", "Čo urobiť dnes"],
-  ["ideas", "Nápady na projekty"],
-  ["comms", "Navrhované e-maily a meetingy"],
-];
-
-function briefText(o) {
-  const parts = [];
-  if (o.nothing_new) parts.push("Za toto obdobie nie je nič nové.");
-  for (const [key, title] of SECTIONS) {
-    const items = o[key] ?? [];
-    parts.push(`## ${title}`);
-    if (!items.length) parts.push("(nič)");
-    for (const it of items) {
-      const from = [...new Set(it.sources.map((s) => SOURCE_WORD[s.system] ?? s.system))].join(", ");
-      parts.push(`- ${it.text} (zdroj: ${from})`);
-    }
-  }
-  return parts.join("\n");
+// --- everything the agent may need for follow-up questions ---
+const det = [];
+for (const b of o.bugs) det.push(`BUG ${taskLine(b)}\n  Popis: ${b.description || "(bez popisu)"}`);
+for (const p of o.projects) {
+  det.push(`PROJEKT ${p.name} (${p.path}); ľudia: ${p.people.join(", ") || "-"}`);
+  for (const t of p.changed_tasks) det.push(`  zmena ${taskLine(t)}\n    Popis: ${t.description || "(bez popisu)"}`);
+  for (const t of p.in_progress) det.push(`  rieši sa ${taskLine(t)}`);
+  for (const t of p.today) det.push(`  priorita dnes: ${t.text} → ${t.who}${t.task_key ? ` (${t.task_key})` : ""}. Prečo: ${t.why}`);
 }
-
-const TZ = "Europe/Bratislava";
-const local = (iso) => {
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? iso : new Intl.DateTimeFormat("sk-SK", { timeZone: TZ, day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" }).format(d);
-};
-
-function briefDetails(o) {
-  const lines = [];
-  for (const [key, title] of SECTIONS) {
-    (o[key] ?? []).forEach((it, i) => {
-      const src = it.sources.map((s) => `${SOURCE_WORD[s.system] ?? s.system} ${s.ref}${s.at ? ` (${local(s.at)} miestneho času)` : ""}`).join("; ");
-      lines.push(`${title} ${i + 1}: ${it.text}\n  Prečo: ${it.why}\n  Zdroje: ${src}`);
-    });
-  }
-  const failed = (o.sources_checked ?? []).filter((s) => s.status === "failed").map((s) => s.source);
-  if (failed.length) lines.push(`Zdroje, ktoré sa dnes nepodarilo prečítať: ${failed.join(", ")}.`);
-  return lines.join("\n") || "(žiadne podrobnosti)";
+for (const t of o.new_tasks) det.push(`NOVÁ ÚLOHA ${taskLine(t)}\n  Popis: ${t.description || "(bez popisu)"}`);
+for (const e of o.emails) det.push(`E-MAIL od ${e.from}, ${localTime(e.received_at)}, predmet „${e.subject}“${e.needs_reply ? ", čaká na odpoveď" : ""}\n  Obsah: ${e.content}\n  Prečo dôležité: ${e.why}`);
+for (const [k, title] of [["today", "DNES"], ["ideas", "NÁPAD"], ["comms", "NÁVRH KOMUNIKÁCIE"]]) {
+  for (const i of o[k]) det.push(`${title}: ${i.text}\n  Detaily: ${i.details}\n  Prečo: ${i.why}\n  Zdroje: ${src(i.sources)}`);
 }
+for (const q of o.questions) det.push(`OTÁZKA (${q.topic}): ${q.question}\n  Prečo sa pýtam: ${q.why}`);
+const failed = o.sources_checked.filter((s) => s.status === "failed").map((s) => s.source);
+if (failed.length) det.push(`Zdroje, ktoré sa dnes nepodarilo prečítať: ${failed.join(", ")}.`);
 
-async function api(method, url, body) {
-  const res = await fetch(API + url, {
-    method,
-    headers: { "xi-api-key": KEY, "content-type": "application/json" },
-    body: body ? JSON.stringify(body) : undefined,
-    signal: AbortSignal.timeout(60_000),
-  });
-  const text = await res.text();
-  if (!res.ok) throw new Error(`ElevenLabs ${method} ${url} → HTTP ${res.status}: ${text.slice(0, 500)}`);
-  return JSON.parse(text);
-}
-
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-async function placeCall(vars) {
-  const r = await api("POST", "/v1/convai/sip-trunk/outbound-call", {
-    agent_id: def.agentId,
-    agent_phone_number_id: def.phoneNumberId,
-    to_number: def.toNumber,
-    conversation_initiation_client_data: { dynamic_variables: vars },
-    telephony_call_config: { ringing_timeout_secs: def.ringingTimeoutSecs ?? 60 },
-  });
-  if (!r.success || !r.conversation_id) throw new Error(`call not started: ${r.message ?? JSON.stringify(r)}`);
-  return r;
-}
-
-async function waitForEnd(conversationId) {
-  const deadline = Date.now() + 30 * 60_000;
-  let conv;
-  while (Date.now() < deadline) {
-    await sleep(15_000);
-    conv = await api("GET", `/v1/convai/conversations/${conversationId}`);
-    if (["done", "failed"].includes(conv.status)) return conv;
-  }
-  return conv;
-}
+const instructions = `Toto je ranný brief za obdobie ${o.period_label}.
+Poradie: (1) čo sa urobilo po poslednom hovore, ak niečo, (2) bugy, (3) projekt po projekte: čo je nové, čo sa rieši, priorita na dnes a kto ju má riešiť, (4) nové úlohy, (5) dôležité e-maily, (6) Marekove úlohy na dnes, (7) nápady, (8) navrhované e-maily a meetingy, (9) otázky.
+Pri projektoch povedz zhrnutie a priority. Jednotlivé zmenené úlohy vymenuj, len keď sa Marek spýta, máš ich v podrobnostiach s názvami a popismi. Pri e-mailoch vieš povedať ich obsah.
+Po každom bloku sa krátko opýtaj, či má otázku alebo či pokračovať.
+Otázky polož na konci, jednu po druhej, a počkaj na odpoveď. Ak sa otázka týka projektu, o ktorom práve hovoríte, môžeš ju položiť hneď tam.
+Marek ti môže zadať nové úlohy pre seba alebo developerov. Postupuj podľa pravidiel v časti „Počas hovoru nič nevykonávaš“.`;
 
 const vars = {
-  brief_text: briefText(output),
-  brief_details: briefDetails(output),
-  brief_period: output.period_label,
-  brief_date: new Intl.DateTimeFormat("sk-SK", { timeZone: "Europe/Bratislava", dateStyle: "full" }).format(new Date()),
+  first_message: `Dobré ráno, Marek. Mám pre teba ranný brief za obdobie ${o.period_label}. Môžem začať?`,
+  call_instructions: instructions,
+  call_content: say.join("\n\n"),
+  call_details: det.join("\n") || "(žiadne podrobnosti)",
 };
-fs.writeFileSync(path.join(RUN_DIR, "call-variables.json"), JSON.stringify(vars, null, 2));
+console.log(`variables: content ${vars.call_content.length} chars, details ${vars.call_details.length} chars`);
 
-const attempts = [];
-for (let attempt = 0; attempt <= (def.retries ?? 1); attempt++) {
-  if (attempt > 0) await sleep((def.retryAfterMin ?? 10) * 60_000);
-  const started = await placeCall(vars);
-  console.log(`call ${attempt + 1} started: conversation ${started.conversation_id}`);
-  const conv = await waitForEnd(started.conversation_id);
-  const userTurns = (conv?.transcript ?? []).filter((t) => t.role === "user" && t.message).length;
-  const info = {
-    attempt: attempt + 1,
-    conversation_id: started.conversation_id,
-    sip_call_id: started.sip_call_id,
-    status: conv?.status ?? "unknown",
-    duration_secs: conv?.metadata?.call_duration_secs ?? null,
-    termination_reason: conv?.metadata?.termination_reason ?? null,
-    user_turns: userTurns,
-    answered: userTurns > 0 || (conv?.metadata?.call_duration_secs ?? 0) > 15,
-  };
-  attempts.push(info);
-  fs.writeFileSync(path.join(RUN_DIR, `call-${attempt + 1}-transcript.json`), JSON.stringify(conv?.transcript ?? [], null, 2));
-  console.log(JSON.stringify(info));
-  if (info.answered) break;
+const result = await placeCallAndWait(vars, { runDir: RUN_DIR });
+if (!result.answered) {
+  console.log("call not answered (logged, not an error)");
+} else {
+  startFollowup({ runDir: RUN_DIR, kind: "morning-brief", purpose: "Ranný brief", content: o, transcript: result.transcript, conversationId: result.conversationId });
 }
-fs.writeFileSync(path.join(RUN_DIR, "call.json"), JSON.stringify({ attempts }, null, 2));
-const last = attempts.at(-1);
-if (!last.answered) console.log("call not answered (logged, not an error)");
