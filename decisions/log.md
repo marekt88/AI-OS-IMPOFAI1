@@ -75,3 +75,20 @@ Keep it terse. Future-you will thank present-you for capturing the *why*, not ju
 **Alternatives considered:** prepísanie promptu agenta pri každom hovore (override), agent so živým prístupom k MCP. Akcie počas hovoru (úlohy, e-maily, meetingy, otázky) a indexovanie prepisu prídu neskôr cez server tools a post-call webhook do PM.
 
 **Owner:** Marek Tóth
+
+## 2026-10-18 - Plán AI platformy a fáza 1
+
+**Decision:** Cieľ a plán sú zapísané v `references/ai-platforma-ciel.md` a `references/ai-platforma-plan.md` (fázy 0–6). Fáza 1 beží v AIOS runneri bez zmien v PM:
+- prichádzajúci hovor k osobnému asistentovi (Linphone číslo prepnuté z testovacej Petry);
+- followup akcie iba navrhne, vykoná ich samostatný `action-executor` (úzky zoznam nástrojov, limit 10, záloha pred zmazaním, audit komentárom, prístupy, financie a e-maily len cez úlohu na schválenie);
+- spätný hovor s tichými hodinami 21:00–7:30, max 3 za deň, strop 60 min za deň;
+- brief v3 so všetkými aktívnymi projektmi a frontou otázok;
+- opakovanie pri prechodných chybách a testovací režim `--dry-run`.
+
+Presun do PM (entity Agent, AgentRun, Call, Approval, Question) príde vo fáze 3.
+
+**Why:** Swarm 4 agentov s krížovou recenziou. Dáta ukazujú, že dnes bolí spoľahlivosť a chýbajúca slučka „zavolaj – urobí – zavolá späť“, nie chýbajúca infraštruktúra v PM. Červený tím ukázal riziko prompt injection (followup s právami zapisovať čítal e-maily), preto oddelenie návrhu a vykonania.
+
+**Alternatives considered:** fronta jobov v PM hneď (architekt), druhé potvrdenie mimo hlasu a 2 týždne testovacieho režimu (červený tím), samostatné druhé číslo pre asistenta. Otvorené pre Mareka: model predplatného pre produkt pre iné firmy (Anthropic nepovoľuje zdieľať predplatné), prvý server pre serverových agentov.
+
+**Owner:** Marek Tóth (rozhodnutia orchestrátora v autonómnom režime, na potvrdenie)

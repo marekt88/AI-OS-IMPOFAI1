@@ -1,0 +1,10 @@
+{
+  "description": "Prichádzajúce hovory: každých 5 minút prečíta z ElevenLabs dokončené prichádzajúce hovory osobného asistenta (Linphone číslo) od posledného spracovania a pre každý spustí call-followup s kind inbound a overením volajúceho (mtoth). Bez claude -p, stav v state/inbound-call.cursor.json.",
+  "enabled": true,
+  "schedule": "*/5 * * * *",
+  "tz": "Europe/Bratislava",
+  "claude": false,
+  "catchUpMin": 5,
+  "afterTimeoutMin": 5,
+  "keepRuns": 300
+}

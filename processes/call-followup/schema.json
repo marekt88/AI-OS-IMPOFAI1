@@ -3,11 +3,17 @@
   "additionalProperties": false,
   "required": [
     "ok",
+    "dry_run",
+    "kind",
+    "caller_verified",
+    "interrupted",
     "summary",
     "notes_written",
-    "actions_done",
+    "proposed_actions",
     "actions_skipped",
-    "open_questions"
+    "open_questions",
+    "answered_questions",
+    "callback"
   ],
   "properties": {
     "ok": {
@@ -16,9 +22,31 @@
     "error": {
       "type": "string"
     },
+    "dry_run": {
+      "type": "boolean",
+      "description": "true = nič sa nezapísalo, notes_written iba popisuje plán"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "morning-brief",
+        "interview",
+        "inbound",
+        "callback",
+        "other"
+      ]
+    },
+    "caller_verified": {
+      "type": "boolean",
+      "description": "inbound: caller obsahuje mtoth; ostatné druhy true"
+    },
+    "interrupted": {
+      "type": "boolean",
+      "description": "hovor sa skončil prerušením pred záverečným zhrnutím"
+    },
     "summary": {
       "type": "string",
-      "description": "2–4 vety po slovensky: čo sa v hovore dohodlo a čo sa po ňom urobilo"
+      "description": "2–4 vety po slovensky: čo sa v hovore dohodlo a čo sa navrhuje vykonať"
     },
     "notes_written": {
       "type": "array",
@@ -35,35 +63,85 @@
           },
           "what": {
             "type": "string"
+          },
+          "planned_content": {
+            "type": "string",
+            "description": "iba v dry-run: obsah alebo diff, ktorý by sa zapísal"
           }
         }
       }
     },
-    "actions_done": {
+    "proposed_actions": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "what",
-          "ref",
-          "quote"
+          "id",
+          "tool",
+          "args",
+          "summary",
+          "quote",
+          "at_secs",
+          "confirmed",
+          "risk",
+          "target_key",
+          "target_name"
         ],
         "properties": {
-          "what": {
+          "id": {
             "type": "string",
-            "description": "čo sa urobilo, po slovensky"
+            "description": "A1, A2…"
           },
-          "ref": {
+          "tool": {
             "type": "string",
-            "description": "kľúč úlohy, cesta poznámky, id"
+            "description": "presné meno PM MCP nástroja bez prefixu, napr. pm_assign_task"
+          },
+          "args": {
+            "type": "object",
+            "description": "argumenty nástroja s vyriešenými id/kľúčmi/e-mailmi"
+          },
+          "summary": {
+            "type": "string",
+            "description": "jedna veta po slovensky, čo akcia urobí"
           },
           "quote": {
             "type": "string",
-            "description": "Marekova veta z hovoru, na ktorú sa akcia opiera"
+            "description": "doslovná Marekova veta (role user) z prepisu, ktorou akciu zadal alebo potvrdil"
+          },
+          "readback": {
+            "type": "string",
+            "description": "doslovná veta asistenta, ktorú Marek potvrdil (ak bola), najlepšie s kľúčom úlohy"
+          },
+          "at_secs": {
+            "type": "number"
+          },
+          "confirmed": {
+            "type": "boolean"
+          },
+          "risk": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "destructive",
+              "needs_approval"
+            ]
+          },
+          "target_key": {
+            "type": "string",
+            "description": "kľúč dotknutej úlohy (IMP-123), pri vytváraní prázdny"
+          },
+          "target_name": {
+            "type": "string",
+            "description": "názov dotknutej úlohy, pri vytváraní názov novej"
+          },
+          "assignee_name": {
+            "type": "string",
+            "description": "pri pm_assign_task (a pm_create_task s riešiteľom): meno riešiteľa, ako zaznelo v hovore"
           }
         }
-      }
+      },
+      "maxItems": 10
     },
     "actions_skipped": {
       "type": "array",
@@ -86,10 +164,104 @@
     },
     "open_questions": {
       "type": "array",
+      "description": "otázky vo fronte context/otvorene-otazky.md, ktoré tento hovor pridal alebo ponechal relevantné",
       "items": {
-        "type": "string"
-      },
-      "description": "čo treba nabudúce dopýtať"
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "question",
+          "why",
+          "topic",
+          "new"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Q-001…"
+          },
+          "question": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "new": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "answered_questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "answer",
+          "quote"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "callback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "needed",
+        "reason",
+        "say",
+        "questions"
+      ],
+      "properties": {
+        "needed": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "say": {
+          "type": "string",
+          "description": "čo má spätný hovor povedať na úvod (bez výsledkov executora, tie doplní kód)"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "question",
+              "why"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "question": {
+                "type": "string"
+              },
+              "why": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

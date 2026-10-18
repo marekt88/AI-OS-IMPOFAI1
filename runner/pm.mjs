@@ -1,17 +1,34 @@
 // Error reporting into the PM task list "AI Bugs" — talks to PM MCP over plain HTTP with its own token,
 // so it works even when Claude Code (login, connectors) is the thing that is broken.
 import fs from "node:fs";
-import { DIRS, redact, secrets } from "./core.mjs";
+import { DIRS, isReadOnlyTool, redact, secrets } from "./core.mjs";
 
 const PM_MCP_URL = "https://project-managment.impofai.com/api/mcp";
 export const BUGS_LIST = "cmv0zalyu0009p327hpyvas8d"; // Startups / Projekt Manazment / AI Bugs
 const ISSUES_FILE = () => `${DIRS.state}/issues.json`;
 const QUEUE_FILE = () => `${DIRS.state}/undelivered.jsonl`;
 
+/** A secret is set (secrets.env, or the env an after.mjs got from the runner). The value is never returned. */
+export function hasSecret(name) {
+  return Boolean(secrets()[name] || process.env[name]);
+}
+
 let rpcId = 0;
-export async function pmTool(name, args) {
-  const token = secrets().PM_MCP_TOKEN;
-  if (!token) throw new Error("PM_MCP_TOKEN missing in ~/.aios-runner/secrets.env");
+/**
+ * Calls one PM MCP tool over HTTP. Token: `token` (explicit value) > `tokenEnv` (name of a secret, e.g.
+ * "PM_ACTIONS_TOKEN"; missing = error, no fallback) > PM_MCP_TOKEN (default, error reporting token).
+ * Dry-run (RUN_DRY=1): write tools (anything but get/list/search/read/fetch) are not sent, the result is
+ * { dry_run: true, tool, args }. Read tools work normally.
+ */
+export async function pmTool(name, args, { token: explicit = null, tokenEnv = null } = {}) {
+  if (process.env.RUN_DRY === "1" && !isReadOnlyTool(name)) {
+    // K2 fail-safe: in dry-run a write tool is never sent to PM
+    console.log(`[dry-run] pmTool ${name} not called`);
+    return { dry_run: true, tool: name, args };
+  }
+  const tokenName = tokenEnv || "PM_MCP_TOKEN";
+  const token = explicit || secrets()[tokenName] || process.env[tokenName];
+  if (!token) throw new Error(`${tokenName} missing in ~/.aios-runner/secrets.env`);
   const res = await fetch(secrets().PM_MCP_URL || PM_MCP_URL, {
     method: "POST",
     headers: {
@@ -53,6 +70,11 @@ function saveIssues(v) {
 export async function reportIssue({ fingerprint, title, details, process: proc = null, runId = null }) {
   const at = new Date().toISOString();
   const safe = { fingerprint, title: redact(title), details: redact(details ?? ""), process: proc, runId, at };
+  if (process.env.RUN_DRY === "1") {
+    // K2: a dry-run never writes to PM (not even bug reports)
+    console.log(`[dry-run] issue not reported: ${safe.title}`);
+    return false;
+  }
   try {
     await deliver(safe);
     return true;
@@ -98,6 +120,7 @@ async function deliver({ fingerprint, title, details, process: proc, runId, at }
 
 /** A process that had an open issue succeeded again → note it on the task (the human closes it). */
 export async function noteRecovered(fingerprintPrefix, message) {
+  if (process.env.RUN_DRY === "1") return;
   const issues = loadIssues();
   for (const [fp, info] of Object.entries(issues)) {
     if (!fp.startsWith(fingerprintPrefix) || !info.taskKey || info.recoveredAt) continue;

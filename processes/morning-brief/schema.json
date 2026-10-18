@@ -6,6 +6,7 @@
     "period_label",
     "nothing_new",
     "followup_report",
+    "followups",
     "bugs",
     "new_tasks",
     "projects",
@@ -31,48 +32,55 @@
     },
     "followup_report": {
       "type": "string",
-      "description": "čo sa urobilo po poslednom hovore (z last_followup), prázdne ak nič"
+      "description": "1–3 vety: čo sa urobilo po všetkých hovoroch od posledného briefu (zhrnutie poľa followups), prázdne ak nič"
     },
-    "bugs": {
+    "followups": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "key",
-          "name",
-          "change",
-          "status",
-          "assignee",
-          "description",
+          "at",
+          "kind",
+          "summary",
+          "executed",
+          "skipped",
+          "approvals",
           "sources"
         ],
         "properties": {
-          "key": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "change": {
+          "at": {
             "type": "string",
-            "description": "čo sa stalo: vytvorená, dokončená, presunutá z X do Y, nový komentár…"
+            "description": "čas hovoru alebo spracovania, ISO"
           },
-          "status": {
-            "type": "string"
-          },
-          "assignee": {
-            "type": "string"
-          },
-          "priority": {
-            "type": "string"
-          },
-          "due": {
-            "type": "string"
-          },
-          "description": {
+          "kind": {
             "type": "string",
-            "description": "skrátený popis úlohy (max 400 znakov), prázdny ak úloha popis nemá"
+            "description": "morning-brief | interview | inbound | callback"
+          },
+          "summary": {
+            "type": "string",
+            "description": "1–2 vety: o čom bol hovor"
+          },
+          "executed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "čo sa naozaj vykonalo, s kľúčom úlohy a menom, napr. 'IMP-1491 priradená Leonardovi Tóthovi'"
+          },
+          "skipped": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "čo sa nevykonalo a prečo"
+          },
+          "approvals": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "čo čaká na Marekovo schválenie (úloha v AI Bugs s kľúčom)"
           },
           "sources": {
             "type": "array",
@@ -94,15 +102,112 @@
                     "pm-task",
                     "pm-notification",
                     "pm-company-map",
+                    "pm-tree",
                     "gmail",
                     "calendar",
                     "fireflies",
-                    "call-followup"
+                    "call-followup",
+                    "action-executor",
+                    "open-questions"
                   ]
                 },
                 "ref": {
                   "type": "string",
-                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru, id behu"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "at": {
+                  "type": "string",
+                  "description": "čas udalosti, ISO s časovou zónou"
+                }
+              }
+            }
+          }
+        }
+      },
+      "description": "jeden záznam pre každý hovor od posledného briefu (z followups a executions)"
+    },
+    "bugs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "name",
+          "change",
+          "status",
+          "assignee",
+          "description",
+          "sources"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "kľúč úlohy, napr. IMP-1491"
+          },
+          "name": {
+            "type": "string",
+            "description": "presný názov úlohy z PM"
+          },
+          "change": {
+            "type": "string",
+            "description": "čo sa stalo v okne: vytvorená, dokončená, presunutá z X do Y, nový komentár… Pri úlohe bez zmeny 'bez zmeny'"
+          },
+          "status": {
+            "type": "string",
+            "description": "to_do | in_progress | in_review | complete"
+          },
+          "assignee": {
+            "type": "string",
+            "description": "celé meno riešiteľa, prázdne ak nikto"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "due": {
+            "type": "string",
+            "description": "termín YYYY-MM-DD, prázdne ak nie je"
+          },
+          "description": {
+            "type": "string",
+            "description": "1–2 vety: o čom úloha je a čo presne treba urobiť (z popisu v PM, max 300 znakov); prázdne ak úloha popis nemá",
+            "maxLength": 400
+          },
+          "sources": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "system",
+                "ref"
+              ],
+              "properties": {
+                "system": {
+                  "type": "string",
+                  "enum": [
+                    "pm-brain-log",
+                    "pm-brain-note",
+                    "pm-call",
+                    "pm-task",
+                    "pm-notification",
+                    "pm-company-map",
+                    "pm-tree",
+                    "gmail",
+                    "calendar",
+                    "fireflies",
+                    "call-followup",
+                    "action-executor",
+                    "open-questions"
+                  ]
+                },
+                "ref": {
+                  "type": "string",
+                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru, id behu"
                 },
                 "url": {
                   "type": "string"
@@ -134,30 +239,36 @@
         ],
         "properties": {
           "key": {
-            "type": "string"
+            "type": "string",
+            "description": "kľúč úlohy, napr. IMP-1491"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "presný názov úlohy z PM"
           },
           "change": {
             "type": "string",
-            "description": "čo sa stalo: vytvorená, dokončená, presunutá z X do Y, nový komentár…"
+            "description": "čo sa stalo v okne: vytvorená, dokončená, presunutá z X do Y, nový komentár… Pri úlohe bez zmeny 'bez zmeny'"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "to_do | in_progress | in_review | complete"
           },
           "assignee": {
-            "type": "string"
+            "type": "string",
+            "description": "celé meno riešiteľa, prázdne ak nikto"
           },
           "priority": {
             "type": "string"
           },
           "due": {
-            "type": "string"
+            "type": "string",
+            "description": "termín YYYY-MM-DD, prázdne ak nie je"
           },
           "description": {
             "type": "string",
-            "description": "skrátený popis úlohy (max 400 znakov), prázdny ak úloha popis nemá"
+            "description": "1–2 vety: o čom úloha je a čo presne treba urobiť (z popisu v PM, max 300 znakov); prázdne ak úloha popis nemá",
+            "maxLength": 400
           },
           "sources": {
             "type": "array",
@@ -179,15 +290,18 @@
                     "pm-task",
                     "pm-notification",
                     "pm-company-map",
+                    "pm-tree",
                     "gmail",
                     "calendar",
                     "fireflies",
-                    "call-followup"
+                    "call-followup",
+                    "action-executor",
+                    "open-questions"
                   ]
                 },
                 "ref": {
                   "type": "string",
-                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru, id behu"
                 },
                 "url": {
                   "type": "string"
@@ -210,8 +324,14 @@
         "additionalProperties": false,
         "required": [
           "name",
+          "aliases",
           "path",
+          "changed",
+          "last_change_at",
+          "open_count",
+          "next_due",
           "people",
+          "owners",
           "summary",
           "changed_tasks",
           "in_progress",
@@ -219,22 +339,51 @@
         ],
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "názov projektu, ako ho Marek volá"
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "iné mená projektu: klient, firma, skratky (napr. Zacharides = Imagewell)"
           },
           "path": {
             "type": "string",
             "description": "cesta v PM (space / folder)"
+          },
+          "changed": {
+            "type": "boolean",
+            "description": "true, ak sa v okne niečo zmenilo"
+          },
+          "last_change_at": {
+            "type": "string",
+            "description": "kedy sa naposledy zmenila niektorá úloha projektu, ISO; prázdne ak nevieš"
+          },
+          "open_count": {
+            "type": "integer",
+            "description": "počet otvorených úloh (z pm_get_workspace_tree)"
+          },
+          "next_due": {
+            "type": "string",
+            "description": "najbližší termín otvorenej úlohy: 'IMP-123 Názov, 2026-10-20, rieši Meno'; prázdne ak žiadny"
           },
           "people": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "description": "kto je priradený k úlohám projektu (podľa PM)"
+            "description": "kto je priradený k otvoreným úlohám projektu (podľa PM)"
+          },
+          "owners": {
+            "type": "string",
+            "description": "potvrdené priradenie ľudí na projekt zo second brainu (context/projekty-a-tim.md), prázdne ak nie je potvrdené"
           },
           "summary": {
             "type": "string",
-            "description": "2–3 vety: čo je nové a čo sa rieši"
+            "description": "2–3 vety: čo je nové a čo sa rieši; pri projekte bez zmeny 'bez zmeny od …, otvorené N, najbližší termín …, kto …'",
+            "maxLength": 700
           },
           "changed_tasks": {
             "type": "array",
@@ -252,30 +401,36 @@
               ],
               "properties": {
                 "key": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "kľúč úlohy, napr. IMP-1491"
                 },
                 "name": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "presný názov úlohy z PM"
                 },
                 "change": {
                   "type": "string",
-                  "description": "čo sa stalo: vytvorená, dokončená, presunutá z X do Y, nový komentár…"
+                  "description": "čo sa stalo v okne: vytvorená, dokončená, presunutá z X do Y, nový komentár… Pri úlohe bez zmeny 'bez zmeny'"
                 },
                 "status": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "to_do | in_progress | in_review | complete"
                 },
                 "assignee": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "celé meno riešiteľa, prázdne ak nikto"
                 },
                 "priority": {
                   "type": "string"
                 },
                 "due": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "termín YYYY-MM-DD, prázdne ak nie je"
                 },
                 "description": {
                   "type": "string",
-                  "description": "skrátený popis úlohy (max 400 znakov), prázdny ak úloha popis nemá"
+                  "description": "1–2 vety: o čom úloha je a čo presne treba urobiť (z popisu v PM, max 300 znakov); prázdne ak úloha popis nemá",
+                  "maxLength": 400
                 },
                 "sources": {
                   "type": "array",
@@ -297,15 +452,18 @@
                           "pm-task",
                           "pm-notification",
                           "pm-company-map",
+                          "pm-tree",
                           "gmail",
                           "calendar",
                           "fireflies",
-                          "call-followup"
+                          "call-followup",
+                          "action-executor",
+                          "open-questions"
                         ]
                       },
                       "ref": {
                         "type": "string",
-                        "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                        "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru, id behu"
                       },
                       "url": {
                         "type": "string"
@@ -319,7 +477,7 @@
                 }
               }
             },
-            "description": "VŠETKY úlohy projektu, ktoré sa v okne zmenili"
+            "description": "VŠETKY úlohy projektu, ktoré sa v okne zmenili (aj dokončené)"
           },
           "in_progress": {
             "type": "array",
@@ -337,30 +495,36 @@
               ],
               "properties": {
                 "key": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "kľúč úlohy, napr. IMP-1491"
                 },
                 "name": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "presný názov úlohy z PM"
                 },
                 "change": {
                   "type": "string",
-                  "description": "čo sa stalo: vytvorená, dokončená, presunutá z X do Y, nový komentár…"
+                  "description": "čo sa stalo v okne: vytvorená, dokončená, presunutá z X do Y, nový komentár… Pri úlohe bez zmeny 'bez zmeny'"
                 },
                 "status": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "to_do | in_progress | in_review | complete"
                 },
                 "assignee": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "celé meno riešiteľa, prázdne ak nikto"
                 },
                 "priority": {
                   "type": "string"
                 },
                 "due": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "termín YYYY-MM-DD, prázdne ak nie je"
                 },
                 "description": {
                   "type": "string",
-                  "description": "skrátený popis úlohy (max 400 znakov), prázdny ak úloha popis nemá"
+                  "description": "1–2 vety: o čom úloha je a čo presne treba urobiť (z popisu v PM, max 300 znakov); prázdne ak úloha popis nemá",
+                  "maxLength": 400
                 },
                 "sources": {
                   "type": "array",
@@ -382,15 +546,18 @@
                           "pm-task",
                           "pm-notification",
                           "pm-company-map",
+                          "pm-tree",
                           "gmail",
                           "calendar",
                           "fireflies",
-                          "call-followup"
+                          "call-followup",
+                          "action-executor",
+                          "open-questions"
                         ]
                       },
                       "ref": {
                         "type": "string",
-                        "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                        "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru, id behu"
                       },
                       "url": {
                         "type": "string"
@@ -403,7 +570,9 @@
                   }
                 }
               }
-            }
+            },
+            "description": "rozpracované a najdôležitejšie otvorené úlohy (max 8)",
+            "maxItems": 8
           },
           "today": {
             "type": "array",
@@ -450,15 +619,18 @@
                           "pm-task",
                           "pm-notification",
                           "pm-company-map",
+                          "pm-tree",
                           "gmail",
                           "calendar",
                           "fireflies",
-                          "call-followup"
+                          "call-followup",
+                          "action-executor",
+                          "open-questions"
                         ]
                       },
                       "ref": {
                         "type": "string",
-                        "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                        "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru, id behu"
                       },
                       "url": {
                         "type": "string"
@@ -483,6 +655,8 @@
         "additionalProperties": false,
         "required": [
           "from",
+          "to",
+          "account",
           "subject",
           "received_at",
           "content",
@@ -492,7 +666,16 @@
         ],
         "properties": {
           "from": {
-            "type": "string"
+            "type": "string",
+            "description": "meno a adresa odosielateľa"
+          },
+          "to": {
+            "type": "string",
+            "description": "na ktorú našu adresu prišiel"
+          },
+          "account": {
+            "type": "string",
+            "description": "ktorého účtu sa mail týka: služba + organizácia / prihlasovací e-mail / názov účtu, ako je v maile; 'v maile neuvedené' ak tam nie je"
           },
           "subject": {
             "type": "string"
@@ -502,7 +685,8 @@
           },
           "content": {
             "type": "string",
-            "description": "vecný obsah mailu: požiadavky, čísla, termíny, mená (max 1500 znakov)"
+            "description": "vecný obsah mailu: požiadavky, čísla, sumy, termíny, mená (max 1500 znakov)",
+            "maxLength": 1500
           },
           "why": {
             "type": "string"
@@ -530,15 +714,18 @@
                     "pm-task",
                     "pm-notification",
                     "pm-company-map",
+                    "pm-tree",
                     "gmail",
                     "calendar",
                     "fireflies",
-                    "call-followup"
+                    "call-followup",
+                    "action-executor",
+                    "open-questions"
                   ]
                 },
                 "ref": {
                   "type": "string",
-                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru, id behu"
                 },
                 "url": {
                   "type": "string"
@@ -571,7 +758,8 @@
           },
           "details": {
             "type": "string",
-            "description": "podrobnosti pre doplňujúce otázky: názvy, popisy, čísla, kto, kedy"
+            "description": "podrobnosti pre doplňujúce otázky: názvy, kľúče úloh, popisy, čísla, kto, kedy (max 800 znakov)",
+            "maxLength": 800
           },
           "why": {
             "type": "string"
@@ -596,15 +784,18 @@
                     "pm-task",
                     "pm-notification",
                     "pm-company-map",
+                    "pm-tree",
                     "gmail",
                     "calendar",
                     "fireflies",
-                    "call-followup"
+                    "call-followup",
+                    "action-executor",
+                    "open-questions"
                   ]
                 },
                 "ref": {
                   "type": "string",
-                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru, id behu"
                 },
                 "url": {
                   "type": "string"
@@ -638,7 +829,8 @@
           },
           "details": {
             "type": "string",
-            "description": "podrobnosti pre doplňujúce otázky: názvy, popisy, čísla, kto, kedy"
+            "description": "podrobnosti pre doplňujúce otázky: názvy, kľúče úloh, popisy, čísla, kto, kedy (max 800 znakov)",
+            "maxLength": 800
           },
           "why": {
             "type": "string"
@@ -663,15 +855,18 @@
                     "pm-task",
                     "pm-notification",
                     "pm-company-map",
+                    "pm-tree",
                     "gmail",
                     "calendar",
                     "fireflies",
-                    "call-followup"
+                    "call-followup",
+                    "action-executor",
+                    "open-questions"
                   ]
                 },
                 "ref": {
                   "type": "string",
-                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru, id behu"
                 },
                 "url": {
                   "type": "string"
@@ -704,7 +899,8 @@
           },
           "details": {
             "type": "string",
-            "description": "podrobnosti pre doplňujúce otázky: názvy, popisy, čísla, kto, kedy"
+            "description": "podrobnosti pre doplňujúce otázky: názvy, kľúče úloh, popisy, čísla, kto, kedy (max 800 znakov)",
+            "maxLength": 800
           },
           "why": {
             "type": "string"
@@ -729,15 +925,18 @@
                     "pm-task",
                     "pm-notification",
                     "pm-company-map",
+                    "pm-tree",
                     "gmail",
                     "calendar",
                     "fireflies",
-                    "call-followup"
+                    "call-followup",
+                    "action-executor",
+                    "open-questions"
                   ]
                 },
                 "ref": {
                   "type": "string",
-                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru"
+                  "description": "kľúč úlohy, cesta poznámky, id vlákna, id udalosti, id hovoru, id behu"
                 },
                 "url": {
                   "type": "string"
@@ -758,11 +957,16 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "id",
           "question",
           "why",
           "topic"
         ],
         "properties": {
+          "id": {
+            "type": "string",
+            "description": "id z context/otvorene-otazky.md (Q-001…); prázdne pri novej otázke"
+          },
           "question": {
             "type": "string"
           },

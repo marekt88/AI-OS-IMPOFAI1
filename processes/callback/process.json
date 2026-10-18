@@ -1,0 +1,8 @@
+{
+  "description": "Spätný hovor Marekovi s výsledkom vykonaných akcií a otázkami. Vstup --input JSON { say, questions[{id, question, why}], done[], skipped[], source_run, depth }. Rešpektuje callGuard (tiché hodiny, 3 callbacky denne, 60 min denne); keď nesmie volať, uloží obsah do state/pending-callback.json pre ranný brief. Po hovore call-followup s kind callback. Spúšťa ho action-executor.",
+  "enabled": true,
+  "schedule": null,
+  "claude": false,
+  "afterTimeoutMin": 60,
+  "keepRuns": 100
+}

@@ -1,0 +1,140 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ok",
+    "dry_run",
+    "executed",
+    "skipped",
+    "approvals_created",
+    "backups",
+    "source_run",
+    "conversation_id",
+    "kind"
+  ],
+  "properties": {
+    "ok": {
+      "type": "boolean",
+      "description": "false len keď sa nedalo pracovať vôbec (PM nedostupné); zlyhanie jednej akcie patrí do skipped"
+    },
+    "error": {
+      "type": "string"
+    },
+    "dry_run": {
+      "type": "boolean"
+    },
+    "executed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action_id",
+          "tool",
+          "ref",
+          "what",
+          "audit_comment"
+        ],
+        "properties": {
+          "action_id": {
+            "type": "string"
+          },
+          "tool": {
+            "type": "string"
+          },
+          "ref": {
+            "type": "string",
+            "description": "kľúč úlohy alebo id"
+          },
+          "what": {
+            "type": "string",
+            "description": "čo sa urobilo, po slovensky, s kľúčom úlohy"
+          },
+          "audit_comment": {
+            "type": "string",
+            "description": "text auditného komentára (v dry-run text, ktorý by sa pridal)"
+          }
+        }
+      }
+    },
+    "skipped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action_id",
+          "reason"
+        ],
+        "properties": {
+          "action_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "approvals_created": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action_id",
+          "task_key",
+          "what"
+        ],
+        "properties": {
+          "action_id": {
+            "type": "string"
+          },
+          "task_key": {
+            "type": "string",
+            "description": "v dry-run prázdne"
+          },
+          "what": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "backups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action_id",
+          "task_key",
+          "task_json"
+        ],
+        "properties": {
+          "action_id": {
+            "type": "string"
+          },
+          "task_key": {
+            "type": "string"
+          },
+          "task_json": {
+            "type": "string",
+            "description": "JSON { task: výstup pm_get_task, activity: výstup pm_list_task_activity } pred zmazaním"
+          }
+        }
+      }
+    },
+    "source_run": {
+      "type": "string",
+      "description": "skopírované zo vstupu"
+    },
+    "conversation_id": {
+      "type": "string",
+      "description": "skopírované zo vstupu"
+    },
+    "kind": {
+      "type": "string",
+      "description": "skopírované zo vstupu"
+    }
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "description": "Ranný brief: zber zmien od posledného briefu (PM po projektoch, AI Bugs, nové úlohy, e-maily s obsahom, kalendár, otázky), o 9:00 hovor na Linphone mtoth, po hovore call-followup.",
+  "description": "Ranný brief: zber zmien od posledného briefu (všetky aktívne projekty z PM aj bez zmien, AI Bugs, nové úlohy, e-maily s obsahom, kalendár, výsledky hovorov a executora, otvorené otázky), o 9:00 hovor na Linphone mtoth, po hovore call-followup.",
   "enabled": true,
   "schedule": "30 8 * * *",
   "tz": "Europe/Bratislava",
@@ -40,6 +40,7 @@
     "mcp__claude_ai_Google_Calendar__list_calendars"
   ],
   "requireTools": [
+    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_workspace_tree",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_tasks",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_notifications",
     "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_my_tasks",
@@ -48,8 +49,14 @@
   ],
   "context": [
     {
-      "var": "last_followup",
-      "process": "call-followup"
+      "var": "followups",
+      "process": "call-followup",
+      "mode": "since"
+    },
+    {
+      "var": "executions",
+      "process": "action-executor",
+      "mode": "since"
     }
   ]
 }

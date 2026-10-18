@@ -37,6 +37,8 @@ Read `references/3ms-framework.md` once. It's how {{Your Name}} thinks about AI 
 - `scripts/konkurencia-scan.mjs` + `data/konkurencia/` — tyzdenny monitoring konkurencie. Scheduled task "konkurencia-tyzdenny-sken" bezi v pondelok rano, reporty pristavaju do `context/konkurencia/`. Ako to funguje: `references/konkurencia-monitoring.md`.
 - `runner/` + `processes/` — spúšťač opakovaných AI procesov na serveri (`claude -p` na predplatnom, cron tick každých 5 min, chyby do PM listu AI Bugs). Nový proces = nový priečinok v `processes/`. Návod: `references/ai-runner.md`.
 - `processes/morning-brief/` — ranný brief: o 9:00 hlasový agent ElevenLabs zavolá na Linphone `mtoth` so zmenami od posledného briefu. Ako funguje a odkiaľ sú informácie: `references/ranny-brief.md`.
+- `processes/inbound-call/`, `call-followup/`, `action-executor/`, `callback/` — hlasová slučka: Marek zavolá asistentovi, po hovore sa zapíše do second brainu, potvrdené akcie vykoná executor a asistent zavolá späť s výsledkom. Návod: `references/ai-runner.md`.
+- `references/ai-platforma-ciel.md` + `references/ai-platforma-plan.md` — dlhodobý cieľ AI platformy IMPOFAI a plán po fázach (fáza 1 rozpracovaná).
 
 See `EXPANSIONS.md` for what to add as you grow.
 
@@ -48,7 +50,7 @@ Firemný second brain (Karpathyho wiki: zdroje, poznámky, schéma) žije v IMPO
 - Hľadanie: `pm_search_brain` (úryvky s riadkom a časom), čítanie po častiach `pm_read_brain_note`, odkazy `pm_get_brain_note_links`.
 - Čo sa zmenilo od nejakého času: `pm_list_brain_log`; nové hovory `pm_list_brain_calls` a fronta na spracovanie `pm_list_brain_call_queue`.
 - Firma a ľudia: `pm_get_company_map`, `pm_get_person`, `pm_find_contact`.
-- Zápis (`pm_update_brain_note`, `pm_append_brain_section`, `pm_save_brain_call_summary`) len keď o to používateľ požiada. Opakované procesy v `processes/` second brain iba čítajú.
+- Zápis (`pm_update_brain_note`, `pm_append_brain_section`, `pm_save_brain_call_summary`) len keď o to používateľ požiada. Z procesov v `processes/` do second brainu zapisuje iba `call-followup` (poznámky o hovoroch, fronta otázok `context/otvorene-otazky.md`); ostatné len čítajú.
 - Token vidí len poznámky, na ktoré má rozsah. Prázdny výsledok nemusí znamenať, že poznámka neexistuje.
 
 ## Knowledge base

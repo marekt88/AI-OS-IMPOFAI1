@@ -1,6 +1,6 @@
 // Interview call: questions from the input → call → call-followup indexes the answers.
 import fs from "node:fs";
-import { placeCallAndWait, startFollowup } from "../../runner/voice-call.mjs";
+import { callGuard, placeCallAndWait, startFollowup } from "../../runner/voice-call.mjs";
 
 const { output: o } = JSON.parse(fs.readFileSync(process.env.RUN_OUTPUT, "utf8"));
 if (!o?.questions?.length) {
@@ -18,6 +18,11 @@ const vars = {
   call_content: o.questions.map((q, i) => `${i + 1}. ${q.question}`).join("\n"),
   call_details: o.questions.map((q, i) => `${i + 1}. Prečo sa pýtam: ${q.why}`).join("\n"),
 };
-const r = await placeCallAndWait(vars, { runDir: process.env.RUN_DIR });
-if (r.answered) startFollowup({ runDir: process.env.RUN_DIR, kind: "interview", purpose: o.topic, content: o, transcript: r.transcript, conversationId: r.conversationId });
+const guard = callGuard({ kind: "interview" });
+if (!guard.allowed) {
+  console.error(`interview call not allowed now: ${guard.reason}`);
+  process.exit(4);
+}
+const r = await placeCallAndWait(vars, { runDir: process.env.RUN_DIR, kind: "interview" });
+if (r.answered) startFollowup({ runDir: process.env.RUN_DIR, kind: "interview", depth: 0, purpose: o.topic, content: o, transcript: r.transcript, conversationId: r.conversationId });
 else console.log("call not answered (logged, not an error)");

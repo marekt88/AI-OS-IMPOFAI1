@@ -87,3 +87,49 @@ export function todayAt(hhmm, tz, now = new Date()) {
 export function formatIn(date, tz) {
   return new Intl.DateTimeFormat("sk-SK", { timeZone: tz, dateStyle: "medium", timeStyle: "short" }).format(date);
 }
+
+// ---------- retrySlot: one more attempt for a scheduled slot that failed ----------
+export const RETRY_KINDS = ["auth", "claude-error", "timeout"];
+export const RETRY_DELAY_MIN = 10;
+export const RETRY_GRACE_MIN = 30; // a process with deliverAt: the retry must be ready by deliverAt + 30 min
+
+/** deliverAt ("HH:MM") on the day of `slot` in tz + graceMin, as epoch ms; null without deliverAt. */
+export function deliverDeadline(deliverAt, tz, slot, graceMin = RETRY_GRACE_MIN) {
+  if (!deliverAt) return null;
+  const at = todayAt(deliverAt, tz, slot);
+  return at ? at.getTime() + graceMin * 60_000 : null;
+}
+
+/**
+ * Should a failed scheduled run get one more attempt?
+ * → { retry: true, at: Date, deadline } | { retry: false, reason: "kind"|"already-retried"|"late", at?, deadline? }
+ * estimateMs = how long the run needs until its output is ready (last successful prepMs, else timeoutMin).
+ * schedule: when the cron has a slot of its own before the retry time, no retry ("next-slot").
+ * writes: write tools the failed run called (not read-only) → no retry ("writes").
+ */
+export function retryDecision({ kind, failedAt, slot, deliverAt = null, tz, estimateMs, isRetry = false, schedule = null, writes = [], delayMin = RETRY_DELAY_MIN, graceMin = RETRY_GRACE_MIN }) {
+  if (isRetry) return { retry: false, reason: "already-retried" };
+  if (!RETRY_KINDS.includes(kind)) return { retry: false, reason: "kind" };
+  if (writes.length) return { retry: false, reason: "writes", writes: writes.join(", ") }; // the failed run already wrote something: never twice
+  const at = new Date(failedAt.getTime() + delayMin * 60_000);
+  // a frequent schedule (e.g. */5) runs again before the retry anyway
+  if (schedule && latestSlot(schedule, tz, failedAt, at)) return { retry: false, reason: "next-slot", at };
+  const deadline = deliverDeadline(deliverAt, tz, slot ?? failedAt, graceMin);
+  if (deadline != null && at.getTime() + estimateMs > deadline) return { retry: false, reason: "late", at, deadline: new Date(deadline) };
+  return { retry: true, at, deadline: deadline != null ? new Date(deadline) : null };
+}
+
+/**
+ * A pendingRetry from state is due → { run: true } | { run: false } | { run: false, late: true } (would finish after
+ * the deadline) | { run: false, drop: "succeeded"|"stale" } (remove without running or reporting).
+ */
+export const RETRY_STALE_MIN = 60;
+export function pendingRetryDue(pending, now, estimateMs, lastSuccessAt = null) {
+  if (!pending?.at || Date.parse(pending.at) > now.getTime()) return { run: false };
+  // a success after the failure (e.g. a manual run) makes the retry pointless
+  if (lastSuccessAt && pending.failedAt && Date.parse(lastSuccessAt) > Date.parse(pending.failedAt)) return { run: false, drop: "succeeded" };
+  // left over from a pause of the cron (no tick for a long time): drop silently
+  if (now.getTime() - Date.parse(pending.at) > RETRY_STALE_MIN * 60_000) return { run: false, drop: "stale" };
+  if (pending.deadline && now.getTime() + estimateMs > Date.parse(pending.deadline)) return { run: false, late: true };
+  return { run: true };
+}
