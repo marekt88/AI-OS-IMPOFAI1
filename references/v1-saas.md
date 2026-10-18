@@ -1,6 +1,20 @@
-# IMPOFAI V1 – second brain + task management (definícia)
+# KAPSA V1 – second brain + task management (definícia)
 
-Stav: **návrh 2026-10-18, čaká na Marekove odpovede** (otázky na konci). Po odpovediach sa stane záväznou definíciou pre build. Celkový cieľ: [[ai-platforma-ciel]], plán: [[ai-platforma-plan]]. Podklady: swarm R1–R4 v `.swarm/v1-saas/`.
+## 0. Rozhodnutia vlastníka (2026-10-19)
+- **Značka:** KAPSA („vrecko“: firemné znalosti vo vrecku, útulné slovenské slovo). Doména zatiaľ ostáva, nová príde neskôr.
+- **Onboarding:** vek je povinný, k nemu rola a veľkosť tímu.
+- **Tier 45 €:** waitlist („čoskoro“), nie „vypredané“.
+- **Gemini:** iba „iné (experimentálne)“.
+- **Second brain:** čítanie/zápis pre pozvaných **nie vo V1**, prístup obmedzujú foldre a mapovanie.
+- **Po triale:** úplný zámok webu aj MCP, export dát a fakturácia ostávajú dostupné.
+- **E-mail:** provider a adresa zatiaľ chýbajú (Marek ich vytvorí). Kód je pripravený na Resend alebo SMTP cez env, v dev sa e-maily len logujú.
+- **Fakturácia:** Stripe a slovenský Peppol poskytovateľ (napr. SuperFaktúra).
+- **Jazyk:** slovenčina aj angličtina od začiatku pre web, auth, onboarding, guide, šablóny, e-maily a paywall. Voice šablóny Claude sú v angličtine, lebo Claude voice ide len po anglicky.
+- **Prvý kanál:** Marekova sieť a AI workshopy pre majiteľov firiem a nadšencov, kde sa KAPSA predvedie. Reklamy až potom.
+- **Fáza 2 (coding agent):** prvý projekt je samotná PM/KAPSA platforma.
+
+
+Stav: **záväzná definícia od 2026-10-19** (Marekove rozhodnutia sú v kapitole 0). Značka produktu: **KAPSA**. Celkový cieľ: [[ai-platforma-ciel]], plán: [[ai-platforma-plan]]. Podklady: swarm R1–R4 v `.swarm/v1-saas/`.
 
 ## 1. Čo je V1 jednou vetou
 Zdieľaný firemný mozog (second brain) a task management s prístupmi, ktoré používateľ ovláda vlastným AI (Claude, ChatGPT…) cez MCP. V platforme nebeží žiadne AI a neplatí sa za tokeny.
