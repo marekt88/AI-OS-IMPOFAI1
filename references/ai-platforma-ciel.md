@@ -67,3 +67,46 @@ Manažér sa v chate spýta na chybovosť vo výrobe. Systém zistí, že kontex
 8. Produkt pre iné firmy: vlastné prihlásenie každého zamestnanca (Claude Team seat) verzus API. Treba overiť s Anthropic.
 
 Otázky sú vo fronte `context/otvorene-otazky.md` v second braine a asistent ich kladie postupne v ranných hovoroch.
+
+## Doplnenie 2026-10-18 (Marek)
+
+### Produktové línie
+1. **V1 SaaS – second brain + task management (bez AI v platforme).**
+   - Obsah: dnešné PM (úlohy, timetracking, timesheety, prístupy) + second brain (Karpathy wiki) + mapa firmy, všetko plne cez MCP.
+   - Používateľ si AI prináša sám (Claude, ChatGPT, Gemini…): chat, voice mód, naplánované úlohy a konektory sú v jeho AI.
+   - **Hodnota:** second brain sa plní z každodennej práce s vlastným AI a z naplánovaných úloh (Fireflies prepisy, Gmail, zmeny v PM). Voice agent s MCP je asistent, ktorý vie o všetkom, čo človek robí: zmeny v PM, drafty e-mailov, interview na doplnenie medzier v kontexte.
+   - **Predaj:** samostatný SaaS, 30-dňový trial, potom 6 €/seat/mesiac. Vyšší tier za 45 € (proaktívni agenti, AI hovory, custom konektory, dashboardy) je zatiaľ „vypredaný“. Enterprise = custom aplikácie a automatizácie.
+   - Alternatíva k nášmu PM: priame prepojenie s ClickUp. Odporúčanie Fireflies na prepisy meetingov.
+   - Detailná definícia: dokument „V1 – definícia“ v PM (Startups / Projekt Manazment) a `references/v1-saas.md`.
+2. **Platforma s AI (ďalšie verzie):** proaktívni always-on agenti, hlasové hovory, sieť agentov, serveroví coding agenti. Toto je zvyšok tohto dokumentu a [[ai-platforma-plan]].
+
+### Hlasový kanál
+- Hlasový agent ostáva na Linphone. Každý agent bude mať vlastný Linphone účet, alebo neskôr vlastnú mobilnú appku (iOS a Android).
+
+### Coding agenti na serveroch (fáza 2)
+1. Marek povie hlasovému agentovi, čo chce zmeniť v projekte (prvý projekt je otvorená otázka, pozri plán).
+2. PM agent (zatiaľ AIOS runner, neskôr agent v PM) požiadavku spracuje, vytvorí z nej úlohu s promptom a pošle ju Claude Code agentovi na serveri projektu. Ten má rovnaký CLAUDE.md a nástroje ako hlavný orchestrátor a všetky práva.
+3. Coding agent urobí zmenu, nasadí ju na live/preview URL, vytvorí v PM úlohu pre Mareka „skontroluj zmenu na …“ a pošle PM agentovi prehľad (čo, ako, kde otestovať).
+4. PM agent zavolá Marekovi cez hlasového agenta a povie, čo sa urobilo a kde to otestovať.
+5. Otázky alebo žiadosti o povolenie coding agenta idú cez PM agenta do hovoru s Marekom a odpovede späť agentovi.
+
+### Prihlásenie predplatným
+Analýza 2026-10-18 (`.swarm/v1-saas/round1/R1-predplatne-kylon.md`, zdroj: https://code.claude.com/docs/en/legal-and-compliance):
+
+| Variant | Povolené? |
+|---|---|
+| (a) Claude Code beží na **počítači používateľa** (prihlásený vlastným účtom), platforma ho len orchestruje cez lokálny „gateway“ program | áno |
+| (b) platforma hostuje **neupravený** Claude Code a používateľ sa doň prihlási cez flow Anthropicu | len na Commercial Terms a bez zbierania tokenov; treba písomne overiť s Anthropic |
+| (c) držíme používateľov OAuth token (`setup-token`) na našom serveri a spúšťame `claude -p` za neho | **výslovne zakázané** |
+
+Doplnenia:
+- **OpenAI:** „Sign in with ChatGPT“ s využitím plánu existuje, pre hostované aplikácie je však v limitovanom triale cez waitlist. Tokeny z Codex CLI v našej appke nie sú podporená cesta.
+- **Kylon** (kylon.io):
+  - Claude Code púšťa iba lokálne na počítači používateľa cez `kylon gateway run` a token nikdy nevidí;
+  - Codex vie hostovať v cloude s prihlásením cez device code na plán používateľa;
+  - hostovaný Claude s predplatným neponúka;
+  - cena od 50 USD/mes. za workspace s kreditmi.
+- **Dôsledok:**
+  - **V1 (iba MCP, AI si prináša používateľ) je čistá.**
+  - Pre always-on agentov sú dve čisté cesty: lokálny runner u používateľa (vzor Kylon) alebo API (náš kľúč alebo kľúč zákazníka).
+  - Marekov vlastný runner na vlastnom serveri s vlastným Max je jeho osobné použitie, to je v poriadku.
