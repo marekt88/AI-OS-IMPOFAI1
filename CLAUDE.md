@@ -38,6 +38,8 @@ Read `references/3ms-framework.md` once. It's how {{Your Name}} thinks about AI 
 - `runner/` + `processes/` — spúšťač opakovaných AI procesov na serveri (`claude -p` na predplatnom, cron tick každých 5 min, chyby do PM listu AI Bugs). Nový proces = nový priečinok v `processes/`. Návod: `references/ai-runner.md`.
 - `processes/morning-brief/` — ranný brief: o 9:00 hlasový agent ElevenLabs zavolá na Linphone `mtoth` so zmenami od posledného briefu. Ako funguje a odkiaľ sú informácie: `references/ranny-brief.md`.
 - `processes/inbound-call/`, `call-followup/`, `action-executor/`, `callback/` — hlasová slučka: Marek zavolá asistentovi, po hovore sa zapíše do second brainu, potvrdené akcie vykoná executor a asistent zavolá späť s výsledkom. Návod: `references/ai-runner.md`.
+- `processes/ai-tasks-call/`, `ai-tasks-followup/` — hlasový asistent AI tasks (interný test): volá Marekovi o správach kódovacieho agenta v Startups / KAPSA / AI tasks, brainstorming, odpovede a nové úlohy zapíše do KAPSA.
+- `processes/worklog-sync/` + Stop hook `~/.claude/hooks/worklog.mjs` — commity ukončených Claude Code session zapíše do denníka projektu v KAPSA (`context/projekty/kapsa-dennik.md`).
 - `references/ai-platforma-ciel.md` + `references/ai-platforma-plan.md` — dlhodobý cieľ AI platformy IMPOFAI a plán po fázach (fáza 1 rozpracovaná).
 
 See `EXPANSIONS.md` for what to add as you grow.

@@ -1,0 +1,8 @@
+{
+  "description": "Denník práce Claude Code: Stop hook (~/.claude/hooks/worklog.mjs) si pamätá repo a HEAD každej session; tento proces zapíše ukončené session s novými commitmi ako riadok do denníka projektu v KAPSA (impofai-pm → context/projekty/kapsa-dennik.md). Worker AI tasks sa loguje sám.",
+  "enabled": true,
+  "schedule": "*/15 * * * *",
+  "claude": false,
+  "afterTimeoutMin": 5,
+  "keepRuns": 50
+}
