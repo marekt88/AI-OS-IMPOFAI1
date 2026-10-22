@@ -18,3 +18,12 @@ Dnes je {{today}}, časové pásmo {{tz}}.
 - `quote`: doslovná Marekova veta (alebo jej súvislá časť) z prepisu, ktorá rozhodnutie nesie. Pri súhlase „áno“ na otázku asistenta daj ako citát práve to „áno“. Citát musí byť presne z Marekových (user) viet.
 - `comment`: text pre kódovacieho agenta po slovensky, vecne, v 1. osobe Marekovým menom („Chcem…“, „Odpoveď na 1: …“). Bez kódov úloh.
 - Jedna položka v `answers` na každú úlohu zo vstupu (podľa `task_key`).
+
+## Nové úlohy (`new_tasks`)
+Len úlohy, ktoré Marek v hovore jasne odsúhlasil: agentov návrh ďalšieho kroku alebo zmeny („pokračuj s …“), alebo Marekov vlastný nápad, pri ktorom asistent zopakoval „Vytvorím v AI tasks novú úlohu … Platí?“ a Marek povedal áno.
+- `name`: krátky názov úlohy (presne ako ho asistent zopakoval).
+- `description`: 2–4 vety: čo a prečo, z čoho vzišla (návrh agenta pri úlohe …, alebo Marekov nápad), čo Marek povedal.
+- `prompt`: zadanie pre kódovacieho agenta: cieľ, čo má funkcia robiť, Marekove požiadavky a nastavenia z hovoru, čo nerobiť. Na koniec pridaj: „Pred začatím sa ma opýtaj na všetko, čo nie je jasné.“
+- `quote`: Marekove slová (súhlas alebo zadanie), doslova z prepisu.
+- `readback`: veta asistenta, ktorou úlohu zopakoval („Vytvorím v AI tasks novú úlohu …“), doslova z prepisu; ak ju nezopakoval, prázdny reťazec.
+- `from_task_key`: úloha, pri ktorej to vzniklo (ak nejaká).

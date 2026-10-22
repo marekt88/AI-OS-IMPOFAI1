@@ -9,7 +9,7 @@ import { execFileSync } from "node:child_process";
 import { pmTool } from "../../runner/pm.mjs";
 import { callGuard, isDry, placeCallAndWait, readJson, STATE_DIR, writeJson } from "../../runner/voice-call.mjs";
 import { spawnProcess } from "../../runner/spawn.mjs";
-import { AI_TASKS_LIST, BATCH_WAIT_MIN, MIN_GAP_MIN, RETRY_UNANSWERED_MIN, callVariables, pendingItem } from "./lib.mjs";
+import { AI_TASKS_LIST, BATCH_WAIT_MIN, MIN_GAP_MIN, RECENT_DONE_DAYS, RETRY_UNANSWERED_MIN, callVariables, pendingItem } from "./lib.mjs";
 
 const RUN_DIR = process.env.RUN_DIR;
 const STATE = path.join(STATE_DIR, "ai-tasks-call.json");
@@ -20,7 +20,11 @@ const state = readJson(STATE, { announced: {} });
 state.announced ??= {};
 
 // 1) new messages of the worker, oldest first
-const tasks = (await pmTool("pm_list_tasks", { task_list: AI_TASKS_LIST, status: ["in_review", "to_do", "in_progress"], limit: 100, sort: "created_at" })).items ?? [];
+// open tasks + tasks completed in the last days (their last message can be "deployed" or "next steps")
+const recent = Date.now() - RECENT_DONE_DAYS * 86_400_000;
+const tasks = ((await pmTool("pm_list_tasks", { task_list: AI_TASKS_LIST, limit: 100, sort: "created_at" })).items ?? []).filter(
+  (t) => t.status !== "complete" || new Date(t.updated_at).getTime() > recent,
+);
 const items = [];
 for (const t of tasks) {
   const act = await pmTool("pm_list_task_activity", { task: t.key, kind: "comments", order: "desc", limit: 20 });

@@ -4,7 +4,7 @@
 // differs from the worker's, so the worker reads them as Marek's replies.
 import fs from "node:fs";
 import { pmTool } from "../../runner/pm.mjs";
-import { answerComment } from "../ai-tasks-call/lib.mjs";
+import { AI_TASKS_LIST, answerComment, newTaskCheck } from "../ai-tasks-call/lib.mjs";
 
 const input = JSON.parse(fs.readFileSync(process.env.RUN_INPUT, "utf8"));
 const { output: o = {} } = JSON.parse(fs.readFileSync(process.env.RUN_OUTPUT, "utf8"));
@@ -28,6 +28,25 @@ for (const ans of o.answers ?? []) {
     await pmTool("pm_add_task_comment", { task: ans.task_key, body: r.body });
   }
   lines.push(`${name}: ${what}`);
+}
+
+// new tasks agreed in the call → AI tasks (the worker picks them up as TO DO)
+for (const nt of o.new_tasks ?? []) {
+  const c = newTaskCheck(nt, input.transcript);
+  if (!c.ok) {
+    lines.push(`nová úloha ${nt.name}: nevytvorená, ${c.reason}`);
+    continue;
+  }
+  const description = `${nt.description}\n\n(Odsúhlasené v hlasovom hovore ${when}. Marekove slová: „${String(nt.quote).trim()}“)`;
+  if (dry) {
+    console.log(`[dry-run] new task "${nt.name}"\n${description}\n--- prompt ---\n${nt.prompt}\n`);
+  } else {
+    const t = await pmTool("pm_create_task", { task_list: AI_TASKS_LIST, name: nt.name, description, prompt: nt.prompt, type: "feature" });
+    if (nt.from_task_key && tasks.some((x) => x.key === nt.from_task_key)) {
+      await pmTool("pm_add_task_comment", { task: nt.from_task_key, body: `Z hlasového hovoru (${when}) vznikla nová úloha v AI tasks: ${nt.name}${t?.key ? ` (${t.key})` : ""}.` });
+    }
+  }
+  lines.push(`nová úloha ${nt.name}: vytvorená`);
 }
 console.log(lines.join("\n") || "no answers");
 

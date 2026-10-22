@@ -50,3 +50,16 @@ test("deploy said without a clear read-back is downgraded (no deploy keyword at 
   assert.equal(r.downgraded, true);
   assert.doesNotMatch(r.body, /^deploy/);
 });
+
+import { newTaskCheck } from "./lib.mjs";
+test("new task only after a read-back with its name and a plain yes, or Marek's own words", () => {
+  const t = [
+    { role: "agent", message: "Vytvorím v AI tasks novú úlohu Export denníka do PDF: tlačidlo, ktoré stiahne denník projektu. Platí?" },
+    { role: "user", message: "Áno." },
+    { role: "user", message: "A ešte vytvor úlohu na notifikácie e-mailom pri nasadení." },
+  ];
+  assert.equal(newTaskCheck({ name: "Export denníka do PDF", prompt: "x", quote: "Áno." }, t).ok, true);
+  assert.equal(newTaskCheck({ name: "Notifikácie e-mailom pri nasadení", prompt: "x", quote: "vytvor úlohu na notifikácie e-mailom pri nasadení" }, t).ok, true);
+  assert.equal(newTaskCheck({ name: "Úplne iná úloha o fakturácii", prompt: "x", quote: "Áno." }, t).ok, false);
+  assert.equal(newTaskCheck({ name: "Export denníka do PDF", prompt: "", quote: "Áno." }, t).ok, false);
+});
