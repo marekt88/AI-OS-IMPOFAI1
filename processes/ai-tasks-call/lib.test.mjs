@@ -63,3 +63,17 @@ test("new task only after a read-back with its name and a plain yes, or Marek's 
   assert.equal(newTaskCheck({ name: "Úplne iná úloha o fakturácii", prompt: "x", quote: "Áno." }, t).ok, false);
   assert.equal(newTaskCheck({ name: "Export denníka do PDF", prompt: "", quote: "Áno." }, t).ok, false);
 });
+
+test("new task: 'áno, ale …' after the read-back, or a later 'súhlasím' a few turns on (call 22.10.)", () => {
+  const t = [
+    { role: "agent", message: "Vytvorím teda v AI tasks novú úlohu **Spoľahlivosť agentickej slučky a nastavenie e-mailov cez WebSupport**. Platí?" },
+    { role: "user", message: "Aa, áno, ale chcem sa ešte opýtať, že čo je tá spoľahlivosť, ee, agentickej slučky?" },
+    { role: "agent", message: "V podkladoch mám túto úlohu uvedenú ako prvý krok fázy V2…" },
+    { role: "user", message: "Okej, dobre, súhlasím, súhlasím. Môžeš to-- mu to povedať, že súhlasím." },
+    { role: "user", message: "Nie, to nechcem." },
+  ];
+  const name = "Spoľahlivosť agentickej slučky a nastavenie e-mailov cez WebSupport";
+  assert.equal(newTaskCheck({ name, prompt: "x", quote: "Okej, dobre, súhlasím, súhlasím." }, t).ok, true);
+  assert.equal(newTaskCheck({ name, prompt: "x", quote: "Aa, áno, ale chcem sa ešte opýtať" }, t).ok, true);
+  assert.equal(newTaskCheck({ name, prompt: "x", quote: "Nie, to nechcem." }, t).ok, false);
+});

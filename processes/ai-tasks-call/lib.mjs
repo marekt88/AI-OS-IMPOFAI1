@@ -133,11 +133,14 @@ export function answerComment(ans, tasks, transcript, whenLabel) {
 // ---------- after the call: new tasks ----------
 const CREATE = /vytvor|pridaj|zalo[žz]|sprav|urob|pokra[čc]uj/i;
 const nameInTurn = (turn, name) => taskNameHeard(turn, name) || norm(turn).includes(norm(name));
+const READBACK_TURNS = 4;
+const STARTS_YES = /^(?:(?:a+|no|hm+|uh|ehm|tak|teda)\s+)*(?:áno|ano|hej|súhlasím|suhlasim|jasné|jasne|okej|ok|dobre|môžeš|mozes|vytvor\w*|pokračuj|pokracuj)(?:\s|$)/;
 
 /**
  * A new task proposed by the model → { ok, reason }. Created only when Marek said it himself ("vytvor úlohu …",
- * "pokračuj s …" naming the task) or answered a plain yes right after the assistant's read-back
- * "Vytvorím v AI tasks novú úlohu <názov> …".
+ * "pokračuj s …" naming the task) or his words start with a yes ("áno, ale chcem sa ešte opýtať…", "okej, súhlasím")
+ * within the next READBACK_TURNS turns after the assistant's read-back "Vytvorím v AI tasks novú úlohu <názov> …".
+ * Lighter than deploy on purpose: a new task is only a TO DO the worker asks questions about, easy to delete.
  */
 export function newTaskCheck(nt, transcript) {
   if (!String(nt.name ?? "").trim() || !String(nt.prompt ?? "").trim()) return { ok: false, reason: "chýba názov alebo zadanie" };
@@ -145,8 +148,9 @@ export function newTaskCheck(nt, transcript) {
   const q = norm(nt.quote);
   const idx = tr.findIndex((t) => t.role === "user" && q && norm(t.text).includes(q));
   if (idx < 0) return { ok: false, reason: "citát sa nenašiel v Marekových vetách" };
-  const prev = idx > 0 && tr[idx - 1].role === "agent" ? tr[idx - 1].text : "";
   const own = CREATE.test(nt.quote) && nameInTurn(nt.quote, nt.name);
-  const confirmed = isAgreement(nt.quote) && /nov[úa]\s+úloh/i.test(prev) && nameInTurn(prev, nt.name);
+  const yes = isAgreement(nt.quote) || STARTS_YES.test(norm(nt.quote));
+  const readback = tr.slice(Math.max(0, idx - READBACK_TURNS), idx).some((t) => t.role === "agent" && /nov[úa]\s+úloh/i.test(t.text) && nameInTurn(t.text, nt.name));
+  const confirmed = yes && readback;
   return own || confirmed ? { ok: true } : { ok: false, reason: "vytvorenie úlohy nezaznelo jednoznačne (chýba zopakovanie s názvom a áno)" };
 }
