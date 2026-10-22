@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["answers"],
+  "properties": {
+    "answers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["task_key", "decision", "quote", "comment"],
+        "properties": {
+          "task_key": { "type": "string" },
+          "decision": { "type": "string", "enum": ["deploy", "approve", "changes", "answer", "preview", "later", "none"] },
+          "quote": { "type": "string" },
+          "comment": { "type": "string" }
+        }
+      }
+    },
+    "summary": { "type": "string" }
+  }
+}

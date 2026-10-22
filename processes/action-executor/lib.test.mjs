@@ -96,3 +96,11 @@ test("pmtool: task name does not match the confirmed one → nothing is deleted"
   assert.ok(!log.includes("pm_delete_task"));
   assert.match(r.skipped[0].reason, /nesedí/);
 });
+
+test("IMP-1542: approved `comment` arg matches a call with `body` (alias), no mismatch", () => {
+  const actions = [{ id: "A3", tool: "pm_add_task_comment", args: { task: "IMP-1539", comment: "Schválené." }, risk: "normal", target_key: "IMP-1539", quote: "Áno.", summary: "komentár" }];
+  const calls = [{ id: "1", tool: "pm_add_task_comment", input: { task: "IMP-1539", body: "Schválené." }, ok: true, text: "ok" }];
+  const r = verifyModelRun(calls, actions, { executed: [{ action_id: "A3", what: "x" }] }, { conversation_id: "c1" });
+  assert.deepEqual(r.mismatch, []);
+  assert.equal(r.executed[0].action_id, "A3");
+});

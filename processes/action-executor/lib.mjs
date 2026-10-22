@@ -3,14 +3,21 @@
 import fs from "node:fs";
 import { APPROVALS_LIST, MAX_ACTIONS } from "../call-followup/lib.mjs";
 
-export const PREFIX = "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__";
+export const PREFIX = "mcp__claude_ai_KAPSA__";
 const READ = new Set(["pm_get_task", "pm_list_task_activity", "pm_list_task_lists", "pm_list_assignable_users"]);
 const NON_PM = new Set(["ToolSearch", "StructuredOutput"]);
 const KEY_RE = /\b[A-Z]{2,}-\d+\b/;
 
 const canon = (v) => (Array.isArray(v) ? v.map(canon) : v && typeof v === "object"
   ? Object.fromEntries(Object.keys(v).filter((k) => k !== "response_format").sort().map((k) => [k, canon(v[k])])) : v);
-export const sameArgs = (a, b) => JSON.stringify(canon(a ?? {})) === JSON.stringify(canon(b ?? {}));
+// Argument names the followup model writes but the PM tools call differently (IMP-1542: `comment` instead of `body`).
+const ARG_ALIASES = { pm_add_task_comment: { comment: "body", text: "body" } };
+export function normalizeArgs(tool, args) {
+  const al = ARG_ALIASES[tool];
+  if (!al || !args) return args ?? {};
+  return Object.fromEntries(Object.entries(args).map(([k, v]) => [al[k] && !(al[k] in args) ? al[k] : k, v]));
+}
+export const sameArgs = (a, b, tool) => JSON.stringify(canon(normalizeArgs(tool, a))) === JSON.stringify(canon(normalizeArgs(tool, b)));
 
 export function auditText(ctx, quote) {
   const d = new Intl.DateTimeFormat("sk-SK", { timeZone: "Europe/Bratislava", day: "numeric", month: "numeric", year: "numeric" }).format(new Date());
@@ -28,7 +35,7 @@ export function approvalArgs(a, ctx) {
       "",
       `- čo: ${a.summary}`,
       `- nástroj: \`${a.tool}\``,
-      `- argumenty: \`${JSON.stringify(a.args ?? {})}\``,
+      `- argumenty: \`${JSON.stringify(normalizeArgs(a.tool, a.args))}\``,
       `- Marekov citát: „${a.quote}“`,
       `- hovor: ${ctx.conversation_id ?? "?"} (${ctx.kind ?? "?"}), beh ${ctx.source_run ?? "?"}`,
       `- dátum: ${new Date().toISOString()}`,
@@ -73,7 +80,7 @@ export async function runDeterministic(actions, ctx, { pmTool, dry }) {
         res.executed.push({ action_id: a.id, tool: a.tool, ref: a.target_key, what: `${dry ? "(dry-run) " : ""}${a.target_key}: zmazaná („${task?.name ?? a.target_name}“)`, audit_comment: comment });
         continue;
       }
-      const r = await write(a.tool, a.args, a.id);
+      const r = await write(a.tool, normalizeArgs(a.tool, a.args), a.id);
       const ref = a.target_key || (dry ? "(nová)" : keyOf(r)) || "";
       if (a.tool !== "pm_create_task_list" && ref && ref !== "(nová)") await write("pm_add_task_comment", { task: ref, body: comment }, a.id);
       res.executed.push({ action_id: a.id, tool: a.tool, ref, what: `${dry ? "(dry-run) " : ""}${ref ? `${ref}: ` : ""}${a.summary}`, audit_comment: a.tool === "pm_create_task_list" ? "" : comment });
@@ -144,7 +151,7 @@ export function verifyModelRun(calls, actions, modelOut, ctx) {
       continue;
     }
     // an approved action, called exactly as approved
-    const a = actions.find((x) => !used.has(x.id) && x.risk !== "needs_approval" && x.tool === c.tool && sameArgs(x.args, c.input));
+    const a = actions.find((x) => !used.has(x.id) && x.risk !== "needs_approval" && x.tool === c.tool && sameArgs(x.args, c.input, c.tool));
     if (!a) {
       out.mismatch.push({ tool: c.tool, input: c.input, ok: c.ok, why: "zápis, ktorý nie je medzi schválenými akciami" });
       continue;

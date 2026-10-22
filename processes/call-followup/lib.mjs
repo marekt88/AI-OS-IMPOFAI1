@@ -33,11 +33,25 @@ const has = (hay, needle) => {
   return n.length > 0 && ` ${norm(hay)} `.includes(` ${n} `);
 };
 
+// Voice agents name tasks by their name, not by key (Marek, 2026-10-22). A task counts as named when at least 70 %
+// of the significant words of its name (≥ 4 letters, diacritics ignored, at least 2) were said.
+const fold = (s) => norm(s).normalize("NFD").replace(/\p{M}+/gu, "");
+export function taskNameHeard(heard, name) {
+  const sig = [...new Set(fold(name).split(" ").filter((w) => w.length >= 4))];
+  if (sig.length < 2) return false;
+  const h = ` ${fold(heard)} `;
+  return sig.filter((w) => h.includes(` ${w}`)).length / sig.length >= 0.7;
+}
+const taskHeard = (heard, key, name) => (key && has(heard, key)) || (!!name && taskNameHeard(heard, name));
+
 // A reply that only agrees ("áno", "dobre, urob to") confirms nothing by itself: the read-back right before it must
 // name the target (I1 review, finding 1).
 const AGREE = new Set(("áno ano hej jasné jasne dobre ok okej okay súhlasím suhlasim potvrdzujem pokračuj pokracuj urob sprav spravte " +
   "urobte to tak presne môžeš mozes môžete mozete pokojne určite urcite samozrejme jasnačka daj poď pod ďalej dalej je správne spravne " +
-  "prosím prosim teda no nuž hm hmm ehm uh aha áá aaa ja ty ten tú tu ju ho ich aj už uz po hovore potom hneď hned").split(" "));
+  "prosím prosim teda no nuž hm hmm ehm uh aha áá aaa ja ty ten tú tu ju ho ich aj už uz po hovore potom hneď hned " +
+  // the action verb itself („áno, môžeš ju zmazať“); negations (nemaž, nechaj) are not here and fail
+  "zmaž zmaz zmažte zmazte zmazať zmazat vymaž vymaz vymažte vymazte vymazať vymazat vytvor vytvorte vytvoriť vytvorit pridaj pridajte pridať pridat " +
+  "zapíš zapis zapíšte zapiste zapísať zapisat označ oznac označiť oznacit uzavri uzavrieť uzavriet presuň presun presunúť presunut").split(" "));
 export const isAgreement = (q) => {
   const w = words(q);
   return w.length > 0 && w.every((x) => AGREE.has(x));
@@ -124,13 +138,14 @@ export function checkConfirmation(a, tr, agentTurns, callContent) {
   for (const i of idxs) {
     const prev = i > 0 && tr[i - 1].role === "agent" ? tr[i - 1].text : null;
     // the target has to be in Marek's own words, otherwise in the read-back he answered right after
-    const keyInQuote = key && has(a.quote, key);
+    const keyInQuote = taskHeard(a.quote, key, a.target_name);
     const needReadback = agree || (TASK_TOOLS.has(a.tool) && !keyInQuote);
     // key only in the read-back: Marek's words must be a plain "yes" to it ("nechaj tak" next to a key is no confirmation)
-    if (TASK_TOOLS.has(a.tool) && !keyInQuote && !agree) { last = "kľúč úlohy nie je v citáte a citát nie je čistý súhlas s read-backom"; continue; }
+    if (TASK_TOOLS.has(a.tool) && !keyInQuote && !agree) { last = "úloha (názov ani kľúč) nie je v citáte a citát nie je čistý súhlas s read-backom"; continue; }
     if (a.tool === "pm_delete_task" && !keyInQuote) {
       const keys = new Set((prev ?? "").toUpperCase().match(/\b[A-Z]{2,}-\d+\b/g) ?? []);
-      if (keys.size !== 1 || !/zmaž|zmaz|vymaž|vymaz/i.test(prev ?? "")) { last = "mazanie: read-back musí pomenovať práve jednu úlohu a povedať, že sa zmaže"; continue; }
+      const named = keys.size === 1 || (keys.size === 0 && taskNameHeard(prev ?? "", a.target_name));
+      if (!named || !/zmaž|zmaz|vymaž|vymaz/i.test(prev ?? "")) { last = "mazanie: read-back musí pomenovať práve jednu úlohu (názvom alebo kľúčom) a povedať, že sa zmaže"; continue; }
     }
     let rb = "";
     let rbTurn = null;
@@ -150,7 +165,7 @@ export function checkConfirmation(a, tr, agentTurns, callContent) {
     if (TASK_TOOLS.has(a.tool)) {
       if (!key) { last = "chýba target_key"; continue; }
       if (String(args.task ?? "").trim().toUpperCase() !== key.toUpperCase()) { last = `args.task (${args.task}) nie je target_key (${key})`; continue; }
-      if (!has(heard, key)) { last = `kľúč ${key} nezaznel v citáte ani v read-backu`; continue; }
+      if (!taskHeard(heard, key, a.target_name)) { last = `úloha ${key} (názov ani kľúč) nezaznela v citáte ani v read-backu`; continue; }
     }
     if (a.tool === "pm_assign_task" && !nameHeard(a.assignee_name || args.assignee, heard)) { last = "meno riešiteľa nezaznelo v citáte ani v read-backu"; continue; }
     if (agree && a.tool === "pm_create_task") {

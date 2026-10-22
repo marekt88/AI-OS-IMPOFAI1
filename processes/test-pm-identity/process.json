@@ -5,9 +5,9 @@
   "maxTurns": 4,
   "timeoutMin": 5,
   "allowedTools": [
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_current_identity"
+    "mcp__claude_ai_KAPSA__pm_get_current_identity"
   ],
   "requireTools": [
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_current_identity"
+    "mcp__claude_ai_KAPSA__pm_get_current_identity"
   ]
 }

@@ -2,7 +2,7 @@
 // The transcript excerpt is from the morning-brief call of 2026-10-17 (the call with "assign Leo" and "delete IMP-1489").
 import test from "node:test";
 import assert from "node:assert/strict";
-import { precheck, mayCallBack, effectiveRisk, callerVerified, contentCoverage, isAgreement, nameHeard, MAX_ACTIONS } from "./lib.mjs";
+import { precheck, checkConfirmation, taskNameHeard, mayCallBack, effectiveRisk, callerVerified, contentCoverage, isAgreement, nameHeard, MAX_ACTIONS } from "./lib.mjs";
 
 const call1017 = {
   kind: "morning-brief",
@@ -34,7 +34,7 @@ test("17. 10.: confirmed assignment passes, delete without the key in Marek's wo
     A({ id: "R2", tool: "pm_delete_task", risk: "destructive", args: { task: "IMP-1489" }, quote: "keď proces potom prebehol úspešne, tak ten môžeš zmazať", readback: rb1489, target_key: "IMP-1489" }),
   ] });
   assert.deepEqual(ids(r.actions), ["R1"]);
-  assert.match(r.rejected[0].reason, /kľúč úlohy nie je v citáte/);
+  assert.match(r.rejected[0].reason, /nie je v citáte/);
 });
 
 test("wrong target, key not heard, invented quote, other assignee, bare 'Môžeš.' are rejected", () => {
@@ -123,4 +123,29 @@ test("callback chaining: at most one more callback, after a callback only with n
   assert.equal(mayCallBack({ kind: "callback", depth: 1, newResults: false }).ok, false);
   assert.equal(mayCallBack({ kind: "callback", depth: 1, newResults: true }).ok, true);
   assert.equal(mayCallBack({ kind: "callback", depth: 2, newResults: true }).ok, false);
+});
+
+test("delete confirmed with the action verb („Áno, môžeš ju zmazať po hovore.“) after a read-back with one key passes; „nemaž“ does not", () => {
+  const tr = [
+    { role: "agent", text: "Rozumiem, kľúč tej úlohy je IMP-1488. Mám ju teda po hovore zmazať?" },
+    { role: "user", text: "Áno, môžeš ju zmazať po hovore." },
+  ];
+  const a = { id: "A1", tool: "pm_delete_task", args: { task: "IMP-1488" }, quote: "Áno, môžeš ju zmazať po hovore.", target_key: "IMP-1488", target_name: "x", readback: tr[0].text, confirmed: true };
+  assert.equal(checkConfirmation(a, tr, [tr[0].text], {}), null);
+  const no = [{ ...tr[0] }, { role: "user", text: "Nie, nemaž ju." }];
+  assert.notEqual(checkConfirmation({ ...a, quote: "Nie, nemaž ju." }, no, [no[0].text], {}), null);
+});
+
+test("task named by its name instead of the key (voice agents never say keys)", () => {
+  const tr = [
+    { role: "agent", text: "Rozumiem, úlohu Test hlásenia chýb AI runnera mám po hovore zmazať?" },
+    { role: "user", text: "Áno, môžeš ju zmazať." },
+  ];
+  const a = { id: "A1", tool: "pm_delete_task", args: { task: "IMP-1488" }, quote: "Áno, môžeš ju zmazať.", target_key: "IMP-1488", target_name: "[AI runner] Test hlásenia chýb (môžeš zmazať)", readback: tr[0].text, confirmed: true };
+  assert.equal(checkConfirmation(a, tr, [tr[0].text], {}), null);
+  // a different task's name is not enough
+  const other = [{ role: "agent", text: "Mám po hovore zmazať úlohu Dať Martinovi prístup k Power BI?" }, tr[1]];
+  assert.notEqual(checkConfirmation({ ...a, readback: other[0].text }, other, [other[0].text], {}), null);
+  assert.equal(taskNameHeard("pridaj komentár do úlohy Opraviť schema errory Bridgit", "Opraviť schéma errory Bridgit (export schémy na etl.bridgit.one)"), false);
+  assert.equal(taskNameHeard("pridaj komentár do úlohy Opraviť schema errory Bridgit export schémy", "Opraviť schéma errory Bridgit (export schémy)"), true);
 });

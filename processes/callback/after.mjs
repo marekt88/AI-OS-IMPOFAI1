@@ -58,7 +58,7 @@ const details = [
 
 const instructions = `Toto je spätný hovor. Marekovi voláš s výsledkom toho, čo ti zadal v predchádzajúcom hovore.
 Poradie:
-(1) Výsledok: čo je hotové. Pri každej hotovej úlohe povedz aj jej kľúč (napríklad IMP-1481), aby ju vedel nájsť.
+(1) Výsledok: čo je hotové. Pri každej hotovej úlohe povedz jej presný názov. Kód úlohy (napríklad IMP-1481) nikdy nehovor nahlas.
 (2) Čo sa nepodarilo alebo čaká na jeho schválenie a prečo, jednou vetou na položku.
 (3) Otázky: polož ich jednu po druhej, počkaj na odpoveď a každú odpoveď jednou vetou zhrň, aby ťa mohol opraviť.
 Po výsledku sa krátko opýtaj, či k tomu má otázku. Keď ti Marek zadá novú úlohu alebo zmenu, postupuj podľa pravidiel v časti „Počas hovoru nič nevykonávaš“: zopakuj ju presne a nechaj si ju potvrdiť.

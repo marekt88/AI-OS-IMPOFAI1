@@ -92,3 +92,13 @@ Presun do PM (entity Agent, AgentRun, Call, Approval, Question) príde vo fáze 
 **Alternatives considered:** fronta jobov v PM hneď (architekt), druhé potvrdenie mimo hlasu a 2 týždne testovacieho režimu (červený tím), samostatné druhé číslo pre asistenta. Otvorené pre Mareka: model predplatného pre produkt pre iné firmy (Anthropic nepovoľuje zdieľať predplatné), prvý server pre serverových agentov.
 
 **Owner:** Marek Tóth (rozhodnutia orchestrátora v autonómnom režime, na potvrdenie)
+
+## 2026-10-21 - KAPSA V1: externé zdroje cez konektory AI, nie vlastné konektory KAPSA
+
+**Decision:** Vo V1 KAPSA nemá vlastné konektory. Fireflies a ďalšie zdroje číta AI používateľa (Claude, ChatGPT) cez svoje konektory a do KAPSA zapisuje cez MCP. Šablóna „Meetingy z Fireflies do second brainu“ zaindexuje všetky meetingy, ktoré v KAPSA chýbajú, a potom navrhne dennú naplánovanú úlohu na schválenie. Ak ju AI nevie vytvoriť sama, dá JSON s nastaveniami a návod.
+
+**Why:** Test šablóny ukázal, že serverový Fireflies sync potrebuje API kľúč na serveri (FIREFLIES_API_KEY chýbal, 13 hovorov sa nestiahlo). Zákazník si ho nastaviť nevie. Fireflies konektor v Claude fungoval hneď. Fireflies je samostatná služba, ktorú si používateľ musí založiť a púšťať do meetingov.
+
+**Alternatives considered:** serverový sync s kľúčom na organizáciu (V1.1+, spolu s vlastnými konektormi KAPSA).
+
+**Owner:** Marek Tóth

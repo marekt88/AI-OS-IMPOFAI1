@@ -12,9 +12,15 @@
 - **Jazyk:** slovenčina aj angličtina od začiatku pre web, auth, onboarding, guide, šablóny, e-maily a paywall. Voice šablóny Claude sú v angličtine, lebo Claude voice ide len po anglicky.
 - **Prvý kanál:** Marekova sieť a AI workshopy pre majiteľov firiem a nadšencov, kde sa KAPSA predvedie. Reklamy až potom.
 - **Fáza 2 (coding agent):** prvý projekt je samotná PM/KAPSA platforma.
+- **Konektory vo V1 (2026-10-21):** KAPSA nemá vlastné konektory. Externé zdroje (Fireflies, Gmail, Drive…) číta AI používateľa cez svoje konektory (Claude, ChatGPT) a výsledky zapisuje do KAPSA cez MCP. Fireflies: používateľ si založí účet na fireflies.ai a pridá Fireflies konektor do svojho AI. Šablóna najprv zaindexuje všetko, čo chýba, potom navrhne dennú naplánovanú úlohu na schválenie. Serverový Fireflies sync nie je súčasť zákazníckeho setupu. Vlastné konektory v KAPSA až v ďalšej verzii.
+- **Setup pre Claude (2026-10-20):** KAPSA plugin (konektor + pravidlá pri štarte session + skills kontext, second brain, úlohy, poradca + príkazy /kapsa-dnes, /kapsa-uloz) na stiahnutie na /brain/start a /mcp. Onboarding: najprv plugin, potom onboarding cez AI chat. Web a mobil claude.ai pluginy nepodporujú: konektor + skill + globálne inštrukcie.
+- **Globálne inštrukcie a skill (2026-10-20):** AI zapisuje nové fakty a úlohy sám, mazanie len po potvrdení, kódy úloh nehovorí, urguje termíny. Skill je všeobecný pre každú firmu.
+- **Šablóny (2026-10-20):** dizajn podľa Higgsfield, grafika ku každej šablóne, „Vyskúšať v Claude / ChatGPT“ s predvyplneným promptom (záloha: schránka).
+- **Ranný brief a osobný priestor (2026-10-21):** brief sa nastavuje v rozhovore (konektory, témy z webu, systémy) a ukladá do osobného priestoru mozgu `osobne/<id>/`, ktorý vidí len daný človek (ani admin). Nie do Google Drive.
+- **Vlastné konektory (2026-10-21):** zdroj bez hotového konektora rieši šablóna „Vlastný konektor v Claude Code“ (Claude desktop záložka Code alebo claude.ai/code s GitHubom), nie terminál. Lokálny konektor funguje len na danom počítači, konektor v cloude všade.
 
 
-Stav: **záväzná definícia od 2026-10-19** (Marekove rozhodnutia sú v kapitole 0). Značka produktu: **KAPSA**. Celkový cieľ: [[ai-platforma-ciel]], plán: [[ai-platforma-plan]]. Podklady: swarm R1–R4 v `.swarm/v1-saas/`.
+Stav: **záväzná definícia od 2026-10-19, aktualizovaná 2026-10-21** (Marekove rozhodnutia sú v kapitole 0). Značka produktu: **KAPSA**. Celkový cieľ: [[ai-platforma-ciel]], plán: [[ai-platforma-plan]]. Podklady: swarm R1–R4 v `.swarm/v1-saas/`.
 
 ## 1. Čo je V1 jednou vetou
 Zdieľaný firemný mozog (second brain) a task management s prístupmi, ktoré používateľ ovláda vlastným AI (Claude, ChatGPT…) cez MCP. V platforme nebeží žiadne AI a neplatí sa za tokeny.
@@ -112,12 +118,12 @@ Kto poznámku vidí, môže do nej písať (WIKI vrstva). Úroveň „len číta
 | # | Názov | Kategória | AI |
 |---|---|---|---|
 | 1 | Interviewer: doplň medzery v mozgu | chat + voice | Claude, ChatGPT (chat) |
-| 2 | Ranný brief do Google Drive | naplánovaná úloha | Claude |
+| 2 | Ranný brief (osobný priestor v KAPSA) | naplánovaná úloha + chat | Claude, ChatGPT |
 | 3 | Prečítaj mi ranný brief | voice | Claude |
 | 4 | Draft e-mailu hlasom | voice | Claude |
 | 5 | Skill: píš e-maily ako ja (z odoslaných) | skill | Claude, ChatGPT |
 | 6 | Hlasom zmeň úlohy a zapíš čas | voice | Claude |
-| 7 | Fireflies → mozog | naplánovaná úloha | Claude |
+| 7 | Meetingy z Fireflies do second brainu (Fireflies konektor AI) | naplánovaná úloha + chat | Claude, ChatGPT |
 | 8 | Nové e-maily → mozog | naplánovaná úloha | Claude |
 | 9 | Týždenný report klientovi z úloh a času | naplánovaná úloha | Claude |
 | 10 | Doplnenie timesheetu z kalendára | naplánovaná úloha + voice | Claude |
@@ -131,6 +137,7 @@ Kto poznámku vidí, môže do nej písať (WIKI vrstva). Úroveň „len číta
 | 18 | Tip: full vs. obmedzený token | tip | všetky |
 | 19 | Správa pre Ownera Claude Team (pridaj konektor) | tip | Claude Team |
 | 20 | ClickUp + mozog: úlohy v ClickUp, kontext v mozgu | chat + tip | Claude, ChatGPT |
+| 21 | Vlastný konektor v Claude Code | chat (len kopírovať) | Claude |
 
 ## 8. Ceny
 - Trial 30 dní bez karty.

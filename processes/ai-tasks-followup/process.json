@@ -1,0 +1,10 @@
+{
+  "description": "Po hovore hlasového asistenta pre AI tasks (interný test): z prepisu vyberie Marekove odpovede k úlohám a zapíše ich do aktivity úloh v Startups / KAPSA / AI tasks (deploy a schválenia len pri jasnom potvrdení). Zapíše záznam do denníka projektu. Spúšťa ho ai-tasks-call s --input.",
+  "enabled": true,
+  "schedule": null,
+  "model": "sonnet",
+  "maxTurns": 4,
+  "timeoutMin": 10,
+  "allowedTools": [],
+  "keepRuns": 200
+}

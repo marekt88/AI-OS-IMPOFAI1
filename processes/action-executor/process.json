@@ -7,25 +7,25 @@
   "timeoutMin": 15,
   "keepRuns": 365,
   "allowedTools": [
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_create_task",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_update_task",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_update_task_status",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_assign_task",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_set_task_priority",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_add_task_comment",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_move_task",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_add_task_label",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_delete_task",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_create_task_list",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_task",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_task_lists",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_assignable_users",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_task_activity"
+    "mcp__claude_ai_KAPSA__pm_create_task",
+    "mcp__claude_ai_KAPSA__pm_update_task",
+    "mcp__claude_ai_KAPSA__pm_update_task_status",
+    "mcp__claude_ai_KAPSA__pm_assign_task",
+    "mcp__claude_ai_KAPSA__pm_set_task_priority",
+    "mcp__claude_ai_KAPSA__pm_add_task_comment",
+    "mcp__claude_ai_KAPSA__pm_move_task",
+    "mcp__claude_ai_KAPSA__pm_add_task_label",
+    "mcp__claude_ai_KAPSA__pm_delete_task",
+    "mcp__claude_ai_KAPSA__pm_create_task_list",
+    "mcp__claude_ai_KAPSA__pm_get_task",
+    "mcp__claude_ai_KAPSA__pm_list_task_lists",
+    "mcp__claude_ai_KAPSA__pm_list_assignable_users",
+    "mcp__claude_ai_KAPSA__pm_list_task_activity"
   ],
   "dryRunAllowedTools": [
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_get_task",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_task_lists",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_assignable_users",
-    "mcp__claude_ai_Projekt_manazment_-_IMPOFAI__pm_list_task_activity"
+    "mcp__claude_ai_KAPSA__pm_get_task",
+    "mcp__claude_ai_KAPSA__pm_list_task_lists",
+    "mcp__claude_ai_KAPSA__pm_list_assignable_users",
+    "mcp__claude_ai_KAPSA__pm_list_task_activity"
   ]
 }
