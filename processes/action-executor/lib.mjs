@@ -57,7 +57,8 @@ export async function runDeterministic(actions, ctx, { pmTool, dry }) {
     res.writes.push({ tool: name, action_id, args, ref: keyOf(r) });
     return r;
   };
-  for (const a of actions.slice(0, MAX_ACTIONS)) {
+  let counted = 0; // bug moves of the morning brief (bug_move, set by precheck) do not count
+  for (const a of actions.filter((x) => x.bug_move || ++counted <= MAX_ACTIONS)) {
     try {
       if (a.confirmed !== true) { res.skipped.push({ action_id: a.id, reason: "nepotvrdené" }); continue; }
       if (a.risk === "needs_approval") {
@@ -157,7 +158,7 @@ export function verifyModelRun(calls, actions, modelOut, ctx) {
       continue;
     }
     used.add(a.id);
-    actionWrites++;
+    if (!a.bug_move) actionWrites++;
     if (!c.ok) { out.skipped.push({ action_id: a.id, reason: `chyba PM: ${c.text.slice(0, 300)}` }); continue; }
     if (a.tool === "pm_delete_task") {
       const b = readFor.get(a.target_key);

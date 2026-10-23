@@ -8,7 +8,7 @@ import path from "node:path";
 import { envForcesDry } from "../../runner/core.mjs";
 import { pmTool } from "../../runner/pm.mjs";
 import { isDry, localTime, PENDING_FILE, placeCallAndWait, startFollowup } from "../../runner/voice-call.mjs";
-import { AI_TASKS_LIST, readHeartbeat, splitSystemBugs, SYSTEM_BUGS_LIST, workerLine } from "./lib.mjs";
+import { AI_TASKS_LIST, bugCategory, readHeartbeat, splitSystemBugs, SYSTEM_BUGS_LIST, systemBugsLine, workerLine } from "./lib.mjs";
 
 const RUN_DIR = process.env.RUN_DIR;
 const DRY = isDry() || envForcesDry();
@@ -107,7 +107,7 @@ if (followups.length) {
 } else if (o.followup_report) say.push(`## Po poslednom hovore\n${o.followup_report}`);
 if (o.nothing_new) say.push("Za toto obdobie nie je nič nové.");
 say.push(`## Stav workera\n${worker}`);
-say.push(`## Systémové chyby (KAPSA, worker, AI runner)\n${sysItems == null ? "Systémové chyby sa nepodarilo prečítať." : `${sys.urgent.length ? `Urgentné, navrhujem ich presunúť do AI tasks na opravu:\n${list(sys.urgent, (b) => `„${b.name}“ (${STATUS[b.status] ?? b.status})`)}` : "Žiadne urgentné."}${sys.moreUrgent ? `\nĎalšie urgentné systémové chyby: ${sys.moreUrgent}, ponúknem ich v ďalšom briefe.` : ""}${sys.otherCount ? `\nĎalšie systémové chyby bez naliehavosti: ${sys.otherCount}.` : ""}`}`);
+say.push(`## Systémové chyby (KAPSA, worker, AI runner)\n${sysItems == null ? "Systémové chyby sa nepodarilo prečítať." : systemBugsLine(sys)}`);
 say.push(`## Bugy klientov (AI Bugs)\n${clientBugs.length ? list(clientBugs, (b) => `${b.key} ${b.name} (${b.change}; rieši ${b.assignee || "nikto"})`) : "Žiadne otvorené bugy."}`);
 for (const p of changed) {
   say.push(`## Projekt ${p.name}\nNové a čo sa rieši: ${p.summary}\nZmenených úloh: ${p.changed_tasks.length}, otvorených: ${p.open_count}.\nPriority na dnes:\n${list(p.today, (t) => `${t.text} → ${t.who}${t.task_key ? ` (${t.task_key})` : ""}`) || "- (bez priority)"}`);
@@ -137,7 +137,7 @@ add(`STAV WORKERA (kódovací agent pre AI tasks): ${worker}`);
 for (const t of sysItems ?? []) {
   const urgent = sys.urgent.some((u) => u.key === t.key);
   const b = bugInfo.get(t.key);
-  add(`SYSTÉMOVÁ CHYBA${urgent ? " (urgentná, ponúkni presun do AI tasks)" : ""} ${t.key} „${t.name}“: ${STATUS[t.status] ?? t.status}; priorita ${t.priority ?? "žiadna"}; vznikla ${t.created_at ? localTime(t.created_at) : "?"}\n    Popis: ${clip(b?.description ?? "", 300) || "(bez popisu)"}`);
+  add(`SYSTÉMOVÁ CHYBA${urgent ? " (urgentná, navrhnutá na presun do AI tasks)" : ""} ${t.key} „${t.name}“: oblasť ${bugCategory(t.name)}; ${STATUS[t.status] ?? t.status}; priorita ${t.priority ?? "žiadna"}; vznikla ${t.created_at ? localTime(t.created_at) : "?"}\n    Popis: ${clip(b?.description ?? "", 300) || "(bez popisu)"}`);
 }
 for (const b of clientBugs) add(`BUG ${taskLine(b)}`);
 for (const p of o.projects) {
@@ -173,13 +173,13 @@ if (details.length > MAX_DETAILS) console.log(`WARNING: call_details ${details.l
 
 const instructions = `Toto je ranný brief za obdobie ${o.period_label}.
 Poradie: (1) odložené zo spätného hovoru, ak niečo je, (2) čo sa urobilo po hovoroch od posledného briefu: pri každom hovore čo sa urobilo a čo nie a prečo, (3) stav workera jednou vetou a systémové chyby, (4) bugy klientov, (5) projekty so zmenami: čo je nové, čo sa rieši, priorita na dnes a kto ju má riešiť, (6) projekty bez zmeny jednou vetou každý, (7) nové úlohy, (8) dôležité e-maily, (9) Marekove úlohy na dnes, (10) nápady, (11) navrhované e-maily a meetingy, (12) otázky.
-Systémové chyby: vymenuj urgentné systémové chyby ich presnými názvami tak, ako sú v podkladoch, a jednou otázkou sa opýtaj, či ich môžeš všetky presunúť do AI tasks, aby ich worker opravil. Marek môže súhlasiť so všetkými naraz alebo niektoré vynechať; presunieš len tie, s ktorými súhlasil. Ostatné systémové chyby len spočítaj. Bugy klientov sa do AI tasks nepresúvajú, presun pri nich neponúkaj.
+Systémové chyby: sám od seba povedz len počet otvorených systémových chýb, oblasti, do ktorých zasahujú, a v jednej-dvoch vetách, o aké chyby ide (napríklad zlyhaný beh ranného briefu, worker nebeží). Potom jednou otázkou navrhni presun všetkých urgentných do AI tasks, aby ich worker opravil. Názvy jednotlivých chýb vymenuj, až keď sa na ne Marek opýta (sú v podrobnostiach ako SYSTÉMOVÁ CHYBA). Marek môže súhlasiť so všetkými naraz alebo niektoré vynechať; presunieš len tie, s ktorými súhlasil. Bugy klientov sa do AI tasks nepresúvajú, presun pri nich neponúkaj.
 Hovor najprv krátko, detaily hovor až na požiadanie. V podrobnostiach máš pri každej úlohe kľúč, názov, popis, riešiteľa, stav a termín, pri e-mailoch odosielateľa, adresu, účet a obsah. Úlohy vždy pomenuj ich názvom; kód úlohy (napríklad IMP-1491) nikdy nehovor nahlas, ani na konci. Keď sa Marek pýta na konkrétne úlohy (napr. čo presne niekto dokončil), vymenuj ich názvom. Označenia otázok (Q a číslo) nikdy nečítaj nahlas.
 Po každom bloku sa krátko opýtaj, či môžeš pokračovať. V jednej odpovedi polož vždy najviac jednu otázku.
 Otázky polož na konci, jednu po druhej, a počkaj na odpoveď. Ak sa otázka týka projektu, o ktorom práve hovoríte, môžeš ju položiť hneď tam.
 Mená projektov: ${aliases.join("; ") || "pozri podrobnosti"}. Ak Marek povie meno človeka alebo projektu, ktoré presne nesedí na nikoho v podkladoch alebo sedí na viac možností (napríklad „IME“, „Leo“), nehádaj potichu a dopýtaj sa: „Myslíš projekt Zacharides, teda Imagewell?“ alebo „Myslíš Leonarda Tótha?“.
 Marek ti môže zadať nové úlohy pre seba alebo developerov. Postupuj podľa pravidiel v časti „Počas hovoru nič nevykonávaš“. Pri každej akcii si over projekt, task list, presný názov, riešiteľa celým menom a termín, ak ho Marek povedal.
-Pred ukončením hovoru zopakuj všetky dohodnuté akcie po jednej. Presuny systémových chýb zopakuj spolu jednou vetou s presnými názvami všetkých dohodnutých chýb: „Presuniem do AI tasks na opravu tieto chyby: <presný názov 1>, <presný názov 2>. Platí?“ Pri existujúcej úlohe povedz jej presný názov (kód nikdy), pri novej úlohe projekt a task list, potom čo sa má urobiť, meno riešiteľa a termín. Po každej akcii sa opýtaj „Platí?“ a počkaj na áno alebo opravu. Akciu, ktorú Marek nepotvrdí, nevykonáš. Až potom hovor ukonči nástrojom end_call.`;
+Pred ukončením hovoru zopakuj všetky dohodnuté akcie po jednej. Presuny systémových chýb zopakuj spolu jednou vetou. Keď Marek súhlasil so všetkými urgentnými, povedz: „Presuniem do AI tasks na opravu všetky urgentné systémové chyby, spolu ${sys.urgent.length}. Platí?“ Keď niektoré vynechal, povedz presné názvy tých, ktoré presunieš: „Presuniem do AI tasks na opravu tieto chyby: <presný názov 1>, <presný názov 2>. Platí?“ Pri existujúcej úlohe povedz jej presný názov (kód nikdy), pri novej úlohe projekt a task list, potom čo sa má urobiť, meno riešiteľa a termín. Po každej akcii sa opýtaj „Platí?“ a počkaj na áno alebo opravu. Akciu, ktorú Marek nepotvrdí, nevykonáš. Až potom hovor ukonči nástrojom end_call.`;
 
 const vars = {
   first_message: `Dobré ráno, Marek. Mám pre teba ranný brief za obdobie ${o.period_label}. Môžem začať?`,

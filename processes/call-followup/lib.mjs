@@ -54,7 +54,7 @@ const AGREE = new Set(("áno ano hej jasné jasne dobre ok okej okay súhlasím 
   "zapíš zapis zapíšte zapiste zapísať zapisat označ oznac označiť oznacit uzavri uzavrieť uzavriet presuň presun presunúť presunut " +
   // one yes to the brief's list of system bugs („Áno, môžeš opraviť všetky tieto chyby“, IMP-1606); a delete still needs
   // a read-back naming exactly one task
-  "oprav opravte opraviť opravit všetky vsetky všetko vsetko tieto tie chyby chybu erory errory bugy").split(" "));
+  "platí plati oprav opravte opraviť opravit všetky vsetky všetko vsetko tieto tie chyby chybu erory errory bugy").split(" "));
 export const isAgreement = (q) => {
   const w = words(q);
   return w.length > 0 && w.every((x) => AGREE.has(x));
@@ -122,9 +122,13 @@ export function precheck(input, output) {
     const risk = effectiveRisk(a.tool, a.risk);
     const why = checkConfirmation(a, tr, agentTurns, input.call_content) ?? checkBugMove(a, input.call_content);
     if (why) { reject(a, why); continue; }
-    actions.push({ ...a, risk });
+    actions.push({ ...a, risk, ...(isBugMove(a, input.call_content) ? { bug_move: true } : {}) });
   }
-  for (const a of actions.splice(MAX_ACTIONS)) rejected.push({ id: a.id, summary: a.summary, reason: `nad limit ${MAX_ACTIONS} akcií na hovor, nevykonané, ide do otázok`, overLimit: true });
+  // bug moves are bounded by the brief's list, the limit is for everything else
+  let counted = 0;
+  const over = actions.filter((a) => !a.bug_move && ++counted > MAX_ACTIONS);
+  for (const a of over) actions.splice(actions.indexOf(a), 1);
+  for (const a of over) rejected.push({ id: a.id, summary: a.summary, reason: `nad limit ${MAX_ACTIONS} akcií na hovor, nevykonané, ide do otázok`, overLimit: true });
   return { actions, rejected };
 }
 
@@ -134,6 +138,32 @@ function withoutBugNames(turn, callContent) {
   let t = ` ${norm(turn)} `;
   for (const n of names) t = t.split(` ${n} `).join(" ");
   return t.trim();
+}
+
+const NUM_WORDS = ["", "jednu jedna jeden", "dve dva", "tri", "styri", "pat", "sest", "sedem", "osem", "devat", "desat"];
+const isMovable = (key, callContent) => Array.isArray(callContent?.movable_bugs)
+  && callContent.movable_bugs.some((b) => String(b?.key ?? "").toUpperCase() === String(key ?? "").trim().toUpperCase());
+/**
+ * The brief's joint read-back of all offered bugs without their names („Presuniem do AI tasks na opravu všetky urgentné
+ * systémové chyby, spolu 3. Platí?“, Marek 2026-10-23: names only on request). It names every movable bug when it
+ * says AI tasks, all, urgent and the exact count (digit or word).
+ */
+export function jointBugReadback(turn, callContent) {
+  const n = callContent?.movable_bugs?.length ?? 0;
+  if (!n) return false;
+  const h = ` ${fold(turn)} `;
+  if (!h.includes(" ai tasks ") || !/ vsetk/.test(h) || !/ urgentn/.test(h)) return false;
+  const counts = [String(n), ...(NUM_WORDS[n] ?? "").split(" ").filter(Boolean)];
+  const said = [...h.matchAll(/ (\d+) /g)].map((m) => m[1]);
+  if (said.some((d) => d !== String(n))) return false; // another number = not this list
+  return counts.some((c) => h.includes(` ${c} `));
+}
+
+/** A bug move from the brief (move to AI tasks or its prompt): bounded by movable_bugs, not counted in MAX_ACTIONS. */
+export function isBugMove(a, callContent) {
+  if (!isMovable(a.target_key, callContent)) return false;
+  if (a.tool === "pm_move_task") return AI_TASKS.has(String(a.args?.task_list ?? "").trim()) || AI_TASKS.has(norm(a.args?.task_list));
+  return a.tool === "pm_update_task" && Object.keys(a.args ?? {}).every((k) => k === "task" || k === "prompt");
 }
 
 // Ranný brief offers only urgent system bugs (call_content.movable_bugs) for a move to AI tasks, where the coding
@@ -189,7 +219,7 @@ export function checkConfirmation(a, tr, agentTurns, callContent) {
     if (TASK_TOOLS.has(a.tool)) {
       if (!key) { last = "chýba target_key"; continue; }
       if (String(args.task ?? "").trim().toUpperCase() !== key.toUpperCase()) { last = `args.task (${args.task}) nie je target_key (${key})`; continue; }
-      if (!taskHeard(heard, key, a.target_name)) { last = `úloha ${key} (názov ani kľúč) nezaznela v citáte ani v read-backu`; continue; }
+      if (!taskHeard(heard, key, a.target_name) && !(isBugMove(a, callContent) && rbTurn && jointBugReadback(rbTurn, callContent))) { last = `úloha ${key} (názov ani kľúč) nezaznela v citáte ani v read-backu`; continue; }
     }
     if (a.tool === "pm_assign_task" && !nameHeard(a.assignee_name || args.assignee, heard)) { last = "meno riešiteľa nezaznelo v citáte ani v read-backu"; continue; }
     if (agree && a.tool === "pm_create_task") {

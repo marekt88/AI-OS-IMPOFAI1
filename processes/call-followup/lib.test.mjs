@@ -221,3 +221,29 @@ test("brief bug move: one joint yes to the read-back of all offered bugs moves e
   ] }, { proposed_actions: [A({ id: "d", tool: "pm_delete_task", args: { task: "IMP-1594" }, quote: "Áno, všetky tieto chyby", target_key: "IMP-1594", target_name: n1, risk: "destructive" })] });
   assert.deepEqual(del.actions, []);
 });
+
+test("brief bug move: joint read-back without names (all urgent, exact count), no limit for bug moves", () => {
+  const bugs = Array.from({ length: 6 }, (_, i) => ({ key: `IMP-${1700 + i}`, name: `[AI runner] Proces číslo ${i} zlyhal pri behu` }));
+  const input = (agent) => ({
+    kind: "morning-brief",
+    call_content: { bugs, movable_bugs: bugs },
+    transcript: [{ role: "agent", at_secs: 1, message: agent }, { role: "user", at_secs: 2, message: "Áno, platí." }],
+  });
+  const acts = bugs.flatMap((b) => [
+    A({ id: `m${b.key}`, tool: "pm_move_task", args: moveArgs(b.key), quote: "Áno, platí", target_key: b.key, target_name: b.name }),
+    A({ id: `p${b.key}`, tool: "pm_update_task", args: { task: b.key, prompt: "Oprav túto chybu." }, quote: "Áno, platí", target_key: b.key, target_name: b.name }),
+  ]);
+  const ok = precheck(input("Presuniem do AI tasks na opravu všetky urgentné systémové chyby, spolu 6. Platí?"), { proposed_actions: acts });
+  assert.deepEqual(ok.rejected, []);
+  assert.equal(ok.actions.length, 12); // over MAX_ACTIONS, bug moves do not count
+  assert.ok(ok.actions.every((a) => a.bug_move));
+  assert.equal(precheck(input("Presuniem do AI tasks na opravu všetky urgentné systémové chyby, spolu šesť. Platí?"), { proposed_actions: acts }).actions.length, 12);
+  // wrong count, or not "all urgent": not a read-back of this list
+  assert.equal(precheck(input("Presuniem do AI tasks na opravu všetky urgentné systémové chyby, spolu 5. Platí?"), { proposed_actions: acts }).actions.length, 0);
+  assert.equal(precheck(input("Presuniem do AI tasks na opravu tieto chyby. Platí?"), { proposed_actions: acts }).actions.length, 0);
+  // the joint read-back confirms only the moves, nothing else (e.g. a status change of a movable bug)
+  const other = precheck(input("Presuniem do AI tasks na opravu všetky urgentné systémové chyby, spolu 6. Platí?"), { proposed_actions: [
+    A({ id: "s", tool: "pm_update_task_status", args: { task: "IMP-1700", status: "complete" }, quote: "Áno, platí", target_key: "IMP-1700", target_name: bugs[0].name }),
+  ] });
+  assert.equal(other.actions.length, 0);
+});

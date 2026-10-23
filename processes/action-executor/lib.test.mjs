@@ -104,3 +104,15 @@ test("IMP-1542: approved `comment` arg matches a call with `body` (alias), no mi
   assert.deepEqual(r.mismatch, []);
   assert.equal(r.executed[0].action_id, "A3");
 });
+
+test("runDeterministic: bug moves of the brief (bug_move) do not count in the 10 actions per call", async () => {
+  const calls = [];
+  const pmTool = async (name, args) => { calls.push(name); return { key: args.task ?? "IMP-9" }; };
+  const acts = [
+    ...Array.from({ length: 12 }, (_, i) => ({ id: `b${i}`, tool: "pm_move_task", args: { task: `IMP-${i}`, task_list: "Startups / KAPSA / AI tasks", status: "to_do" }, quote: "Áno, platí", confirmed: true, risk: "normal", target_key: `IMP-${i}`, summary: "presun", bug_move: true })),
+    ...Array.from({ length: 11 }, (_, i) => ({ id: `n${i}`, tool: "pm_set_task_priority", args: { task: `IMP-${100 + i}`, priority: "low" }, quote: "Áno, platí", confirmed: true, risk: "normal", target_key: `IMP-${100 + i}`, summary: "priorita" })),
+  ];
+  const r = await runDeterministic(acts, { conversation_id: "c", kind: "morning-brief" }, { pmTool, dry: false });
+  assert.equal(r.executed.filter((e) => e.tool === "pm_move_task").length, 12);
+  assert.equal(r.executed.filter((e) => e.tool === "pm_set_task_priority").length, 10);
+});

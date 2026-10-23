@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { readHeartbeat, splitSystemBugs, workerLine } from "./lib.mjs";
+import { bugCategory, readHeartbeat, splitSystemBugs, systemBugsLine, workerLine } from "./lib.mjs";
 
 const now = new Date("2026-10-23T07:00:00Z");
 const fmt = (d) => d.toISOString().slice(11, 16);
@@ -37,23 +37,41 @@ test("worker with failing polls, missing heartbeat", () => {
   assert.equal(readHeartbeat(f).lastPollOk, true);
 });
 
-test("system bugs: high and urgent offered (urgent first, then oldest), others only counted", () => {
+test("system bugs: all high and urgent offered (urgent first, then oldest), others counted, categories", () => {
   const r = splitSystemBugs([
-    { key: "IMP-3", name: "c", priority: "normal", status: "to_do", created_at: "2026-10-22T10:00:00Z" },
-    { key: "IMP-2", name: "b", priority: "urgent", status: "to_do", created_at: "2026-10-23T06:00:00Z" },
-    { key: "IMP-1", name: "a", priority: "high", status: "in_progress", created_at: "2026-10-22T15:00:00Z" },
-    { key: "IMP-4", name: "d", priority: null, status: "to_do" },
-    { key: "IMP-5", name: "e", priority: "high", status: "complete" },
+    { key: "IMP-3", name: "[AI runner] c", priority: "normal", status: "to_do", created_at: "2026-10-22T10:00:00Z" },
+    { key: "IMP-2", name: "Worker AI tasks nebeží (heartbeat)", priority: "urgent", status: "to_do", created_at: "2026-10-23T06:00:00Z" },
+    { key: "IMP-1", name: "[AI runner] a", priority: "high", status: "in_progress", created_at: "2026-10-22T15:00:00Z" },
+    { key: "IMP-4", name: "Deploy do produkcie zlyhal", priority: null, status: "to_do" },
+    { key: "IMP-5", name: "[AI runner] e", priority: "high", status: "complete" },
   ]);
-  assert.deepEqual(r.urgent.map((b) => b.key), ["IMP-2", "IMP-1"]); // urgent before high
+  assert.deepEqual(r.urgent.map((b) => b.key), ["IMP-2", "IMP-1"]);
+  assert.equal(r.open, 4);
   assert.equal(r.otherCount, 2);
-  assert.equal(r.moreUrgent, 0);
-  assert.deepEqual(splitSystemBugs([]), { urgent: [], moreUrgent: 0, otherCount: 0 });
+  assert.deepEqual(r.categories, [
+    { name: "AI runner", count: 2, urgent: 1 },
+    { name: "server a nasadenie", count: 1, urgent: 0 },
+    { name: "worker", count: 1, urgent: 1 },
+  ]);
+  assert.deepEqual(splitSystemBugs([]), { open: 0, urgent: [], otherCount: 0, categories: [] });
 });
 
-test("system bugs: at most 4 offered (2 executor actions each), the rest of the urgent ones counted", () => {
-  const bugs = Array.from({ length: 6 }, (_, i) => ({ key: `IMP-${i}`, name: `b${i}`, priority: "high", status: "to_do", created_at: `2026-10-2${i}T00:00:00Z` }));
-  const r = splitSystemBugs(bugs);
-  assert.deepEqual(r.urgent.map((b) => b.key), ["IMP-0", "IMP-1", "IMP-2", "IMP-3"]);
-  assert.equal(r.moreUrgent, 2);
+test("system bugs: no limit on the offer", () => {
+  const bugs = Array.from({ length: 7 }, (_, i) => ({ key: `IMP-${i}`, name: `[AI runner] b${i}`, priority: "high", status: "to_do", created_at: `2026-10-1${i}T00:00:00Z` }));
+  assert.equal(splitSystemBugs(bugs).urgent.length, 7);
+});
+
+test("system bugs line: count, categories and the proposal, never names or keys", () => {
+  const s = splitSystemBugs([
+    { key: "IMP-1", name: "[AI runner] Proces morning-brief zlyhal", priority: "high", status: "to_do" },
+    { key: "IMP-2", name: "[AI runner] Test", priority: "normal", status: "to_do" },
+    { key: "IMP-3", name: "Worker AI tasks nebeží (heartbeat)", priority: "high", status: "to_do" },
+  ]);
+  const line = systemBugsLine(s);
+  assert.equal(line, "Otvorených systémových chýb je 3, podľa oblastí: AI runner 2, worker 1. Urgentných je 2, navrhujem ich presunúť do AI tasks, aby ich worker opravil.");
+  assert.doesNotMatch(line, /IMP-|morning-brief/);
+  assert.equal(systemBugsLine(splitSystemBugs([])), "Žiadne otvorené systémové chyby.");
+  assert.match(systemBugsLine(splitSystemBugs([{ key: "IMP-2", name: "x", priority: "low", status: "to_do" }])), /Žiadna nie je urgentná/);
+  assert.equal(bugCategory("Server: málo miesta na disku pre build"), "server a nasadenie");
+  assert.equal(bugCategory("Niečo iné"), "ostatné");
 });
