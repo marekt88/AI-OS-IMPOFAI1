@@ -25,10 +25,13 @@ const recent = Date.now() - RECENT_DONE_DAYS * 86_400_000;
 const tasks = ((await pmTool("pm_list_tasks", { task_list: AI_TASKS_LIST, limit: 100, sort: "created_at" })).items ?? []).filter(
   (t) => t.status !== "complete" || new Date(t.updated_at).getTime() > recent,
 );
+// AI_TASKS_FORCE=1: a call Marek scheduled himself (at job). It also brings up open tasks whose last message is the
+// worker's even if they were announced before, skips the pacing rules and the daily minute cap (kind "manual").
+const FORCE = process.env.AI_TASKS_FORCE === "1";
 const items = [];
 for (const t of tasks) {
   const act = await pmTool("pm_list_task_activity", { task: t.key, kind: "comments", order: "desc", limit: 20 });
-  const it = pendingItem(t, act.items ?? [], state.announced);
+  const it = pendingItem(t, act.items ?? [], state.announced) ?? (FORCE && t.status !== "complete" ? pendingItem(t, act.items ?? [], {}) : null);
   if (it) items.push(it);
 }
 if (!items.length) {
@@ -38,7 +41,7 @@ if (!items.length) {
 items.sort((a, b) => (a.at < b.at ? -1 : 1));
 console.log(`pending: ${items.map((i) => `${i.key} (${i.kind})`).join(", ")}`);
 
-// 2) batching and pacing
+// 2) batching and pacing (not for a scheduled call)
 const workerBusy = (() => {
   try {
     execFileSync("flock", ["-n", WORKER_LOCK, "true"]);
@@ -47,19 +50,19 @@ const workerBusy = (() => {
     return true;
   }
 })();
-if (workerBusy && minsSince(items[0].at) < BATCH_WAIT_MIN) {
+if (!FORCE && workerBusy && minsSince(items[0].at) < BATCH_WAIT_MIN) {
   console.log(`worker is running and the oldest message is ${minsSince(items[0].at).toFixed(0)} min old: waiting to call about more tasks at once`);
   process.exit(0);
 }
-if (minsSince(state.lastCallAt) < MIN_GAP_MIN) {
+if (!FORCE && minsSince(state.lastCallAt) < MIN_GAP_MIN) {
   console.log(`last call ${minsSince(state.lastCallAt).toFixed(0)} min ago (< ${MIN_GAP_MIN}): next tick`);
   process.exit(0);
 }
-if (minsSince(state.lastUnansweredAt) < RETRY_UNANSWERED_MIN) {
+if (!FORCE && minsSince(state.lastUnansweredAt) < RETRY_UNANSWERED_MIN) {
   console.log(`last call was not answered ${minsSince(state.lastUnansweredAt).toFixed(0)} min ago: retry after ${RETRY_UNANSWERED_MIN} min`);
   process.exit(0);
 }
-const guard = callGuard({ kind: "ai-tasks" });
+const guard = callGuard({ kind: FORCE ? "manual" : "ai-tasks" });
 if (!guard.allowed) {
   console.log(`no call now: ${guard.reason} (the messages stay pending)`);
   process.exit(0);
