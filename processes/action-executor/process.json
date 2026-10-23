@@ -15,7 +15,6 @@
     "mcp__claude_ai_KAPSA__pm_add_task_comment",
     "mcp__claude_ai_KAPSA__pm_move_task",
     "mcp__claude_ai_KAPSA__pm_add_task_label",
-    "mcp__claude_ai_KAPSA__pm_delete_task",
     "mcp__claude_ai_KAPSA__pm_create_task_list",
     "mcp__claude_ai_KAPSA__pm_get_task",
     "mcp__claude_ai_KAPSA__pm_list_task_lists",

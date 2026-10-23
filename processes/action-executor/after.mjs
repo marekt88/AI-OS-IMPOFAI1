@@ -6,7 +6,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { appendActionLog, callbackInput, isDry, mayCallBack } from "../call-followup/lib.mjs";
-import { runDeterministic, transcriptCalls, verifyModelRun } from "./lib.mjs";
+import { changesSummary, runDeterministic, transcriptCalls, verifyModelRun } from "./lib.mjs";
 
 const RUN_DIR = process.env.RUN_DIR;
 const outFile = process.env.RUN_OUTPUT;
@@ -15,7 +15,7 @@ const input = JSON.parse(fs.readFileSync(process.env.RUN_INPUT, "utf8"));
 const dry = isDry() || input.dry_run === true;
 const kind = input.kind;
 const depth = Number.isInteger(input.depth) ? input.depth : kind === "callback" ? 1 : 0;
-const ctx = { conversation_id: input.conversation_id ?? null, kind, source_run: input.source_run ?? null };
+const ctx = { conversation_id: input.conversation_id ?? null, kind, source_run: input.source_run ?? null, call_note: input.call_note ?? null };
 
 // pmtool mode keeps the actions out of the model's prompt: they are in a file of the followup run
 let actions = input.actions ?? [];
@@ -71,6 +71,17 @@ if (result.mismatch?.length && !dry) {
     runId: process.env.RUN_ID,
   }).catch((err) => console.error(`mismatch report failed: ${err.message}`));
 }
+
+// summary of the changes → the call note in the brain (Marek 2026-10-23); the task comments point to this note
+const summary = changesSummary(result, actions, prechecked);
+if (summary && ctx.call_note && !dry) {
+  try {
+    await pm.pmTool("pm_append_brain_section", { note: ctx.call_note, heading: "Vykonané zmeny po hovore", text: summary, summary: `zmeny po hovore ${ctx.conversation_id}` }, { tokenEnv: "PM_ACTIONS_TOKEN" });
+    console.log(`summary appended to ${ctx.call_note}`);
+  } catch (err) {
+    console.error(`summary to the call note failed: ${err.message}`);
+  }
+} else if (summary) console.log(`${dry ? "[dry-run] " : ""}summary${ctx.call_note ? ` for ${ctx.call_note}` : " (no call note)"}:\n${summary}`);
 
 // callback: when the followup asked for it, or always after an inbound call with results
 const done = [...result.executed.map((e) => e.what), ...result.approvals_created.map((a) => `${a.what} (čaká na tvoje schválenie${a.task_key ? `, ${a.task_key}` : ""})`)];

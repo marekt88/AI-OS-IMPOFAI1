@@ -37,7 +37,7 @@ export function bugCategory(name = "") {
  * (only counted), categories = [{ name, count, urgent }] of all open ones, most bugs first.
  */
 export function splitSystemBugs(tasks = []) {
-  const open = tasks.filter((t) => t && t.status !== "complete");
+  const open = tasks.filter((t) => t && t.status !== "complete" && t.status !== "cancelled");
   const urgent = open
     .filter((t) => t.priority in URGENT_RANK)
     .sort((a, b) => URGENT_RANK[a.priority] - URGENT_RANK[b.priority] || String(a.created_at ?? "").localeCompare(String(b.created_at ?? "")))

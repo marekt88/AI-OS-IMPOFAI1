@@ -1,7 +1,7 @@
 // action-executor: deterministic execution (pmTool, no model) and verification of a model run's transcript.
 // Only what is verified here (real pmTool results, or tool calls proven by transcript.jsonl) counts as executed.
 import fs from "node:fs";
-import { APPROVALS_LIST, MAX_ACTIONS } from "../call-followup/lib.mjs";
+import { APPROVALS_LIST, CANCELLED, isCancel, MAX_ACTIONS } from "../call-followup/lib.mjs";
 
 export const PREFIX = "mcp__claude_ai_KAPSA__";
 const READ = new Set(["pm_get_task", "pm_list_task_activity", "pm_list_task_lists", "pm_list_assignable_users"]);
@@ -19,9 +19,11 @@ export function normalizeArgs(tool, args) {
 }
 export const sameArgs = (a, b, tool) => JSON.stringify(canon(normalizeArgs(tool, a))) === JSON.stringify(canon(normalizeArgs(tool, b)));
 
-export function auditText(ctx, quote) {
+export function auditText(ctx, quote, { cancel = false } = {}) {
   const d = new Intl.DateTimeFormat("sk-SK", { timeZone: "Europe/Bratislava", day: "numeric", month: "numeric", year: "numeric" }).format(new Date());
-  return `Vykonané asistentom po hovore ${ctx.conversation_id ?? "?"} (${ctx.kind ?? "?"}), ${d}. Podklad: „${quote}“.`;
+  const note = ctx.call_note ? ` Hovor v second braine: ${ctx.call_note}.` : "";
+  const what = cancel ? " Úloha je zrušená (stav CANCELLED), nie zmazaná; vrátiš ju zmenou stavu." : "";
+  return `Vykonané asistentom po hovore ${ctx.conversation_id ?? "?"} (${ctx.kind ?? "?"}), ${d}.${what}${note} Podklad: „${quote}“.`;
 }
 export function approvalArgs(a, ctx) {
   return {
@@ -66,19 +68,20 @@ export async function runDeterministic(actions, ctx, { pmTool, dry }) {
         res.approvals_created.push({ action_id: a.id, task_key: dry ? "" : keyOf(r) ?? "", what: `${dry ? "(dry-run) " : ""}na schválenie: ${a.summary}` });
         continue;
       }
-      const comment = auditText(ctx, a.quote);
-      if (a.tool === "pm_delete_task") {
+      if (a.tool === "pm_delete_task") { res.skipped.push({ action_id: a.id, reason: "mazanie úloh je vypnuté, úlohy sa len rušia" }); continue; }
+      const comment = auditText(ctx, a.quote, { cancel: isCancel(a) });
+      if (isCancel(a)) {
         const task = await call("pm_get_task", { task: a.target_key });
         let activity = null;
         try { activity = await call("pm_list_task_activity", { task: a.target_key }); } catch (err) { activity = { error: String(err.message) }; }
         if (keyOf(task) !== a.target_key || (a.target_name && task?.name && task.name.trim() !== a.target_name.trim())) {
-          res.skipped.push({ action_id: a.id, reason: `úloha ${a.target_key} nesedí s potvrdeným názvom („${task?.name}“), nemažem` });
+          res.skipped.push({ action_id: a.id, reason: `úloha ${a.target_key} nesedí s potvrdeným názvom („${task?.name}“), nerušim` });
           continue;
         }
         res.backups.push({ action_id: a.id, task_key: a.target_key, task_json: JSON.stringify({ task, activity }) });
+        await write("pm_update_task_status", { task: a.target_key, status: CANCELLED }, a.id);
         await write("pm_add_task_comment", { task: a.target_key, body: comment }, a.id);
-        await write("pm_delete_task", { task: a.target_key }, a.id);
-        res.executed.push({ action_id: a.id, tool: a.tool, ref: a.target_key, what: `${dry ? "(dry-run) " : ""}${a.target_key}: zmazaná („${task?.name ?? a.target_name}“)`, audit_comment: comment });
+        res.executed.push({ action_id: a.id, tool: "pm_update_task_status", ref: a.target_key, what: `${dry ? "(dry-run) " : ""}${a.target_key}: zrušená („${task?.name ?? a.target_name}“)`, audit_comment: comment });
         continue;
       }
       const r = await write(a.tool, normalizeArgs(a.tool, a.args), a.id);
@@ -90,6 +93,20 @@ export async function runDeterministic(actions, ctx, { pmTool, dry }) {
     }
   }
   return res;
+}
+
+/** Markdown list of what the executor did after a call, for the call note in the brain (null = nothing to report). */
+export function changesSummary(result, actions = [], prechecked = []) {
+  const byId = new Map(actions.map((a) => [a.id, a]));
+  const lines = [
+    ...result.executed.map((e) => `- urobené: ${e.what}`),
+    ...result.approvals_created.map((a) => `- čaká na schválenie: ${a.what}${a.task_key ? ` (${a.task_key})` : ""}`),
+    ...result.skipped.map((x) => `- neurobené: ${byId.get(x.action_id)?.summary ?? x.action_id} (${x.reason})`),
+    ...prechecked.map((r) => `- neurobené: ${r.summary} (${r.reason})`),
+  ];
+  if (!lines.length) return null;
+  const at = new Intl.DateTimeFormat("sk-SK", { timeZone: "Europe/Bratislava", day: "numeric", month: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date());
+  return `Vykonávač akcií, ${at}:\n${lines.join("\n")}`;
 }
 
 /** Parses transcript.jsonl → [{ id, tool, input, ok, text }] in call order (PM tools without prefix). */
@@ -140,7 +157,6 @@ export function verifyModelRun(calls, actions, modelOut, ctx) {
       && String(c.input.body).includes(String(ctx.conversation_id ?? ""))) {
       const e = out.executed.find((x) => x.ref === c.input.task);
       if (e) e.audit_comment = c.input.body;
-      else out.pendingComments = [...(out.pendingComments ?? []), c.input]; // comment before delete
       continue;
     }
     // approval task
@@ -149,6 +165,11 @@ export function verifyModelRun(calls, actions, modelOut, ctx) {
       if (c.ok) out.approvals_created.push({ action_id: a.id, task_key: c.text.match(KEY_RE)?.[0] ?? "", what: `na schválenie: ${a.summary}` });
       else out.skipped.push({ action_id: a.id, reason: `úloha na schválenie zlyhala: ${c.text.slice(0, 200)}` });
       used.add(a.id);
+      continue;
+    }
+    // tasks are never deleted after a call, not even when an action asks for it
+    if (c.tool === "pm_delete_task") {
+      out.mismatch.push({ tool: c.tool, input: c.input, ok: c.ok, why: "mazanie úloh je vypnuté, úlohy sa len rušia" });
       continue;
     }
     // an approved action, called exactly as approved
@@ -160,11 +181,10 @@ export function verifyModelRun(calls, actions, modelOut, ctx) {
     used.add(a.id);
     if (!a.bug_move) actionWrites++;
     if (!c.ok) { out.skipped.push({ action_id: a.id, reason: `chyba PM: ${c.text.slice(0, 300)}` }); continue; }
-    if (a.tool === "pm_delete_task") {
+    if (isCancel(a)) {
       const b = readFor.get(a.target_key);
-      if (!b?.task) out.mismatch.push({ tool: c.tool, input: c.input, ok: c.ok, why: "mazanie bez zálohy (pm_get_task pred zmazaním)" });
+      if (!b?.task) out.warnings.push(`${a.target_key}: zrušenie bez zálohy (pm_get_task pred zrušením)`);
       else out.backups.push({ action_id: a.id, task_key: a.target_key, task_json: JSON.stringify(b) });
-      if (!(out.pendingComments ?? []).some((x) => x.task === a.target_key)) out.warnings.push(`${a.target_key}: chýba auditný komentár pred zmazaním`);
     }
     const ref = a.target_key || c.text.match(KEY_RE)?.[0] || "";
     if (ref && !a.target_key) touched.set(ref, a.id);
@@ -177,7 +197,6 @@ export function verifyModelRun(calls, actions, modelOut, ctx) {
   }
   // the model claims something it did not do
   for (const e of modelOut?.executed ?? []) if (!out.executed.some((x) => x.action_id === e.action_id) && !modelOut?.dry_run) out.warnings.push(`model tvrdí „${e.what}“, ale v prepise to nie je`);
-  for (const e of out.executed) if (!e.audit_comment && e.tool !== "pm_create_task_list" && e.tool !== "pm_delete_task") out.warnings.push(`${e.ref}: chýba auditný komentár`);
-  delete out.pendingComments;
+  for (const e of out.executed) if (!e.audit_comment && e.tool !== "pm_create_task_list") out.warnings.push(`${e.ref}: chýba auditný komentár`);
   return out;
 }

@@ -4,7 +4,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { callbackInput, callerVerified, isDry, mayCallBack, precheck } from "./lib.mjs";
+import { callbackInput, callerVerified, callNotePath, isDry, mayCallBack, precheck } from "./lib.mjs";
 
 const RUN_DIR = process.env.RUN_DIR;
 const saved = JSON.parse(fs.readFileSync(process.env.RUN_OUTPUT, "utf8"));
@@ -79,7 +79,7 @@ const spawnNext = async (name, inputObj) => {
 const cb = verified && !duplicate && (o.callback?.needed || asked.length) ? o.callback ?? {} : null;
 const cbQuestions = cb ? [...(cb.questions ?? []), ...asked].slice(0, 5) : [];
 const cbInfo = cb ? { needed: true, say: cb.say ?? "", questions: cbQuestions } : { needed: false };
-const meta = { source_run, call_source_run: input.source_run ?? null, conversation_id: input.conversation_id ?? null, kind, depth, dry_run: dry };
+const meta = { source_run, call_source_run: input.source_run ?? null, conversation_id: input.conversation_id ?? null, kind, depth, dry_run: dry, call_note: callNotePath(o.notes_written) };
 if (actions.length) {
   if (mode === "pmtool") {
     // the actions never enter the executor's prompt in this mode

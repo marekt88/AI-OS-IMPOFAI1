@@ -70,8 +70,8 @@ const doneText = (x) => `${textOf(x)}${keyOf(x) && !textOf(x).includes(keyOf(x))
 const skippedText = (x) => `${doneText(x)}${whyOf(x) ? `, dôvod: ${whyOf(x)}` : ""}`;
 
 const WORD = { "pm-brain-log": "second brain", "pm-brain-note": "second brain", "pm-call": "hovor", "pm-task": "úlohy v PM", "pm-tree": "štruktúra PM", "pm-notification": "notifikácie v PM", "pm-company-map": "mapa firmy", gmail: "e-mail", calendar: "kalendár", fireflies: "Fireflies", "call-followup": "spracovanie hovoru", "action-executor": "vykonávač akcií", "open-questions": "otvorené otázky" };
-const KIND = { "morning-brief": "ranný brief", interview: "interview", inbound: "tvoj hovor", callback: "spätný hovor" };
-const STATUS = { to_do: "nezačatá", in_progress: "rozpracovaná", in_review: "na kontrole", complete: "hotová" };
+const KIND = { "morning-brief": "ranný brief", interview: "interview", inbound: "tvoj hovor", callback: "spätný hovor", "ai-tasks": "hovor o AI úlohách" };
+const STATUS = { to_do: "nezačatá", in_progress: "rozpracovaná", in_review: "na kontrole", complete: "hotová", cancelled: "zrušená" };
 const clip = (s = "", n) => (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s);
 const from = (sources = []) => [...new Set(sources.map((s) => WORD[s.system] ?? s.system))].join(", ");
 const src = (sources = []) => sources.map((s) => `${WORD[s.system] ?? s.system} ${s.ref}${s.at ? ` (${localTime(s.at)})` : ""}`).join("; ");

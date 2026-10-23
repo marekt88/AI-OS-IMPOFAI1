@@ -2,7 +2,7 @@
 // The transcript excerpt is from the morning-brief call of 2026-10-17 (the call with "assign Leo" and "delete IMP-1489").
 import test from "node:test";
 import assert from "node:assert/strict";
-import { precheck, checkBugMove, checkConfirmation, taskNameHeard, mayCallBack, effectiveRisk, callerVerified, contentCoverage, isAgreement, nameHeard, MAX_ACTIONS } from "./lib.mjs";
+import { precheck, checkBugMove, checkConfirmation, taskNameHeard, mayCallBack, effectiveRisk, callerVerified, contentCoverage, isAgreement, nameHeard, MAX_ACTIONS, callNotePath } from "./lib.mjs";
 
 const call1017 = {
   kind: "morning-brief",
@@ -246,4 +246,68 @@ test("brief bug move: joint read-back without names (all urgent, exact count), n
     A({ id: "s", tool: "pm_update_task_status", args: { task: "IMP-1700", status: "complete" }, quote: "Áno, platí", target_key: "IMP-1700", target_name: bugs[0].name }),
   ] });
   assert.equal(other.actions.length, 0);
+});
+
+// ---- tasks are cancelled, never deleted; moves need the list; the AI tasks call (Marek 2026-10-23) ----
+const cancelCall = (kind, turns, call_content = {}) => ({ kind, call_content, transcript: turns.map(([role, message]) => ({ role, message, at_secs: 0 })) });
+
+test("a confirmed delete becomes a cancel (status cancelled), risk destructive; „zruš“ read-back counts", () => {
+  const input = cancelCall("morning-brief", [
+    ["agent", "Rozumiem, úlohu Test hlásenia chýb AI runnera po hovore zruším. Platí?"],
+    ["user", "Áno, zruš ju."],
+  ]);
+  const name = "[AI runner] Test hlásenia chýb";
+  for (const tool of ["pm_delete_task", "pm_update_task_status"]) {
+    const args = tool === "pm_delete_task" ? { task: "IMP-1488" } : { task: "IMP-1488", status: "cancelled" };
+    const r = precheck(input, { proposed_actions: [A({ id: "C1", tool, args, quote: "Áno, zruš ju.", readback: input.transcript[0].message, target_key: "IMP-1488", target_name: name })] });
+    assert.equal(r.actions.length, 1, tool);
+    assert.equal(r.actions[0].tool, "pm_update_task_status");
+    assert.deepEqual(r.actions[0].args, { task: "IMP-1488", status: "cancelled" });
+    assert.equal(r.actions[0].risk, "destructive");
+    assert.equal(r.actions[0].cancel, true);
+  }
+  assert.equal(effectiveRisk("pm_update_task_status", "normal", { status: "cancelled" }), "destructive");
+  assert.equal(effectiveRisk("pm_update_task_status", "normal", { status: "complete" }), "normal");
+});
+
+test("cancel needs exactly one task named in a read-back that says it is cancelled", () => {
+  const input = cancelCall("morning-brief", [
+    ["agent", "Mám úlohy Test hlásenia chýb AI runnera a Nastavenie e-mailov cez WebSupport označiť?"],
+    ["user", "Áno."],
+  ]);
+  const r = precheck(input, { proposed_actions: [A({ id: "C2", tool: "pm_update_task_status", args: { task: "IMP-1488", status: "cancelled" }, quote: "Áno.", readback: input.transcript[0].message, target_key: "IMP-1488", target_name: "[AI runner] Test hlásenia chýb (môžeš zmazať)" })] });
+  assert.equal(r.actions.length, 0);
+  assert.match(r.rejected[0].reason, /zrušenie/);
+});
+
+test("a move to another list only when Marek named the list (path, list name heard)", () => {
+  const input = cancelCall("morning-brief", [["user", "Úlohu Nastavenie e-mailov cez WebSupport presuň do listu Human tasks."]]);
+  const mv = (task_list) => A({ id: "M1", tool: "pm_move_task", args: { task: "IMP-1595", task_list }, quote: "Úlohu Nastavenie e-mailov cez WebSupport presuň do listu Human tasks.", target_key: "IMP-1595", target_name: "Nastavenie e-mailov cez WebSupport" });
+  assert.equal(precheck(input, { proposed_actions: [mv("Startups / KAPSA / Human tasks")] }).actions.length, 1);
+  const wrong = precheck(input, { proposed_actions: [mv("Startups / KAPSA / V2")] });
+  assert.equal(wrong.actions.length, 0);
+  assert.match(wrong.rejected[0].reason, /nezaznel/);
+  assert.match(precheck(input, { proposed_actions: [mv("cmvgb51oh00p3t427a20e4jhn")] }).rejected[0].reason, /cesta/);
+});
+
+test("AI tasks call: answers and new AI tasks stay with ai-tasks-followup, other changes pass, no callback", () => {
+  const input = cancelCall("ai-tasks", [
+    ["user", "K úlohe Nastavenie e-mailov cez WebSupport napíš, že heslo vložím zajtra. A úlohu Zmenšiť obraz aplikácie Docker zruš."],
+  ], { tasks: [{ task_key: "IMP-1595", name: "Nastavenie e-mailov cez WebSupport" }] });
+  const q = input.transcript[0].message;
+  const r = precheck(input, { proposed_actions: [
+    A({ id: "K1", tool: "pm_add_task_comment", args: { task: "IMP-1595", body: "heslo zajtra" }, quote: "K úlohe Nastavenie e-mailov cez WebSupport napíš, že heslo vložím zajtra.", target_key: "IMP-1595", target_name: "Nastavenie e-mailov cez WebSupport" }),
+    A({ id: "K2", tool: "pm_create_task", args: { task_list: "Startups / KAPSA / AI tasks", name: "Nastavenie e-mailov cez WebSupport" }, quote: q }),
+    A({ id: "K3", tool: "pm_update_task_status", args: { task: "IMP-1620", status: "cancelled" }, quote: "A úlohu Zmenšiť obraz aplikácie Docker zruš.", target_key: "IMP-1620", target_name: "Zmenšiť obraz aplikácie (Docker)" }),
+  ] });
+  assert.deepEqual(ids(r.actions), ["K3"]);
+  assert.match(r.rejected.find((x) => x.id === "K1").reason, /ai-tasks-followup/);
+  assert.match(r.rejected.find((x) => x.id === "K2").reason, /ai-tasks-followup/);
+  assert.equal(mayCallBack({ kind: "ai-tasks", depth: 0, newResults: true }).ok, false);
+});
+
+test("callNotePath: the call note in context/hovory first", () => {
+  assert.equal(callNotePath([{ path: "context/projekty/kapsa.md", what: "x" }, { path: "context/hovory/2026-10-23-ai-tasks.md", what: "y" }]), "context/hovory/2026-10-23-ai-tasks.md");
+  assert.equal(callNotePath([{ path: "context/projekty/kapsa.md", what: "x" }]), "context/projekty/kapsa.md");
+  assert.equal(callNotePath([]), null);
 });

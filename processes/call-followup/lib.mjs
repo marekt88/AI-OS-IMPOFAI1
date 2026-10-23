@@ -8,6 +8,20 @@ export const APPROVALS_LIST = "cmv0zalyu0009p327hpyvas8d"; // Startups / Projekt
 export const MAX_ACTIONS = 10; // executor writes per call (audit comments not counted)
 export const MAX_CALLBACK_DEPTH = 2; // call → callback (1) → one more callback (2), never more
 
+// Tasks are never deleted after a call (Marek 2026-10-23): a confirmed delete becomes the status "cancelled" with an
+// audit comment. Cancelling keeps the strict rules of a delete (exactly one task named, verb in the read-back).
+export const CANCELLED = "cancelled";
+export const isCancel = (a) => a?.tool === "pm_delete_task" || (a?.tool === "pm_update_task_status" && String(a?.args?.status ?? "").toLowerCase() === CANCELLED);
+/** pm_delete_task → pm_update_task_status { status: "cancelled" }; other actions unchanged. */
+export function asCancel(a) {
+  if (!isCancel(a)) return a;
+  return { ...a, tool: "pm_update_task_status", args: { task: a.args?.task ?? a.target_key, status: CANCELLED }, risk: "destructive", cancel: true };
+}
+
+// The AI tasks call (kind "ai-tasks"): ai-tasks-followup already writes Marek's answers to the tasks of the call and
+// creates the new AI tasks. call-followup adds the brain and the other task changes, never these two again.
+export const AI_TASKS_LIST_ID = "cmvgb51oh00p3t427a20e4jhn";
+
 // Risk comes from the tool name (P4 review), the model can only raise it, never lower it.
 const NORMAL = new Set([
   "pm_create_task", "pm_update_task", "pm_update_task_status", "pm_assign_task", "pm_set_task_priority",
@@ -15,13 +29,14 @@ const NORMAL = new Set([
 ]);
 const DESTRUCTIVE = new Set(["pm_delete_task"]);
 const RANK = { normal: 0, destructive: 1, needs_approval: 2 };
-export function codeRisk(tool) {
+export function codeRisk(tool, args) {
+  if (tool === "pm_update_task_status" && String(args?.status ?? "").toLowerCase() === CANCELLED) return "destructive";
   if (NORMAL.has(tool)) return "normal";
   if (DESTRUCTIVE.has(tool)) return "destructive";
   return "needs_approval"; // access, members, finance, e-mails, anything unknown
 }
-export function effectiveRisk(tool, modelRisk) {
-  const a = codeRisk(tool);
+export function effectiveRisk(tool, modelRisk, args) {
+  const a = codeRisk(tool, args);
   const b = RANK[modelRisk] != null ? modelRisk : "normal";
   return RANK[b] > RANK[a] ? b : a;
 }
@@ -51,6 +66,7 @@ const AGREE = new Set(("áno ano hej jasné jasne dobre ok okej okay súhlasím 
   "prosím prosim teda no nuž hm hmm ehm uh aha áá aaa ja ty ten tú tu ju ho ich aj už uz po hovore potom hneď hned " +
   // the action verb itself („áno, môžeš ju zmazať“); negations (nemaž, nechaj) are not here and fail
   "zmaž zmaz zmažte zmazte zmazať zmazat vymaž vymaz vymažte vymazte vymazať vymazat vytvor vytvorte vytvoriť vytvorit pridaj pridajte pridať pridat " +
+  "zruš zrus zrušte zruste zrušiť zrusit " +
   "zapíš zapis zapíšte zapiste zapísať zapisat označ oznac označiť oznacit uzavri uzavrieť uzavriet presuň presun presunúť presunut " +
   // one yes to the brief's list of system bugs („Áno, môžeš opraviť všetky tieto chyby“, IMP-1606); a delete still needs
   // a read-back naming exactly one task
@@ -119,10 +135,11 @@ export function precheck(input, output) {
   for (const a of output.proposed_actions ?? []) {
     if (a.confirmed !== true) continue; // unconfirmed items live in open_questions
     if (!/^pm_[a-z_]+$/.test(String(a.tool))) { reject(a, `neznámy nástroj ${a.tool}`); continue; }
-    const risk = effectiveRisk(a.tool, a.risk);
-    const why = checkConfirmation(a, tr, agentTurns, input.call_content) ?? checkBugMove(a, input.call_content);
+    const risk = effectiveRisk(a.tool, a.risk, a.args);
+    const why = checkConfirmation(a, tr, agentTurns, input.call_content) ?? checkBugMove(a, input.call_content) ?? checkMoveTarget(a, tr, input.call_content) ?? checkAiTasksCall(a, input);
     if (why) { reject(a, why); continue; }
-    actions.push({ ...a, risk, ...(isBugMove(a, input.call_content) ? { bug_move: true } : {}) });
+    const c = asCancel({ ...a, risk });
+    actions.push({ ...c, ...(isBugMove(a, input.call_content) ? { bug_move: true } : {}) });
   }
   // bug moves are bounded by the brief's list, the limit is for everything else
   let counted = 0;
@@ -179,6 +196,32 @@ export function checkBugMove(a, callContent) {
   return "do AI tasks sa z ranného briefu presúvajú len urgentné systémové chyby, ktoré brief ponúkol";
 }
 
+/**
+ * A move to another list (not the brief's bug moves) only when Marek named the list: its name (the last part of the
+ * path) is in the quote or the read-back. The list has to be given as a path, an id names nothing.
+ */
+export function checkMoveTarget(a, tr, callContent) {
+  if (a.tool !== "pm_move_task" || isBugMove(a, callContent)) return null;
+  const list = String(a.args?.task_list ?? "");
+  const name = list.split("/").map((x) => x.trim()).filter(Boolean).pop() ?? "";
+  if (!list.includes("/") || !name) return "presun: cieľový list musí byť cesta („Priestor / Projekt / List“), nie id";
+  const heard = `${a.quote ?? ""} ${a.readback ?? ""}`;
+  if (has(heard, name) || taskNameHeard(heard, name)) return null;
+  return `presun: cieľový list „${name}“ nezaznel v citáte ani v read-backu`;
+}
+
+/** Kind "ai-tasks": answers to the tasks of the call and new AI tasks are done by ai-tasks-followup, not twice. */
+export function checkAiTasksCall(a, input) {
+  if (input.kind !== "ai-tasks") return null;
+  const callKeys = new Set((input.call_content?.tasks ?? []).map((t) => String(t.task_key ?? t.key ?? "").toUpperCase()).filter(Boolean));
+  if (a.tool === "pm_add_task_comment" && callKeys.has(String(a.target_key ?? "").toUpperCase()))
+    return "odpoveď k úlohe z hovoru o AI tasks zapisuje ai-tasks-followup";
+  const list = String(a.args?.task_list ?? "").trim();
+  if (a.tool === "pm_create_task" && (list === AI_TASKS_LIST_ID || norm(list) === norm("Startups / KAPSA / AI tasks")))
+    return "nové úlohy v AI tasks z hovoru o AI tasks vytvára ai-tasks-followup";
+  return null;
+}
+
 /** null = the action is backed by Marek's own words, else the reason why not. Tries every user turn containing the quote. */
 export function checkConfirmation(a, tr, agentTurns, callContent) {
   const q = norm(a.quote);
@@ -196,10 +239,10 @@ export function checkConfirmation(a, tr, agentTurns, callContent) {
     const needReadback = agree || (TASK_TOOLS.has(a.tool) && !keyInQuote);
     // key only in the read-back: Marek's words must be a plain "yes" to it ("nechaj tak" next to a key is no confirmation)
     if (TASK_TOOLS.has(a.tool) && !keyInQuote && !agree) { last = "úloha (názov ani kľúč) nie je v citáte a citát nie je čistý súhlas s read-backom"; continue; }
-    if (a.tool === "pm_delete_task" && !keyInQuote) {
+    if (isCancel(a) && !keyInQuote) {
       const keys = new Set((prev ?? "").toUpperCase().match(/\b[A-Z]{2,}-\d+\b/g) ?? []);
       const named = keys.size === 1 || (keys.size === 0 && taskNameHeard(prev ?? "", a.target_name));
-      if (!named || !/zmaž|zmaz|vymaž|vymaz/i.test(prev ?? "")) { last = "mazanie: read-back musí pomenovať práve jednu úlohu (názvom alebo kľúčom) a povedať, že sa zmaže"; continue; }
+      if (!named || !/zmaž|zmaz|vymaž|vymaz|zruš|zrus/i.test(prev ?? "")) { last = "zrušenie: read-back musí pomenovať práve jednu úlohu (názvom alebo kľúčom) a povedať, že sa zruší"; continue; }
     }
     let rb = "";
     let rbTurn = null;
@@ -234,8 +277,16 @@ export function checkConfirmation(a, tr, agentTurns, callContent) {
   return last;
 }
 
+/** The note about the call the followup wrote (first one in context/hovory/, else the first written note), or null. */
+export function callNotePath(notesWritten) {
+  const paths = (notesWritten ?? []).map((n) => String(n?.path ?? "").trim()).filter((p) => p.endsWith(".md"));
+  return paths.find((p) => p.startsWith("context/hovory/")) ?? paths[0] ?? null;
+}
+
 /** May this run start another callback? depth = callbacks already in the chain before this call. */
 export function mayCallBack({ kind, depth = kind === "callback" ? 1 : 0, newResults }) {
+  // the AI tasks assistant calls again by itself when the coding agent answers; results are in the task comments
+  if (kind === "ai-tasks") return { ok: false, reason: "hovor o AI tasks nemá spätný hovor (výsledky sú v komentároch úloh)" };
   if (depth + 1 > MAX_CALLBACK_DEPTH) return { ok: false, reason: `reťazenie spätných hovorov dosiahlo limit (${depth})` };
   if (kind === "callback" && !newResults) return { ok: false, reason: "spätný hovor bez nových výsledkov, ďalší sa nevolá" };
   return { ok: true };

@@ -7,7 +7,7 @@ import path from "node:path";
 import os from "node:os";
 import { execFileSync } from "node:child_process";
 import { pmTool } from "../../runner/pm.mjs";
-import { callGuard, isDry, placeCallAndWait, readJson, STATE_DIR, writeJson } from "../../runner/voice-call.mjs";
+import { callGuard, isDry, placeCallAndWait, readJson, startFollowup, STATE_DIR, writeJson } from "../../runner/voice-call.mjs";
 import { spawnProcess } from "../../runner/spawn.mjs";
 import { AI_TASKS_LIST, BATCH_WAIT_MIN, MIN_GAP_MIN, RECENT_DONE_DAYS, RETRY_UNANSWERED_MIN, callVariables, pendingItem } from "./lib.mjs";
 
@@ -20,10 +20,11 @@ const state = readJson(STATE, { announced: {} });
 state.announced ??= {};
 
 // 1) new messages of the worker, oldest first
-// open tasks + tasks completed in the last days (their last message can be "deployed" or "next steps")
+// open tasks + tasks completed in the last days (their last message can be "deployed" or "next steps"); cancelled = closed
 const recent = Date.now() - RECENT_DONE_DAYS * 86_400_000;
+const closed = (t) => t.status === "complete" || t.status === "cancelled";
 const tasks = ((await pmTool("pm_list_tasks", { task_list: AI_TASKS_LIST, limit: 100, sort: "created_at" })).items ?? []).filter(
-  (t) => t.status !== "complete" || new Date(t.updated_at).getTime() > recent,
+  (t) => !closed(t) || new Date(t.updated_at).getTime() > recent,
 );
 // AI_TASKS_FORCE=1: a call Marek scheduled himself (at job). It also brings up open tasks whose last message is the
 // worker's even if they were announced before, skips the pacing rules and the daily minute cap (kind "manual").
@@ -31,7 +32,7 @@ const FORCE = process.env.AI_TASKS_FORCE === "1";
 const items = [];
 for (const t of tasks) {
   const act = await pmTool("pm_list_task_activity", { task: t.key, kind: "comments", order: "desc", limit: 20 });
-  const it = pendingItem(t, act.items ?? [], state.announced) ?? (FORCE && t.status !== "complete" ? pendingItem(t, act.items ?? [], {}) : null);
+  const it = pendingItem(t, act.items ?? [], state.announced) ?? (FORCE && !closed(t) ? pendingItem(t, act.items ?? [], {}) : null);
   if (it) items.push(it);
 }
 if (!items.length) {
@@ -85,10 +86,21 @@ for (const it of items) state.announced[it.key] = it.comment_id;
 state.lastUnansweredAt = null;
 writeJson(STATE, state);
 
-// 4) Marek's answers → task activity
+// 4) Marek's answers → task activity (ai-tasks-followup); the call → second brain + other task changes (call-followup,
+// the same path as every other voice call: brain note, project page, cancel / move / status through action-executor)
+const callTasks = items.map((it, i) => ({ label: `Úloha ${i + 1}`, task_key: it.key, name: it.name, kind: it.kind, agent_message: it.text }));
 await spawnProcess(
   "ai-tasks-followup",
-  { conversation_id: r.conversationId, ended_at: new Date().toISOString(), dry_run: isDry(), tasks: items.map((it, i) => ({ label: `Úloha ${i + 1}`, task_key: it.key, name: it.name, kind: it.kind, agent_message: it.text })), transcript: r.transcript },
+  { conversation_id: r.conversationId, ended_at: new Date().toISOString(), dry_run: isDry(), tasks: callTasks, transcript: r.transcript },
   { fromRunDir: RUN_DIR, label: "ai-tasks-followup" },
 );
-console.log(`call answered (${r.conversationId}): ai-tasks-followup started for ${items.length} task(s)`);
+await startFollowup({
+  runDir: RUN_DIR,
+  kind: "ai-tasks",
+  purpose: "Hovor hlasového asistenta o AI úlohách: správy kódovacieho agenta v Startups / KAPSA / AI tasks a Marekove odpovede.",
+  content: { tasks: callTasks },
+  transcript: r.transcript,
+  conversationId: r.conversationId,
+  label: "call-followup",
+});
+console.log(`call answered (${r.conversationId}): ai-tasks-followup and call-followup started for ${items.length} task(s)`);
