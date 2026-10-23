@@ -51,7 +51,10 @@ const AGREE = new Set(("áno ano hej jasné jasne dobre ok okej okay súhlasím 
   "prosím prosim teda no nuž hm hmm ehm uh aha áá aaa ja ty ten tú tu ju ho ich aj už uz po hovore potom hneď hned " +
   // the action verb itself („áno, môžeš ju zmazať“); negations (nemaž, nechaj) are not here and fail
   "zmaž zmaz zmažte zmazte zmazať zmazat vymaž vymaz vymažte vymazte vymazať vymazat vytvor vytvorte vytvoriť vytvorit pridaj pridajte pridať pridat " +
-  "zapíš zapis zapíšte zapiste zapísať zapisat označ oznac označiť oznacit uzavri uzavrieť uzavriet presuň presun presunúť presunut").split(" "));
+  "zapíš zapis zapíšte zapiste zapísať zapisat označ oznac označiť oznacit uzavri uzavrieť uzavriet presuň presun presunúť presunut " +
+  // one yes to the brief's list of system bugs („Áno, môžeš opraviť všetky tieto chyby“, IMP-1606); a delete still needs
+  // a read-back naming exactly one task
+  "oprav opravte opraviť opravit všetky vsetky všetko vsetko tieto tie chyby chybu erory errory bugy").split(" "));
 export const isAgreement = (q) => {
   const w = words(q);
   return w.length > 0 && w.every((x) => AGREE.has(x));
@@ -125,6 +128,14 @@ export function precheck(input, output) {
   return { actions, rejected };
 }
 
+// The read-back of bug moves is mostly the bug names, which are also in call_content: they do not count as quoted text.
+function withoutBugNames(turn, callContent) {
+  const names = (callContent?.movable_bugs ?? []).map((b) => norm(b?.name)).filter(Boolean).sort((a, b) => b.length - a.length);
+  let t = ` ${norm(turn)} `;
+  for (const n of names) t = t.split(` ${n} `).join(" ");
+  return t.trim();
+}
+
 // Ranný brief offers only urgent system bugs (call_content.movable_bugs) for a move to AI tasks, where the coding
 // worker picks them up by itself. In a call with that list, a move to AI tasks of anything else is refused.
 const AI_TASKS = new Set(["cmvgb51oh00p3t427a20e4jhn", norm("Startups / KAPSA / AI tasks")]);
@@ -173,7 +184,7 @@ export function checkConfirmation(a, tr, agentTurns, callContent) {
       rb = a.readback;
     }
     // judged on the whole agent turn, not on the excerpt the model picked
-    if (rbTurn && contentCoverage(rbTurn, callContent) > MAX_CONTENT_COVERAGE) { last = "read-back je väčšinou citát z call_content (e-mail, podklady), nie potvrdenie"; continue; }
+    if (rbTurn && contentCoverage(withoutBugNames(rbTurn, callContent), callContent) > MAX_CONTENT_COVERAGE) { last = "read-back je väčšinou citát z call_content (e-mail, podklady), nie potvrdenie"; continue; }
     const heard = `${a.quote} ${rb}`;
     if (TASK_TOOLS.has(a.tool)) {
       if (!key) { last = "chýba target_key"; continue; }

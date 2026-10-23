@@ -37,7 +37,7 @@ test("worker with failing polls, missing heartbeat", () => {
   assert.equal(readHeartbeat(f).lastPollOk, true);
 });
 
-test("system bugs: high and urgent offered (oldest first), others only counted", () => {
+test("system bugs: high and urgent offered (urgent first, then oldest), others only counted", () => {
   const r = splitSystemBugs([
     { key: "IMP-3", name: "c", priority: "normal", status: "to_do", created_at: "2026-10-22T10:00:00Z" },
     { key: "IMP-2", name: "b", priority: "urgent", status: "to_do", created_at: "2026-10-23T06:00:00Z" },
@@ -45,7 +45,15 @@ test("system bugs: high and urgent offered (oldest first), others only counted",
     { key: "IMP-4", name: "d", priority: null, status: "to_do" },
     { key: "IMP-5", name: "e", priority: "high", status: "complete" },
   ]);
-  assert.deepEqual(r.urgent.map((b) => b.key), ["IMP-1", "IMP-2"]);
+  assert.deepEqual(r.urgent.map((b) => b.key), ["IMP-2", "IMP-1"]); // urgent before high
   assert.equal(r.otherCount, 2);
-  assert.deepEqual(splitSystemBugs([]), { urgent: [], otherCount: 0 });
+  assert.equal(r.moreUrgent, 0);
+  assert.deepEqual(splitSystemBugs([]), { urgent: [], moreUrgent: 0, otherCount: 0 });
+});
+
+test("system bugs: at most 4 offered (2 executor actions each), the rest of the urgent ones counted", () => {
+  const bugs = Array.from({ length: 6 }, (_, i) => ({ key: `IMP-${i}`, name: `b${i}`, priority: "high", status: "to_do", created_at: `2026-10-2${i}T00:00:00Z` }));
+  const r = splitSystemBugs(bugs);
+  assert.deepEqual(r.urgent.map((b) => b.key), ["IMP-0", "IMP-1", "IMP-2", "IMP-3"]);
+  assert.equal(r.moreUrgent, 2);
 });

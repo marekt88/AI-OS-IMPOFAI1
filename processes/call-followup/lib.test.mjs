@@ -190,3 +190,34 @@ test("brief bug move: guard only applies to moves into AI tasks in a call with m
   assert.equal(checkBugMove(a, briefMove.call_content), null);
   assert.equal(checkBugMove(A({ tool: "pm_move_task", args: moveArgs("IMP-1491"), target_key: "IMP-1491" }), { bugs: [] }), null);
 });
+
+test("brief bug move: one joint yes to the read-back of all offered bugs moves each of them", () => {
+  const n1 = "[AI runner] Proces ai-tasks-call ešte beží, ďalší beh preskočený";
+  const n2 = "[AI runner] Proces morning-brief zlyhal (required-tools)";
+  const input = {
+    kind: "morning-brief",
+    call_content: {
+      bugs: [{ key: "IMP-1594", name: n1 }, { key: "IMP-1614", name: n2 }],
+      movable_bugs: [{ key: "IMP-1594", name: n1 }, { key: "IMP-1614", name: n2 }],
+    },
+    transcript: [
+      { role: "agent", at_secs: 500, message: `Presuniem do AI tasks na opravu tieto chyby: ${n1}, ${n2}. Platí?` },
+      { role: "user", at_secs: 506, message: "Áno, môžeš opraviť všetky tieto erory." },
+    ],
+  };
+  const quote = "Áno, môžeš opraviť všetky tieto erory";
+  assert.equal(isAgreement(quote), true);
+  const acts = [["IMP-1594", n1], ["IMP-1614", n2]].flatMap(([k, n]) => [
+    A({ id: `m${k}`, tool: "pm_move_task", args: moveArgs(k), quote, target_key: k, target_name: n }),
+    A({ id: `p${k}`, tool: "pm_update_task", args: { task: k, prompt: "Oprav túto chybu." }, quote, target_key: k, target_name: n }),
+  ]);
+  const { actions, rejected } = precheck(input, { proposed_actions: acts });
+  assert.deepEqual(rejected, []);
+  assert.equal(actions.length, 4);
+  // a joint yes still never deletes several tasks
+  const del = precheck({ ...input, transcript: [
+    { role: "agent", at_secs: 1, message: "Zmažem tieto chyby: IMP-1594 a IMP-1614. Platí?" },
+    { role: "user", at_secs: 2, message: "Áno, všetky tieto chyby." },
+  ] }, { proposed_actions: [A({ id: "d", tool: "pm_delete_task", args: { task: "IMP-1594" }, quote: "Áno, všetky tieto chyby", target_key: "IMP-1594", target_name: n1, risk: "destructive" })] });
+  assert.deepEqual(del.actions, []);
+});
