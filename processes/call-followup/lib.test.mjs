@@ -2,7 +2,7 @@
 // The transcript excerpt is from the morning-brief call of 2026-10-17 (the call with "assign Leo" and "delete IMP-1489").
 import test from "node:test";
 import assert from "node:assert/strict";
-import { precheck, checkConfirmation, taskNameHeard, mayCallBack, effectiveRisk, callerVerified, contentCoverage, isAgreement, nameHeard, MAX_ACTIONS } from "./lib.mjs";
+import { precheck, checkBugMove, checkConfirmation, taskNameHeard, mayCallBack, effectiveRisk, callerVerified, contentCoverage, isAgreement, nameHeard, MAX_ACTIONS } from "./lib.mjs";
 
 const call1017 = {
   kind: "morning-brief",
@@ -148,4 +148,45 @@ test("task named by its name instead of the key (voice agents never say keys)", 
   assert.notEqual(checkConfirmation({ ...a, readback: other[0].text }, other, [other[0].text], {}), null);
   assert.equal(taskNameHeard("pridaj komentár do úlohy Opraviť schema errory Bridgit", "Opraviť schéma errory Bridgit (export schémy na etl.bridgit.one)"), false);
   assert.equal(taskNameHeard("pridaj komentár do úlohy Opraviť schema errory Bridgit export schémy", "Opraviť schéma errory Bridgit (export schémy)"), true);
+});
+
+// IMP-1606: the morning brief offers urgent system bugs for a move to AI tasks; the read-back names the bug by its name.
+const briefMove = {
+  kind: "morning-brief",
+  call_content: {
+    bugs: [{ key: "IMP-1614", name: "[AI runner] Proces morning-brief zlyhal (required-tools)" }, { key: "IMP-1491", name: "[Dashboard] Hovory sa nespúšťajú" }],
+    movable_bugs: [{ key: "IMP-1614", name: "[AI runner] Proces morning-brief zlyhal (required-tools)", priority: "high", status: "to_do" }],
+  },
+  transcript: [
+    { role: "agent", at_secs: 400, message: "Presuniem chybu Proces morning-brief zlyhal, required tools, z AI runnera do AI tasks na opravu. Platí?" },
+    { role: "user", at_secs: 405, message: "Áno." },
+  ],
+};
+const moveArgs = (task, task_list = "Startups / KAPSA / AI tasks") => ({ task, task_list, status: "to_do" });
+
+test("brief bug move: urgent system bug moved and prompted on a plain yes to the read-back", () => {
+  const name = "[AI runner] Proces morning-brief zlyhal (required-tools)";
+  const { actions, rejected } = precheck(briefMove, { proposed_actions: [
+    A({ id: "m", tool: "pm_move_task", args: moveArgs("IMP-1614"), quote: "Áno", target_key: "IMP-1614", target_name: name }),
+    A({ id: "p", tool: "pm_update_task", args: { task: "IMP-1614", prompt: "Oprav túto chybu." }, quote: "Áno", target_key: "IMP-1614", target_name: name }),
+  ] });
+  assert.deepEqual(rejected, []);
+  assert.deepEqual(ids(actions), ["m", "p"]);
+});
+
+test("brief bug move: a bug the brief did not offer is never moved to AI tasks", () => {
+  const { actions, rejected } = precheck({ ...briefMove, transcript: [
+    { role: "agent", at_secs: 1, message: "Presuniem bug Dashboard Hovory sa nespúšťajú do AI tasks. Platí?" },
+    { role: "user", at_secs: 2, message: "Áno." },
+  ] }, { proposed_actions: [
+    A({ id: "m", tool: "pm_move_task", args: moveArgs("IMP-1491", "cmvgb51oh00p3t427a20e4jhn"), quote: "Áno", target_key: "IMP-1491", target_name: "[Dashboard] Hovory sa nespúšťajú" }),
+  ] });
+  assert.deepEqual(actions, []);
+  assert.match(rejected[0].reason, /len urgentné systémové chyby/);
+});
+
+test("brief bug move: guard only applies to moves into AI tasks in a call with movable_bugs", () => {
+  const a = A({ tool: "pm_move_task", args: moveArgs("IMP-1491", "Clients / PlusReality / Done"), target_key: "IMP-1491" });
+  assert.equal(checkBugMove(a, briefMove.call_content), null);
+  assert.equal(checkBugMove(A({ tool: "pm_move_task", args: moveArgs("IMP-1491"), target_key: "IMP-1491" }), { bugs: [] }), null);
 });

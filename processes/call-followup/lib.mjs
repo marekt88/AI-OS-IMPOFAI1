@@ -117,12 +117,25 @@ export function precheck(input, output) {
     if (a.confirmed !== true) continue; // unconfirmed items live in open_questions
     if (!/^pm_[a-z_]+$/.test(String(a.tool))) { reject(a, `neznámy nástroj ${a.tool}`); continue; }
     const risk = effectiveRisk(a.tool, a.risk);
-    const why = checkConfirmation(a, tr, agentTurns, input.call_content);
+    const why = checkConfirmation(a, tr, agentTurns, input.call_content) ?? checkBugMove(a, input.call_content);
     if (why) { reject(a, why); continue; }
     actions.push({ ...a, risk });
   }
   for (const a of actions.splice(MAX_ACTIONS)) rejected.push({ id: a.id, summary: a.summary, reason: `nad limit ${MAX_ACTIONS} akcií na hovor, nevykonané, ide do otázok`, overLimit: true });
   return { actions, rejected };
+}
+
+// Ranný brief offers only urgent system bugs (call_content.movable_bugs) for a move to AI tasks, where the coding
+// worker picks them up by itself. In a call with that list, a move to AI tasks of anything else is refused.
+const AI_TASKS = new Set(["cmvgb51oh00p3t427a20e4jhn", norm("Startups / KAPSA / AI tasks")]);
+export function checkBugMove(a, callContent) {
+  const movable = callContent?.movable_bugs;
+  if (a.tool !== "pm_move_task" || !Array.isArray(movable)) return null;
+  const dest = String(a.args?.task_list ?? "").trim();
+  if (!AI_TASKS.has(dest) && !AI_TASKS.has(norm(dest))) return null;
+  const key = String(a.target_key ?? "").trim().toUpperCase();
+  if (movable.some((b) => String(b?.key ?? "").toUpperCase() === key)) return null;
+  return "do AI tasks sa z ranného briefu presúvajú len urgentné systémové chyby, ktoré brief ponúkol";
 }
 
 /** null = the action is backed by Marek's own words, else the reason why not. Tries every user turn containing the quote. */

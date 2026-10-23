@@ -24,12 +24,16 @@ Od `lastSuccessAt` (posledný úspešný brief) po teraz. Prvý beh pokrýva 24 
 |---|---|---|
 | Odložené zo spätného hovoru | `~/.aios-runner/state/pending-callback.json` (píše `processes/callback`, keď nemohol volať) | blok „Odložené zo spätného hovoru“ na začiatku |
 | Po hovoroch od posledného briefu | `{{followups}}` = všetky úspešné `call-followup` od posledného briefu, `{{executions}}` = výstupy `action-executor` (režim `since`, K3) | pri každom hovore: čo sa urobilo (`executed`), čo nie a prečo (`skipped`), čo čaká na schválenie |
-| Bugy | všetky task listy AI Bugs | kľúč, názov, riešiteľ |
+| Stav workera | `~/kapsa-worker/state/heartbeat.json` (worker AI tasks) + `pm_list_tasks` v Startups / KAPSA / AI tasks (`after.mjs`, bez modelu) | jedna veta: beží / nebeží (bez kontroly 15 min a bez behu) / chyby (3+ zlyhané kontroly), na čom robí (názov úlohy), koľko úloh čaká na Mareka, koľko behov zlyhalo |
+| Systémové chyby | `pm_list_tasks` v Startups / KAPSA / AI Bugs (`after.mjs`, bez modelu) | urgentné (priorita vysoká alebo urgentná) názvom, pri každej zvlášť ponuka presunu do AI tasks; ostatné len počet |
+| Bugy klientov | ostatné task listy AI Bugs (model) | kľúč, názov, riešiteľ; presun sa neponúka |
 | Projekty | `pm_get_workspace_tree` (`delivery`, `labs`) | **všetky aktívne projekty** (aspoň 1 otvorená úloha alebo potvrdené priradenie). So zmenami: zhrnutie a priority. Bez zmeny: „bez zmeny od …, otvorené N, najbližší termín, kto“ |
 | Úlohy | `pm_list_tasks`, `pm_get_task` | pri každej úlohe kľúč, názov, popis v 1–2 vetách, riešiteľ, stav, termín (v podrobnostiach) |
 | Aliasy a tím | `context/projekty-a-tim.md` | napr. Zacharides = Imagewell; potvrdené priradenie ľudí (`owners`). Na priradenie sa brief už nepýta, ak je potvrdené |
 | E-maily | Gmail | odosielateľ, adresa príjemcu, **účet** (služba, organizácia, kľúč), obsah s číslami |
 | Otázky | `context/otvorene-otazky.md` (K6, píše `call-followup`) | 2–3 najstaršie otvorené otázky s id `Q-…`, potom nové otázky zo zberu (spolu max 6) |
+
+**Presun systémovej chyby do AI tasks** (IMP-1606, Marek 2026-10-23): urgentné systémové chyby idú do followupu ako `call_content.movable_bugs`. Keď Marek pri read-backu „Presuniem chybu <názov> do AI tasks na opravu. Platí?“ povie áno, `call-followup` navrhne `pm_move_task` (do Startups / KAPSA / AI tasks, stav `to_do`) a `pm_update_task` so zadaním pre kódovacieho agenta; vykoná ich `action-executor` s auditným komentárom. Worker na serveri potom úlohu sám zoberie (najprv otázky). `precheck` odmietne presun do AI tasks pri chybe, ktorá v `movable_bugs` nie je (`checkBugMove`).
 
 Pokyny pre hlasového agenta (`call_instructions`):
 

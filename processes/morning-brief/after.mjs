@@ -6,7 +6,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { envForcesDry } from "../../runner/core.mjs";
+import { pmTool } from "../../runner/pm.mjs";
 import { isDry, localTime, PENDING_FILE, placeCallAndWait, startFollowup } from "../../runner/voice-call.mjs";
+import { AI_TASKS_LIST, readHeartbeat, splitSystemBugs, SYSTEM_BUGS_LIST, workerLine } from "./lib.mjs";
 
 const RUN_DIR = process.env.RUN_DIR;
 const DRY = isDry() || envForcesDry();
@@ -30,6 +32,36 @@ function readPending() {
   return items.filter((i) => i && (i.say || i.done?.length || i.skipped?.length || i.questions?.length));
 }
 const pending = readPending();
+
+// --- KAPSA AI tasks worker and system bugs (read here, not by the model: exact priority, list and worker heartbeat) ---
+// Any PM read failing only drops its part; the brief still goes out.
+const pmRead = async (name, args) => {
+  try {
+    return await pmTool(name, args);
+  } catch (err) {
+    console.log(`PM read ${name} failed, part skipped: ${err.message}`);
+    return null;
+  }
+};
+const openStatus = ["to_do", "in_progress", "in_review"];
+const hb = readHeartbeat();
+const [sysRes, waitingRes, failedRes, runningTask] = await Promise.all([
+  pmRead("pm_list_tasks", { task_list: SYSTEM_BUGS_LIST, status: openStatus, limit: 100 }),
+  pmRead("pm_list_tasks", { task_list: AI_TASKS_LIST, status: openStatus, agent_run_status: ["needs_review"], limit: 1 }),
+  pmRead("pm_list_tasks", { task_list: AI_TASKS_LIST, status: openStatus, agent_run_status: ["failed"], limit: 1 }),
+  hb?.running?.key ? pmRead("pm_get_task", { task: hb.running.key }) : null,
+]);
+const sysItems = Array.isArray(sysRes?.items) ? sysRes.items : null;
+const sys = splitSystemBugs(sysItems ?? []);
+const sysKeys = new Set((sysItems ?? []).map((t) => t.key));
+const worker = workerLine(hb, {
+  runningName: runningTask?.name ?? null,
+  waiting: Number.isInteger(waitingRes?.total) ? waitingRes.total : null,
+  failed: Number.isInteger(failedRes?.total) ? failedRes.total : null,
+  fmt: (d) => localTime(d.toISOString()),
+});
+const bugInfo = new Map((o.bugs ?? []).map((b) => [b.key, b])); // the model's copy has the description
+const clientBugs = (o.bugs ?? []).filter((b) => !sysKeys.has(b.key));
 // same helpers as processes/callback/after.mjs: keep task keys and reasons
 const keyOf = (x) => x?.task_key ?? x?.key ?? x?.result?.key ?? x?.result?.task_key ?? x?.backup?.key ?? null;
 const textOf = (x) => (typeof x === "string" ? x : x?.what ?? x?.summary ?? x?.text ?? x?.name ?? x?.title ?? x?.request ?? x?.tool ?? JSON.stringify(x));
@@ -74,7 +106,9 @@ if (followups.length) {
   say.push(`## Po hovoroch od posledného briefu\n${list(followups, (f) => `${KIND[f.kind] ?? f.kind} ${localTime(f.at)}: ${sent(f.summary)}${f.executed.length ? ` Urobené: ${f.executed.join("; ")}.` : ""}${f.skipped.length ? ` Neurobené: ${f.skipped.join("; ")}.` : ""}${f.approvals.length ? ` Čaká na tvoje schválenie: ${f.approvals.join("; ")}.` : ""}`)}`);
 } else if (o.followup_report) say.push(`## Po poslednom hovore\n${o.followup_report}`);
 if (o.nothing_new) say.push("Za toto obdobie nie je nič nové.");
-say.push(`## Bugy (AI Bugs)\n${o.bugs.length ? list(o.bugs, (b) => `${b.key} ${b.name} (${b.change}; rieši ${b.assignee || "nikto"})`) : "Žiadne otvorené bugy."}`);
+say.push(`## Stav workera\n${worker}`);
+say.push(`## Systémové chyby (KAPSA, worker, AI runner)\n${sysItems == null ? "Systémové chyby sa nepodarilo prečítať." : `${sys.urgent.length ? `Urgentné, ponúkni presun do AI tasks:\n${list(sys.urgent, (b) => `„${b.name}“ (${STATUS[b.status] ?? b.status})`)}` : "Žiadne urgentné."}${sys.otherCount ? `\nĎalšie systémové chyby bez naliehavosti: ${sys.otherCount}.` : ""}`}`);
+say.push(`## Bugy klientov (AI Bugs)\n${clientBugs.length ? list(clientBugs, (b) => `${b.key} ${b.name} (${b.change}; rieši ${b.assignee || "nikto"})`) : "Žiadne otvorené bugy."}`);
 for (const p of changed) {
   say.push(`## Projekt ${p.name}\nNové a čo sa rieši: ${p.summary}\nZmenených úloh: ${p.changed_tasks.length}, otvorených: ${p.open_count}.\nPriority na dnes:\n${list(p.today, (t) => `${t.text} → ${t.who}${t.task_key ? ` (${t.task_key})` : ""}`) || "- (bez priority)"}`);
 }
@@ -99,7 +133,13 @@ for (const p of pending) {
   add(`ODLOŽENÉ ZO SPÄTNÉHO HOVORU${p.at ? ` (${localTime(p.at)})` : ""}${p.reason ? `, dôvod odloženia: ${p.reason}` : ""}\n  ${p.say ?? ""}\n  Urobené: ${(p.done ?? []).map(doneText).join("; ") || "-"}\n  Neurobené: ${(p.skipped ?? []).map(skippedText).join("; ") || "-"}`);
 }
 for (const f of followups) add(`HOVOR (${KIND[f.kind] ?? f.kind}, ${localTime(f.at)}): ${f.summary}\n  Urobené: ${f.executed.join("; ") || "-"}\n  Neurobené: ${f.skipped.join("; ") || "-"}\n  Na schválenie: ${f.approvals.join("; ") || "-"}\n  Zdroje: ${src(f.sources)}`);
-for (const b of o.bugs) add(`BUG ${taskLine(b)}`);
+add(`STAV WORKERA (kódovací agent pre AI tasks): ${worker}`);
+for (const t of sysItems ?? []) {
+  const urgent = sys.urgent.some((u) => u.key === t.key);
+  const b = bugInfo.get(t.key);
+  add(`SYSTÉMOVÁ CHYBA${urgent ? " (urgentná, ponúkni presun do AI tasks)" : ""} ${t.key} „${t.name}“: ${STATUS[t.status] ?? t.status}; priorita ${t.priority ?? "žiadna"}; vznikla ${t.created_at ? localTime(t.created_at) : "?"}\n    Popis: ${clip(b?.description ?? "", 300) || "(bez popisu)"}`);
+}
+for (const b of clientBugs) add(`BUG ${taskLine(b)}`);
 for (const p of o.projects) {
   add(`PROJEKT ${p.name}${p.aliases?.length ? ` (iné mená: ${p.aliases.join(", ")})` : ""}, cesta ${p.path}; ${p.changed ? "zmeny v okne" : "bez zmeny v okne"}; posledná zmena ${p.last_change_at ? localTime(p.last_change_at) : "neznáma"}; otvorených úloh ${p.open_count}; najbližší termín: ${p.next_due || "žiadny"}\n  Ľudia na úlohách: ${p.people.join(", ") || "-"}; potvrdené priradenie: ${p.owners || "nepotvrdené"}\n  Zhrnutie: ${p.summary}`);
   for (const t of p.changed_tasks) add(`  zmena ${taskLine(t)}`, 3, `  zmena ${taskHead(t)}`);
@@ -132,13 +172,14 @@ const details = det.map((d) => d.text).filter((t) => t != null).join("\n");
 if (details.length > MAX_DETAILS) console.log(`WARNING: call_details ${details.length} chars over budget ${MAX_DETAILS} even after cutting (only never-cut parts left)`);
 
 const instructions = `Toto je ranný brief za obdobie ${o.period_label}.
-Poradie: (1) odložené zo spätného hovoru, ak niečo je, (2) čo sa urobilo po hovoroch od posledného briefu: pri každom hovore čo sa urobilo a čo nie a prečo, (3) bugy, (4) projekty so zmenami: čo je nové, čo sa rieši, priorita na dnes a kto ju má riešiť, (5) projekty bez zmeny jednou vetou každý, (6) nové úlohy, (7) dôležité e-maily, (8) Marekove úlohy na dnes, (9) nápady, (10) navrhované e-maily a meetingy, (11) otázky.
+Poradie: (1) odložené zo spätného hovoru, ak niečo je, (2) čo sa urobilo po hovoroch od posledného briefu: pri každom hovore čo sa urobilo a čo nie a prečo, (3) stav workera jednou vetou a systémové chyby, (4) bugy klientov, (5) projekty so zmenami: čo je nové, čo sa rieši, priorita na dnes a kto ju má riešiť, (6) projekty bez zmeny jednou vetou každý, (7) nové úlohy, (8) dôležité e-maily, (9) Marekove úlohy na dnes, (10) nápady, (11) navrhované e-maily a meetingy, (12) otázky.
+Systémové chyby: pri každej urgentnej systémovej chybe povedz jej presný názov tak, ako je v podkladoch, a opýtaj sa: „Mám ju presunúť do AI tasks, aby ju worker opravil?“ Pýtaj sa na každú zvlášť, nikdy na všetky naraz. Ostatné systémové chyby len spočítaj. Bugy klientov sa do AI tasks nepresúvajú, presun pri nich neponúkaj.
 Hovor najprv krátko, detaily hovor až na požiadanie. V podrobnostiach máš pri každej úlohe kľúč, názov, popis, riešiteľa, stav a termín, pri e-mailoch odosielateľa, adresu, účet a obsah. Úlohy vždy pomenuj ich názvom; kód úlohy (napríklad IMP-1491) nikdy nehovor nahlas, ani na konci. Keď sa Marek pýta na konkrétne úlohy (napr. čo presne niekto dokončil), vymenuj ich názvom. Označenia otázok (Q a číslo) nikdy nečítaj nahlas.
 Po každom bloku sa krátko opýtaj, či môžeš pokračovať. V jednej odpovedi polož vždy najviac jednu otázku.
 Otázky polož na konci, jednu po druhej, a počkaj na odpoveď. Ak sa otázka týka projektu, o ktorom práve hovoríte, môžeš ju položiť hneď tam.
 Mená projektov: ${aliases.join("; ") || "pozri podrobnosti"}. Ak Marek povie meno človeka alebo projektu, ktoré presne nesedí na nikoho v podkladoch alebo sedí na viac možností (napríklad „IME“, „Leo“), nehádaj potichu a dopýtaj sa: „Myslíš projekt Zacharides, teda Imagewell?“ alebo „Myslíš Leonarda Tótha?“.
 Marek ti môže zadať nové úlohy pre seba alebo developerov. Postupuj podľa pravidiel v časti „Počas hovoru nič nevykonávaš“. Pri každej akcii si over projekt, task list, presný názov, riešiteľa celým menom a termín, ak ho Marek povedal.
-Pred ukončením hovoru zopakuj všetky dohodnuté akcie po jednej. Pri existujúcej úlohe povedz jej presný názov (kód nikdy), pri novej úlohe projekt a task list, potom čo sa má urobiť, meno riešiteľa a termín. Po každej akcii sa opýtaj „Platí?“ a počkaj na áno alebo opravu. Akciu, ktorú Marek nepotvrdí, nevykonáš. Až potom hovor ukonči nástrojom end_call.`;
+Pred ukončením hovoru zopakuj všetky dohodnuté akcie po jednej. Pri presune systémovej chyby povedz: „Presuniem chybu <presný názov chyby> do AI tasks na opravu. Platí?“ Pri existujúcej úlohe povedz jej presný názov (kód nikdy), pri novej úlohe projekt a task list, potom čo sa má urobiť, meno riešiteľa a termín. Po každej akcii sa opýtaj „Platí?“ a počkaj na áno alebo opravu. Akciu, ktorú Marek nepotvrdí, nevykonáš. Až potom hovor ukonči nástrojom end_call.`;
 
 const vars = {
   first_message: `Dobré ráno, Marek. Mám pre teba ranný brief za obdobie ${o.period_label}. Môžem začať?`,
@@ -163,7 +204,7 @@ if (!result.answered) {
   console.log("call not answered (logged, not an error); period not advanced, pending callback kept for the next brief");
   process.exit(0);
 }
-await startFollowup({ runDir: RUN_DIR, kind: "morning-brief", purpose: "Ranný brief", content: { ...o, deferred_callback: pending }, transcript: result.transcript, conversationId: result.conversationId });
+await startFollowup({ runDir: RUN_DIR, kind: "morning-brief", purpose: "Ranný brief", content: { ...o, worker_status: worker, movable_bugs: sys.urgent, deferred_callback: pending }, transcript: result.transcript, conversationId: result.conversationId });
 
 if (pending.length) {
   // delivered = the agent ended the call itself (end_call, i.e. after the summary) and it lasted long enough;
