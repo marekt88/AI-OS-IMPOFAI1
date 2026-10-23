@@ -286,6 +286,32 @@ export function classifyTransient(out) {
   return { cls, text: text.slice(0, 1000), retrySafe: writes.length === 0, why: writes.length ? `write tools already called: ${writes.join(", ")}` : null };
 }
 
+/**
+ * 2026-10-23 morning-brief: after an OAuth refresh race the retry started without the claude.ai connectors
+ * (they connected only later); the model saw nothing but ToolSearch and gave up after one turn → required-tools.
+ * A finished attempt in which some required tools were never even called is repeated like a transient failure.
+ * Required tools that were called but failed (e.g. permission denied after a connector rename) are a config
+ * problem, not transient → null.
+ * Returns null or { cls: "connectors", text, retrySafe, why }.
+ */
+export function classifyMissingTools(out, require = []) {
+  if (!out || out.timedOut || !out.result || !require.length) return null;
+  const neverCalled = require.filter((t) => !(out.toolOk ?? []).includes(t) && !(out.toolCalls ?? []).includes(t));
+  if (!neverCalled.length) return null;
+  const c = out.connectors;
+  const seen = c ? ` (claude.ai konektory pri štarte: ${c.total}, pripojené ${c.connected}, čakajúce ${c.pending}, chybné ${c.failed})` : "";
+  const writes = [...new Set((out.toolCalls ?? []).filter((t) => !isReadOnlyTool(t)))];
+  return { cls: "connectors", text: `required tools never called: ${neverCalled.join(", ")}${seen}`, retrySafe: writes.length === 0,
+    why: writes.length ? `write tools already called: ${writes.join(", ")}` : null };
+}
+
+/** Status counts of the claude.ai connectors in the stream-json init message (diagnostics only). */
+export function connectorSummary(init) {
+  const list = (init?.mcp_servers ?? []).filter((s) => String(s.name).startsWith("claude.ai "));
+  const n = (st) => list.filter((s) => s.status === st).length;
+  return { total: list.length, connected: n("connected"), pending: n("pending"), failed: n("failed") + n("needs-auth") };
+}
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function render(template, vars) {
@@ -420,7 +446,8 @@ export async function runProcess(p, { manual = false, slot = null, noDeliverWait
         throw new RunError("input", "input is not valid JSON");
       }
     } else {
-      // 1. + 2. login check and claude -p; transient failures (OAuth refresh race, network, 429/overloaded) are
+      // 1. + 2. login check and claude -p; transient failures (OAuth refresh race, network, 429/overloaded, required
+      // tools never called because connectors were not loaded yet) are
       // repeated up to 3 attempts with 60 s and 120 s waits, each attempt logged in log.steps.claudeAttempts
       const tools = toolsFor(p, dryRun);
       log.tools = { allowed: tools.allowed, require: tools.require };
@@ -458,15 +485,15 @@ export async function runProcess(p, { manual = false, slot = null, noDeliverWait
         out = await runClaude(args, p, transcript);
         const ms = Date.now() - t0;
         msTotal += ms;
-        const tr = classifyTransient(out);
+        const tr = classifyTransient(out) ?? classifyMissingTools(out, tools.require);
         attempts.push({ attempt: i + 1, at, phase: "claude", ms, exitCode: out.exitCode, timedOut: out.timedOut, subtype: out.result?.subtype ?? null,
           isError: out.result?.is_error ?? null, terminalReason: out.result?.terminal_reason ?? null, ok: !tr && !!out.result && !out.result.is_error && out.result.subtype === "success" && out.exitCode === 0,
           transient: tr ? tr.cls : null, retried: !!(tr && tr.retrySafe && !last), note: tr && !tr.retrySafe ? tr.why : null,
-          message: tr ? redact(tr.text).slice(0, 300) : null });
+          message: tr ? redact(tr.text).slice(0, 300) : null, connectors: out.connectors ?? null });
         if (!tr || !tr.retrySafe) break;
         if (last) {
           if (tr.cls === "auth-refresh") throw new RunError("auth", `claude -p: obnova prihlásenia zlyhala aj po ${i + 1} pokusoch: ${redact(tr.text).slice(0, 400)}`);
-          break; // network / rate: falls through to the normal classification below (claude-error)
+          break; // network / rate / connectors: falls through to the normal classification below (claude-error, required-tools)
         }
         save();
         await sleep(delays[i]);
@@ -550,7 +577,7 @@ function runClaude(args, p, transcriptFile) {
   return new Promise((resolve) => {
     const child = spawn(CLAUDE_BIN, args, { cwd: p.cwd, env: claudeEnv(), stdio: ["ignore", "pipe", "pipe"] });
     const transcript = fs.createWriteStream(transcriptFile, { mode: 0o600 });
-    let buf = "", stderr = "", result = null, timedOut = false, apiError = null;
+    let buf = "", stderr = "", result = null, timedOut = false, apiError = null, connectors = null;
     const toolNames = new Map(), toolCalls = [], toolErrors = [], toolOk = [];
     const onLine = (line) => {
       if (!line.trim()) return;
@@ -561,7 +588,8 @@ function runClaude(args, p, transcriptFile) {
       } catch {
         return;
       }
-      if (m.type === "assistant") {
+      if (m.type === "system" && m.subtype === "init") connectors = connectorSummary(m);
+      else if (m.type === "assistant") {
         if (m.is_api_error_message || m.error) apiError = { error: m.error ?? null, text: (m.message?.content ?? []).map((c) => c.text ?? "").join(" ") };
         for (const c of m.message?.content ?? []) if (c.type === "tool_use") { toolNames.set(c.id, c.name); toolCalls.push(c.name); }
       } else if (m.type === "user") {
@@ -592,12 +620,12 @@ function runClaude(args, p, transcriptFile) {
       clearTimeout(timer);
       if (buf) onLine(buf);
       transcript.end();
-      resolve({ exitCode: code, timedOut, result, stderr, toolCalls, toolErrors, toolOk, apiError });
+      resolve({ exitCode: code, timedOut, result, stderr, toolCalls, toolErrors, toolOk, apiError, connectors });
     });
     child.on("error", (err) => {
       clearTimeout(timer);
       transcript.end();
-      resolve({ exitCode: -1, timedOut, result: null, stderr: String(err.message), toolCalls, toolErrors, toolOk, apiError });
+      resolve({ exitCode: -1, timedOut, result: null, stderr: String(err.message), toolCalls, toolErrors, toolOk, apiError, connectors });
     });
   });
 }

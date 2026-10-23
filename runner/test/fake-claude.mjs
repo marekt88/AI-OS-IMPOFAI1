@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Fake `claude` CLI for runner tests: no network, no real Claude. Controlled by env:
 //   FAKE_DIR   state dir (attempt counter, recorded args/prompts)
-//   FAKE_PLAN  comma list of attempt outcomes: ok | oauth | net | overloaded-after-write | not-json
+//   FAKE_PLAN  comma list of attempt outcomes: ok | oauth | net | no-tools | overloaded-after-write | not-json
 //   FAKE_TOOL  tool name reported as called successfully in "ok"; FAKE_OUTPUT structured_output JSON
 import fs from "node:fs";
 import path from "node:path";
@@ -29,6 +29,11 @@ if (step === "oauth") {
 } else if (step === "net") {
   out({ type: "result", subtype: "success", is_error: true, terminal_reason: "api_error", num_turns: 1, result: "API Error: Connection error. (fetch failed: ECONNRESET)" });
   process.exit(1);
+} else if (step === "no-tools") {
+  // 2026-10-23: connectors not loaded at init, the model gives up without calling any required tool
+  out({ type: "system", subtype: "init", tools: ["StructuredOutput", "ToolSearch"], mcp_servers: [{ name: "plugin:kapsa:kapsa", status: "needs-auth" }] });
+  out({ type: "result", subtype: "success", is_error: false, num_turns: 2, result: "", structured_output: { ok: false, error: "tools not available" } });
+  process.exit(0);
 } else if (step === "overloaded-after-write") {
   out({ type: "assistant", message: { content: [{ type: "tool_use", id: "t1", name: "mcp__x__pm_create_task", input: {} }] } });
   out({ type: "user", message: { content: [{ type: "tool_result", tool_use_id: "t1", content: "created IMP-1" }] } });

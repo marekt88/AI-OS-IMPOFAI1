@@ -93,6 +93,24 @@ test("network error on all attempts stays claude-error", () => {
   assert.equal(t.queued(), ""); // dry-run reports nothing
 });
 
+test("required tools never called (connectors not loaded yet), then ok: repeated, run succeeds", () => {
+  const t = setup();
+  const r = t.run(["run", "t-basic", "--dry-run"], { FAKE_PLAN: "oauth,no-tools,ok" });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  const log = t.runLog("t-basic", t.runs("t-basic")[0]);
+  assert.equal(log.ok, true);
+  assert.deepEqual(log.steps.claudeAttempts.map((a) => a.transient), ["auth-refresh", "connectors", null]);
+  assert.deepEqual(log.steps.claudeAttempts[1].connectors, { total: 0, connected: 0, pending: 0, failed: 0 });
+});
+
+test("required tools never called on all attempts → required-tools after 3 attempts", () => {
+  const t = setup();
+  t.run(["run", "t-basic", "--dry-run"], { FAKE_PLAN: "no-tools" });
+  const log = t.runLog("t-basic", t.runs("t-basic")[0]);
+  assert.equal(log.error.kind, "required-tools");
+  assert.equal(log.steps.claudeAttempts.length, 3);
+});
+
 test("transient error after a write tool is not repeated", () => {
   const t = setup();
   t.run(["run", "t-basic", "--dry-run"], { FAKE_PLAN: "overloaded-after-write,ok" });

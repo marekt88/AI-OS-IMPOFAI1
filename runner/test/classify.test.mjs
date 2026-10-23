@@ -90,3 +90,38 @@ test("retry delays: 60 s then 120 s by default", () => {
   assert.deepEqual(retryDelays(), [0, 5]);
   if (saved == null) delete process.env.RUN_RETRY_DELAYS_MS; else process.env.RUN_RETRY_DELAYS_MS = saved;
 });
+
+const { classifyMissingTools, connectorSummary } = await import("../core.mjs");
+const REQ = ["mcp__claude_ai_KAPSA__pm_list_tasks", "mcp__claude_ai_Gmail__search_threads"];
+const done = (extra) => ({ exitCode: 0, timedOut: false, stderr: "", apiError: null, toolErrors: [], toolCalls: [], toolOk: [],
+  result: { subtype: "success", is_error: false, num_turns: 2, result: "" }, ...extra });
+
+test("2026-10-23 morning-brief: required tools never called (connectors not loaded) → transient connectors", () => {
+  const out = done({ toolCalls: ["StructuredOutput"], toolOk: ["StructuredOutput"], connectors: { total: 0, connected: 0, pending: 0, failed: 0 } });
+  const t = classifyMissingTools(out, REQ);
+  assert.equal(t?.cls, "connectors");
+  assert.equal(t.retrySafe, true);
+  assert.match(t.text, /pm_list_tasks.*search_threads.*konektory pri štarte: 0/);
+});
+
+test("2026-10-21 morning-brief: required tools called but denied (connector rename) is not retried", () => {
+  const out = done({ toolCalls: REQ, toolOk: [] });
+  assert.equal(classifyMissingTools(out, REQ), null);
+});
+
+test("all required tools ok, no require list, or timeout → null", () => {
+  assert.equal(classifyMissingTools(done({ toolCalls: REQ, toolOk: REQ }), REQ), null);
+  assert.equal(classifyMissingTools(done({}), []), null);
+  assert.equal(classifyMissingTools(done({ timedOut: true }), REQ), null);
+});
+
+test("missing required tools after a write tool: not retry-safe", () => {
+  const t = classifyMissingTools(done({ toolCalls: ["mcp__claude_ai_KAPSA__pm_create_task"] }), REQ);
+  assert.equal(t.retrySafe, false);
+});
+
+test("connectorSummary counts only claude.ai connectors", () => {
+  const init = { mcp_servers: [{ name: "plugin:kapsa:kapsa", status: "needs-auth" }, { name: "claude.ai KAPSA", status: "pending" },
+    { name: "claude.ai Gmail", status: "connected" }, { name: "claude.ai Canva", status: "needs-auth" }] };
+  assert.deepEqual(connectorSummary(init), { total: 3, connected: 1, pending: 1, failed: 1 });
+});

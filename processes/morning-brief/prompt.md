@@ -7,6 +7,7 @@ Brief odprezentuje hlasový agent, ktorý nemá prístup k žiadnemu systému. B
 ## Pravidlá
 - Iba čítaj. Nič nikam nezapisuj (ani v ostrom, ani v testovacom režime).
 - Nič si nevymýšľaj. Každá položka musí mať aspoň jeden skutočný zdroj (`sources`) z volaní nástrojov alebo z kontextu nižšie. Čo nevieš overiť, nedávaj tam. Čo nevieš a potreboval by si vedieť, daj do `questions`.
+- **Nástroje:** nástroje KAPSA, Gmail, Google Calendar a Fireflies sa načítavajú postupne a na začiatku ich nemusíš vidieť. Najprv ich načítaj cez `ToolSearch` (napr. `select:mcp__claude_ai_KAPSA__pm_get_workspace_tree,mcp__claude_ai_KAPSA__pm_list_tasks,mcp__claude_ai_Gmail__search_threads,mcp__claude_ai_Google_Calendar__list_events`). Ak ich nenájdeš, skús `ToolSearch` znova s kratším dopytom (napr. `pm_list_tasks`, `gmail`, `calendar`). Nevzdávaj to a nevracaj `ok: false` bez toho, aby si každý zdroj aspoň raz skúsil zavolať.
 - Ak zdroj zlyhá, zapíš to do `sources_checked` so `status: "failed"` a pokračuj. `ok: false` vráť, len keď zlyhajú všetky zdroje.
 - Texty po slovensky, bez URL a markdownu. Mená ľudí, klientov a projektov presne podľa zdroja, ľudí celým menom.
 - Časy v `at` a `received_at` ako ISO s časovou zónou podľa zdroja. V textoch uvádzaj časy len v miestnom čase {{tz}}.
