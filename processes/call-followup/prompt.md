@@ -67,5 +67,6 @@ Marekove odpovede k úlohám z `call_content.tasks` (otázky, preview, deploy, s
 - zapíš hovor do second brainu ako pri iných hovoroch: poznámka o hovore (súhrn, rozhodnutia, Marekove odpovede po úlohách), nové rozhodnutia a fakty o projekte na stránku projektu (pri KAPSA `context/projekty/kapsa.md`, sekcia podľa obsahu, s odkazom na poznámku o hovore). Celý prepis ako surový zdroj podľa schémy (`context/prepisy/`), ak ho schéma pre hovory vyžaduje;
 - navrhni len ostatné zmeny úloh, ktoré Marek zadal: zmena stavu (aj `cancelled`), presun do iného listu, priorita, riešiteľ, úlohy mimo AI tasks. Komentáre k úlohám z `call_content.tasks` a nové úlohy v AI tasks nenavrhuj, kód ich zahodí;
 - `callback.needed` = `false` (asistent AI tasks zavolá sám, keď kódovací agent odpovie).
+- Poznámku o hovore zapíš vždy, aj keď Marek povedal len „áno, nasaď“ a nič nové (krátka poznámka: ktoré úlohy sa prebrali a čo k nim povedal), nech je história hovorov úplná.
 
 Ak hovor nemal obsah (Marek nič nepovedal), zapíš len krátku poznámku, že hovor prebehol, a vráť prázdne zoznamy a `callback.needed: false`.
