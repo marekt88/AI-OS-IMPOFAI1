@@ -1,6 +1,6 @@
 {
   "description": "Hlasový asistent pre AI tasks (interný test len pre IMPOFAI): keď kódovací agent na serveri napíše do aktivity úlohy v Startups / KAPSA / AI tasks otázky, preview alebo žiadosť o schválenie, zavolá Marekovi (viac úloh v jednom hovore). Úlohy pomenúva názvom, nikdy kódom. Odpovede zapíše ai-tasks-followup do aktivity, kde ich prevezme kódovací agent.",
-  "enabled": true,
+  "enabled": false,
   "schedule": "*/5 * * * *",
   "claude": false,
   "afterTimeoutMin": 40,
