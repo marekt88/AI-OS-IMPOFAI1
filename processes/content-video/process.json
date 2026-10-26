@@ -1,0 +1,33 @@
+{
+  "description": "Video job content systému IMPOFAI: zo schváleného scenára (json script) postaví HyperFrames projekt v štýle IMPOFAI Scéna (plugin reel + impofai-video-style + impofai-avatar 0.10) a vyrenderuje tichý náhľad; after.mjs ho nahrá ako <KEY>_video-vN.mp4 a posunie etapu na pripravene-na-audio. Spúšťa content-pipeline. Vypnuté, kým na serveri nie je ffmpeg s libx264 a HyperFrames.",
+  "enabled": false,
+  "schedule": null,
+  "tz": "Europe/Bratislava",
+  "model": "opus",
+  "maxTurns": 250,
+  "timeoutMin": 45,
+  "afterTimeoutMin": 15,
+  "builtinTools": [
+    "Read",
+    "Write",
+    "Edit",
+    "Bash",
+    "Grep",
+    "Glob"
+  ],
+  "allowedTools": [
+    "Read",
+    "Write",
+    "Edit",
+    "Bash",
+    "Grep",
+    "Glob",
+    "mcp__claude_ai_KAPSA__pm_get_task",
+    "mcp__claude_ai_KAPSA__pm_list_task_attachments",
+    "mcp__claude_ai_KAPSA__pm_read_task_attachment"
+  ],
+  "requireTools": [
+    "mcp__claude_ai_KAPSA__pm_get_task"
+  ],
+  "keepRuns": 60
+}

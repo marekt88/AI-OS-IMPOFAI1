@@ -7,8 +7,23 @@
   "maxTurns": 120,
   "timeoutMin": 30,
   "afterTimeoutMin": 10,
-  "builtinTools": ["Read", "Grep", "WebFetch"],
-  "allowedTools": ["Read", "Grep", "WebFetch", "mcp__claude_ai_KAPSA__pm_get_task", "mcp__claude_ai_KAPSA__pm_list_task_activity", "mcp__claude_ai_KAPSA__pm_search_brain"],
-  "requireTools": ["mcp__claude_ai_KAPSA__pm_get_task"],
+  "builtinTools": [
+    "Read",
+    "Grep",
+    "WebFetch"
+  ],
+  "allowedTools": [
+    "Read",
+    "Grep",
+    "WebFetch",
+    "mcp__claude_ai_KAPSA__pm_get_task",
+    "mcp__claude_ai_KAPSA__pm_list_task_activity",
+    "mcp__claude_ai_KAPSA__pm_search_brain",
+    "mcp__claude_ai_KAPSA__pm_list_task_attachments",
+    "mcp__claude_ai_KAPSA__pm_read_task_attachment"
+  ],
+  "requireTools": [
+    "mcp__claude_ai_KAPSA__pm_get_task"
+  ],
   "keepRuns": 100
 }

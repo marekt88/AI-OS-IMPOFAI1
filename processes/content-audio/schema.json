@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "final_file", "cover_file", "popis_file", "duration_s", "width", "height", "fps", "video_codec", "audio_codec", "lufs", "true_peak", "size_bytes", "tts_characters_sent", "tts_cache_hits", "error_code", "notes_sk"],
+  "properties": {
+    "ok": { "type": "boolean" },
+    "final_file": { "type": ["string", "null"] },
+    "cover_file": { "type": ["string", "null"] },
+    "popis_file": { "type": ["string", "null"] },
+    "duration_s": { "type": ["number", "null"] },
+    "width": { "type": ["integer", "null"] },
+    "height": { "type": ["integer", "null"] },
+    "fps": { "type": ["number", "null"] },
+    "video_codec": { "type": ["string", "null"] },
+    "audio_codec": { "type": ["string", "null"] },
+    "lufs": { "type": ["number", "null"] },
+    "true_peak": { "type": ["number", "null"] },
+    "size_bytes": { "type": ["integer", "null"] },
+    "tts_characters_sent": { "type": "integer" },
+    "tts_cache_hits": { "type": "integer" },
+    "error_code": { "type": ["string", "null"], "enum": [null, "E_TOOL", "E_ACCESS", "E_CREDITS", "E_AUDIO", "E_VIDEO", "E_SIZE", "E_CODEC"] },
+    "notes_sk": { "type": "string" }
+  }
+}

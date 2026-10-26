@@ -1,0 +1,33 @@
+{
+  "description": "Audio job content systému IMPOFAI: hlas cez processes/_lib/tts.mjs (ElevenLabs REST s cache), retime, zvuky, mix −14 LUFS, finálny render, cover a popis; after.mjs nahrá <KEY>_final/cover/popis/result-vN. Spúšťa content-pipeline. Vypnuté, kým na serveri nie je ffmpeg s libx264 a HyperFrames.",
+  "enabled": false,
+  "schedule": null,
+  "tz": "Europe/Bratislava",
+  "model": "opus",
+  "maxTurns": 250,
+  "timeoutMin": 45,
+  "afterTimeoutMin": 15,
+  "builtinTools": [
+    "Read",
+    "Write",
+    "Edit",
+    "Bash",
+    "Grep",
+    "Glob"
+  ],
+  "allowedTools": [
+    "Read",
+    "Write",
+    "Edit",
+    "Bash",
+    "Grep",
+    "Glob",
+    "mcp__claude_ai_KAPSA__pm_get_task",
+    "mcp__claude_ai_KAPSA__pm_list_task_attachments",
+    "mcp__claude_ai_KAPSA__pm_read_task_attachment"
+  ],
+  "requireTools": [
+    "mcp__claude_ai_KAPSA__pm_get_task"
+  ],
+  "keepRuns": 60
+}

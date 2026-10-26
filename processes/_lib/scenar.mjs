@@ -123,6 +123,26 @@ export function machineScript(s, { idea, version, projectDate }) {
   };
 }
 
+/**
+ * The script of a kanban task. PM MCP cuts tool responses at 25 000 characters, so a long description loses its
+ * machine blocks: the source of truth is the newest attachment "<slug>_script-vN.json" ({ script, popis }), the
+ * description block is only a fallback. `pm` = (tool, args) → result.
+ */
+export async function loadScript(pm, taskKey) {
+  const t = await pm("pm_get_task", { task: taskKey });
+  const att = (t.attachments ?? [])
+    .map((a) => ({ a, n: Number(a.file_name?.match(/_script-v(\d+)\.json$/)?.[1] ?? 0) }))
+    .filter((x) => x.n)
+    .sort((x, y) => y.n - x.n)[0];
+  if (att) {
+    const r = await pm("pm_read_task_attachment", { attachment: att.a.id, max_chars: 100000 });
+    const j = JSON.parse(r.content);
+    return { task: t, script: j.script, popis: j.popis, source: att.a.file_name };
+  }
+  const script = readBlock(t.description, "script");
+  return script ? { task: t, script, popis: readBlock(t.description, "popis"), source: "description" } : { task: t, script: null };
+}
+
 /** Reads a ```json <tag>``` block from a task description (null when missing or invalid). */
 export function readBlock(description, tag) {
   const m = String(description ?? "").match(new RegExp("```json " + tag + "\\n([\\s\\S]*?)\\n```"));

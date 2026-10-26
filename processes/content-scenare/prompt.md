@@ -7,7 +7,8 @@ Vstup: {{input}}
 Nič nezapisuješ do KAPSA. Úlohu založí alebo upraví kód z tvojho JSON výstupu.
 
 ## 1. Načítaj
-- Nápad alebo scenár cez `pm_get_task` (description obsahuje fakty, „Netvrdiť“, platnosť, typ CTA, blok ```json idea``` alebo ```json script```). Pri revízii prečítaj aj nápad, na ktorý scenár odkazuje.
+- Nápad cez `pm_get_task` (description obsahuje fakty, „Netvrdiť“, platnosť, typ CTA a blok ```json idea```).
+- Pri revízii: Scenár (strojová časť) čítaj z prílohy úlohy `<slug>_script-vN.json` s najvyšším N: `pm_get_task` → `attachments`, potom `pm_read_task_attachment` s `max_chars` 100000 (obsahuje `script` a `popis`). Description úlohy môže byť v odpovedi skrátený. Prečítaj aj nápad, na ktorý scenár odkazuje (`idea`).
 - Pravidlá z pluginu (nástroj Read, priečinok `/home/marek/impofai-content/plugin/`):
   - `skills/impofai-brand/SKILL.md`, `skills/impofai-brand/references/content-and-hooks.md`, `skills/impofai-brand/references/vyslovnost.md`
   - `skills/reel/SKILL.md` (Typ A, tabuľka scenára, kvalita)

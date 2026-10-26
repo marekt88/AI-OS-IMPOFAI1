@@ -84,6 +84,27 @@ function start(task, st, job, input) {
   st.job = { kind: job, started_at: nowIso, input_comment_ids: input.comments?.map((c) => c.id) ?? [] };
 }
 
+/** FINALIZE (no LLM): the newest <KEY>_result-vN.json must point at an existing <KEY>_final-vN.mp4 without problems. */
+async function finalize(key) {
+  const t = await pm("pm_get_task", { task: key });
+  const att = t.attachments ?? [];
+  const results = att.map((a) => ({ a, n: Number(a.file_name.match(new RegExp(`^${key}_result-v(\\d+)\\.json$`))?.[1] ?? 0) })).filter((x) => x.n).sort((x, y) => y.n - x.n);
+  if (!results.length) return { ok: false, why: "chýba manifest <KEY>_result-vN.json (ozvučenie neprebehlo)." };
+  const { a, n } = results[0];
+  const r = await pm("pm_read_task_attachment", { attachment: a.id, max_chars: 20000 });
+  let m;
+  try {
+    m = JSON.parse(r.content);
+  } catch {
+    return { ok: false, why: `manifest ${a.file_name} sa nedá prečítať.` };
+  }
+  const final = att.find((x) => x.id === m.finalAttachmentId);
+  if (!final || final.file_name !== `${key}_final-v${n}.mp4`) return { ok: false, why: `manifest v${n} neukazuje na prílohu ${key}_final-v${n}.mp4.` };
+  if (m.problems?.length) return { ok: false, why: `finál v${n} neprešiel kontrolou: ${m.problems.join("; ")}.` };
+  if (!(m.durationSec >= 3 && m.durationSec <= 90) || final.size_bytes > 25 * 1024 * 1024) return { ok: false, why: `finál v${n}: dĺžka ${m.durationSec} s alebo veľkosť mimo limitov.` };
+  return { ok: true, id: final.id, name: final.file_name, duration: m.durationSec, url: `https://project-managment.impofai.com/api/v1/attachments/${final.id}/download` };
+}
+
 // ---------- main ----------
 const list = await pm("pm_list_tasks", { task_list: cfg.kanban_list, status: ["to_do", "in_progress", "in_review"], label: STAGES, limit: 100 });
 for (const t of list.items ?? []) {
@@ -121,8 +142,17 @@ for (const t of list.items ?? []) {
     st.job = null;
   } else if (tr.kind === "job") {
     if (tr.job === "FINALIZE") {
-      await comment(key, st, "E_FINAL", "**E_FINAL:** finálne video (`<KEY>_final-vN.mp4` + manifest) zatiaľ neexistuje, ozvučenie ešte nie je zapojené. Úloha ostáva v ready for posting bez ukazovateľa finálu, publikovanie ju nevezme.");
-      if (!dry) await pm("pm_update_agent_run", { task: key, agent_run_status: "failed" });
+      const f = await finalize(key);
+      log.push(`${key}: FINALIZE ${f.ok ? f.name : f.why}`);
+      if (!dry) {
+        if (f.ok) {
+          await pm("pm_update_agent_run", { task: key, preview_url: f.url, agent_run_status: null });
+          await pm("pm_add_task_comment", { task: key, body: `**Finál:** ${f.name} (príloha ${f.id}, ${f.duration} s). Úloha je pripravená na publikovanie.` });
+        } else {
+          await pm("pm_update_agent_run", { task: key, preview_url: null, agent_run_status: "failed" });
+          await pm("pm_add_task_comment", { task: key, body: `**E_FINAL:** ${f.why} Publikovanie úlohu nevezme. Vráť etapu na schvalene-na-audio.` });
+        }
+      }
       st.stage = cur;
     } else {
       const g = gate(tr.job);

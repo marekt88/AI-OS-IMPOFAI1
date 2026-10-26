@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "video_file", "duration_s", "size_bytes", "error_code", "notes_sk", "script_version"],
+  "properties": {
+    "ok": { "type": "boolean" },
+    "video_file": { "type": ["string", "null"] },
+    "duration_s": { "type": ["number", "null"] },
+    "size_bytes": { "type": ["integer", "null"] },
+    "error_code": { "type": ["string", "null"], "enum": [null, "E_TOOL", "E_ASSET", "E_VIDEO", "E_SIZE", "E_CODEC"] },
+    "notes_sk": { "type": "string" },
+    "script_version": { "type": ["integer", "null"] }
+  }
+}
