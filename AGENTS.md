@@ -38,7 +38,7 @@ Read `references/3ms-framework.md` once. It's how {{Your Name}} thinks about AI 
 - `runner/` + `processes/` — spúšťač opakovaných AI procesov na serveri (`claude -p` na predplatnom, cron tick každých 5 min, chyby do PM listu AI Bugs). Nový proces = nový priečinok v `processes/`. Návod: `references/ai-runner.md`.
 - `processes/morning-brief/` — ranný brief: o 9:00 hlasový agent ElevenLabs zavolá na Linphone `mtoth` so zmenami od posledného briefu. Ako funguje a odkiaľ sú informácie: `references/ranny-brief.md`.
 - `processes/inbound-call/`, `call-followup/`, `action-executor/`, `callback/` — hlasová slučka: Marek zavolá asistentovi, po hovore sa zapíše do second brainu, potvrdené akcie vykoná executor a asistent zavolá späť s výsledkom. Návod: `references/ai-runner.md`.
-- `processes/yt-transcripts/`, `ai-news/` + `processes/_lib/zdroje.mjs` — vrstva zdrojov IMPOFAI content systému: prepisy YouTube creatorov (cez proxy) a denné overené AI novinky do `/home/marek/impofai-content/zdroje/` (`index.jsonl` + `run-complete`). Návrh celého systému: `/home/marek/.swarm/impofai-content-system/navrh.md`.
+- `processes/yt-transcripts/`, `ai-news/`, `content-napady/`, `content-scenare/`, `content-pipeline/`, `content-video/`, `content-audio/` + `processes/_lib/` — IMPOFAI content systém (zdroje → nápady → scenáre → kanban News posts → video → audio → publikovanie). Návod: `references/content-system.md`.
 - `references/ai-platforma-ciel.md` + `references/ai-platforma-plan.md` — dlhodobý cieľ AI platformy IMPOFAI a plán po fázach (fáza 1 rozpracovaná).
 
 See `EXPANSIONS.md` for what to add as you grow.
