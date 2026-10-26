@@ -1,6 +1,6 @@
 {
   "description": "Krok A content systému IMPOFAI: z nových zdrojov (zdroje/index.jsonl: AI novinky, prepisy YouTube) a pravidiel značky z pluginu navrhne 5–8 detailných obsahových nápadov bez hookov. after.mjs ich overí, odstráni duplicity a založí ako úlohy „Nápad: …“ (label napad) a pre každý nápad formátu A spustí krok B (content-scenare). Spúšťa ho ai-news. Návrh: ~/.swarm/impofai-content-system/navrh.md §3.",
-  "enabled": false,
+  "enabled": true,
   "schedule": null,
   "tz": "Europe/Bratislava",
   "model": "opus",
