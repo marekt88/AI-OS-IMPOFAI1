@@ -1,11 +1,11 @@
 {
-  "description": "Audio job content systému IMPOFAI: hlas cez processes/_lib/tts.mjs (ElevenLabs REST s cache), retime, zvuky, mix −14 LUFS, finálny render, cover a popis; after.mjs nahrá <KEY>_final/cover/popis/result-vN. Spúšťa content-pipeline. Vypnuté, kým na serveri nie je ffmpeg s libx264 a HyperFrames.",
-  "enabled": false,
+  "description": "Audio job content systému IMPOFAI: hlas cez processes/_lib/tts.mjs (ElevenLabs REST s cache), retime, zvuky, mix −14 LUFS, finálny render, cover a popis; after.mjs nahrá <KEY>_final/cover/popis/result-vN. Spúšťa content-pipeline. Render cez `hyperframes render --docker` (server nemá lokálny Chrome), ffmpeg cez Docker wrapper v ~/.local/bin.",
+  "enabled": true,
   "schedule": null,
   "tz": "Europe/Bratislava",
   "model": "opus",
   "maxTurns": 250,
-  "timeoutMin": 45,
+  "timeoutMin": 60,
   "afterTimeoutMin": 15,
   "builtinTools": [
     "Read",

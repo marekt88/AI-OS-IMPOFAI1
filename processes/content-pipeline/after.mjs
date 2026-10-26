@@ -24,7 +24,8 @@ const nowIso = new Date().toISOString();
 const cfg = readJson(path.join(ROOT, "config", "content.json"), {});
 const tokenEnv = cfg.token_env || "CONTENT_PM_TOKEN";
 const STATE_DIR = path.join(ROOT, "state", "pipeline");
-const JOB_STALE_MIN = 90; // a job without news for this long is considered dead and may be started again
+const JOB_STALE_MIN = 150; // a job without news for this long is considered dead (video timeout is 90 min)
+const HEAVY = new Set(["VIDEO_JOB", "VIDEO_REVISION", "AUDIO_JOB", "AUDIO_REVISION"]);
 if (!hasSecret(tokenEnv)) throw new Error(`${tokenEnv} chýba v ~/.aios-runner/secrets.env`);
 
 const log = [];
@@ -59,8 +60,19 @@ function gate(job) {
   checks.push(ffmpegReady());
   const failed = checks.find((c) => !c.ok);
   if (failed) return { ok: false, code: "E_TOOL", why: failed.why };
+  // one heavy job at a time on the whole server (render + Chrome in Docker); the others wait in the queue
+  const other = heavyRunning();
+  if (other) return { ok: false, code: "E_BUSY", why: `beží iný ťažký job (${other}), toto video je v poradí` };
   const r = resources();
   return r.ok ? { ok: true, proc } : r;
+}
+function heavyRunning() {
+  if (!fs.existsSync(STATE_DIR)) return null;
+  for (const f of fs.readdirSync(STATE_DIR)) {
+    const st = readJson(path.join(STATE_DIR, f), null);
+    if (st?.job && HEAVY.has(st.job.kind) && !st.job.done && Date.now() - Date.parse(st.job.started_at) < JOB_STALE_MIN * 60_000) return st.key;
+  }
+  return null;
 }
 
 // ---------- helpers ----------
