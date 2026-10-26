@@ -1,0 +1,9 @@
+{
+  "description": "Produkčný poller content systému IMPOFAI (bez claude -p): každých 5 min prejde kanban News posts, podľa etapového labelu a nových ľudských komentárov spúšťa revíziu scenára (content-scenare), video (content-video), ozvučenie (content-audio), finalizáciu a návraty. Blokery (chýbajúci ffmpeg, disk, RAM, nehotový proces) komentuje raz a job čaká vo fronte. Návrh: ~/.swarm/impofai-content-system/navrh.md §1, §4.",
+  "enabled": true,
+  "schedule": "*/5 * * * *",
+  "tz": "Europe/Bratislava",
+  "claude": false,
+  "afterTimeoutMin": 4,
+  "keepRuns": 50
+}
