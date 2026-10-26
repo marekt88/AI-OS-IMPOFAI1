@@ -1,0 +1,66 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "items", "unclear", "notes_sk"],
+  "properties": {
+    "ok": { "type": "boolean" },
+    "notes_sk": { "type": "string", "description": "1-3 vety o behu: čo sa hľadalo, čo nefungovalo" },
+    "unclear": { "type": "array", "items": { "type": "string" } },
+    "items": {
+      "type": "array",
+      "maxItems": 15,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["story_key", "event_date", "title_sk", "company", "category", "release_stage", "summary_sk", "facts", "do_not_claim", "conflicts_sk", "eu_availability", "sources", "verification"],
+        "properties": {
+          "story_key": { "type": "string" },
+          "event_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "title_sk": { "type": "string" },
+          "company": { "type": "string" },
+          "category": { "enum": ["novy-model", "nova-platforma", "zistenie-vyhlasenie", "nova-funkcia"] },
+          "release_stage": { "enum": ["GA", "preview", "beta", "waitlist", "oznamene", "nezname"] },
+          "summary_sk": { "type": "string" },
+          "facts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["claim_sk", "sources"],
+              "properties": {
+                "claim_sk": { "type": "string" },
+                "sources": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "minItems": 1 }
+              }
+            }
+          },
+          "do_not_claim": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["claim_sk", "reason"],
+              "properties": { "claim_sk": { "type": "string" }, "reason": { "type": "string" } }
+            }
+          },
+          "conflicts_sk": { "type": "array", "items": { "type": "string" } },
+          "eu_availability": { "enum": ["dostupne", "nedostupne-v-eu", "nezname"] },
+          "sources": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["url", "publisher", "type"],
+              "properties": {
+                "url": { "type": "string" },
+                "publisher": { "type": "string" },
+                "type": { "enum": ["primary", "press", "other"] }
+              }
+            }
+          },
+          "verification": { "enum": ["2-zdroje", "iba-primarny", "neoverene"] }
+        }
+      }
+    }
+  }
+}

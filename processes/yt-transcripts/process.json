@@ -1,0 +1,10 @@
+{
+  "description": "Zdroje obsahu IMPOFAI: 4× denne nové videá 11 YouTube creatorov z RSS, prepisy (Supadata, záložne youtube-transcript-api) do /home/marek/impofai-content/zdroje/youtube, riadky do zdroje/index.jsonl a run-complete. Bez claude -p. Návrh: ~/.swarm/impofai-content-system/navrh.md §2.",
+  "enabled": false,
+  "schedule": "15 5,11,17,23 * * *",
+  "tz": "Europe/Bratislava",
+  "claude": false,
+  "catchUpMin": 60,
+  "afterTimeoutMin": 25,
+  "keepRuns": 60
+}

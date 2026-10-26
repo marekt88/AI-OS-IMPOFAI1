@@ -1,0 +1,15 @@
+{
+  "description": "Zdroje obsahu IMPOFAI: denne o 6:00 overené AI novinky z webu (témy z briefu: modely, platformy, zistenia, funkcie Claude/OpenAI/Gemini/Kimi/Higgsfield/ElevenLabs…), každý fakt s URL, hlavný zoznam iba 2 zdroje. after.mjs zapíše zdroje/ai-news/<dátum>_ai-news.{json,md}, index.jsonl, run-complete a spustí krok A (content-napady). Návrh: ~/.swarm/impofai-content-system/navrh.md §2.",
+  "enabled": true,
+  "schedule": "0 6 * * *",
+  "tz": "Europe/Bratislava",
+  "model": "sonnet",
+  "maxTurns": 150,
+  "timeoutMin": 25,
+  "afterTimeoutMin": 5,
+  "catchUpMin": 60,
+  "builtinTools": ["WebSearch", "WebFetch"],
+  "allowedTools": ["WebSearch", "WebFetch"],
+  "context": [{ "var": "previous", "process": "ai-news" }],
+  "keepRuns": 60
+}
