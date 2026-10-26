@@ -38,7 +38,7 @@ const FORBIDDEN = [/každú sobotu/i, /\bvyral\b/i];
 
 function problems(i) {
   const p = [];
-  const text = JSON.stringify(i);
+  const text = JSON.stringify({ ...i, do_not_claim: undefined }); // "Netvrdiť" may quote what must not be said
   for (const re of FORBIDDEN) if (re.test(text)) p.push(`zakázaný text ${re}`);
   for (const f of i.facts) for (const s of f.sources) if (!/^https?:\/\//.test(s)) p.push(`fakt bez platnej URL: ${f.text.slice(0, 60)}`);
   if (!i.details.length) p.push("chýba typový blok (details)");
@@ -143,7 +143,10 @@ if (fs.existsSync(scenare)) {
   else if (dry) stepB = "dry-run: content-scenare sa nespúšťa";
   else {
     const toScript = created.filter((c) => c.key && c.format === "A");
-    for (const c of toScript) spawnProcess("content-scenare", { mode: "new", idea: c.key }, { label: `scenar-${c.key}` });
+    for (const c of toScript) {
+      await pmTool("pm_add_task_label", { task: c.key, label: "scenar-bezi" }, { tokenEnv });
+      spawnProcess("content-scenare", { mode: "new", idea: c.key }, { label: `scenar-${c.key}` });
+    }
     stepB = `content-scenare spustený pre ${toScript.length} nápadov`;
   }
 }

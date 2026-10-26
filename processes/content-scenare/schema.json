@@ -1,0 +1,81 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "skip_reason", "slug", "name", "duration_s", "cta_type", "cta_text", "valid_until", "pointa", "open_loop", "hooks", "chosen_hook", "hook_why", "lines", "cover_text", "popis", "assets", "facts", "do_not_claim", "brand_check", "questions", "changes"],
+  "properties": {
+    "ok": { "type": "boolean" },
+    "skip_reason": { "type": ["string", "null"], "enum": [null, "expirovane", "format-nie-A", "chybaju-fakty"] },
+    "slug": { "type": "string" },
+    "name": { "type": "string", "maxLength": 140, "description": "jadro scenára jednou vetou (názov úlohy)" },
+    "duration_s": { "type": "number" },
+    "cta_type": { "enum": ["workshop", "konzultacia", "klucove-slovo", "diskusia-web"] },
+    "cta_text": { "type": "string" },
+    "valid_until": { "type": ["string", "null"] },
+    "pointa": { "type": "string" },
+    "open_loop": { "type": "string" },
+    "hooks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["archetype", "voice", "on_screen", "frame0"],
+        "properties": { "archetype": { "type": "string" }, "voice": { "type": "string" }, "on_screen": { "type": "string" }, "frame0": { "type": "string" } }
+      }
+    },
+    "chosen_hook": { "type": "integer", "minimum": 1, "maximum": 3 },
+    "hook_why": { "type": "string" },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["t_from", "t_to", "titulky", "elevenlabs", "avatar", "set", "metaphor", "action", "elements", "highlight", "on_screen", "source_url", "sound"],
+        "properties": {
+          "t_from": { "type": "number" },
+          "t_to": { "type": "number" },
+          "titulky": { "type": "string" },
+          "elevenlabs": { "type": "string" },
+          "avatar": { "type": "string" },
+          "set": { "type": "string" },
+          "metaphor": { "type": "string" },
+          "action": { "type": "string" },
+          "elements": { "type": "array", "items": { "type": "string" } },
+          "highlight": { "type": "string" },
+          "on_screen": { "type": "string" },
+          "source_url": { "type": ["string", "null"] },
+          "sound": { "type": "string" }
+        }
+      }
+    },
+    "cover_text": { "type": "string" },
+    "popis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["instagram", "facebook", "youtube", "linkedin", "tiktok", "first_comment", "hashtags"],
+      "properties": {
+        "instagram": { "type": "string" },
+        "facebook": { "type": "string" },
+        "youtube": { "type": "object", "additionalProperties": false, "required": ["title", "description"], "properties": { "title": { "type": "string" }, "description": { "type": "string" } } },
+        "linkedin": { "type": "string" },
+        "tiktok": { "type": "object", "additionalProperties": false, "required": ["title", "text"], "properties": { "title": { "type": "string" }, "text": { "type": "string" } } },
+        "first_comment": { "type": ["string", "null"] },
+        "hashtags": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "assets": {
+      "type": "array",
+      "items": { "type": "object", "additionalProperties": false, "required": ["id", "what", "url", "status"], "properties": { "id": { "type": "string" }, "what": { "type": "string" }, "url": { "type": ["string", "null"] }, "status": { "enum": ["mame", "treba-nasnimat", "suhlas-r1"] } } }
+    },
+    "facts": {
+      "type": "array",
+      "items": { "type": "object", "additionalProperties": false, "required": ["claim", "url", "checked", "line"], "properties": { "claim": { "type": "string" }, "url": { "type": "string" }, "checked": { "type": "string" }, "line": { "type": "integer" } } }
+    },
+    "do_not_claim": { "type": "array", "items": { "type": "string" } },
+    "brand_check": {
+      "type": "array",
+      "items": { "type": "object", "additionalProperties": false, "required": ["item", "ok", "note"], "properties": { "item": { "type": "string" }, "ok": { "type": "boolean" }, "note": { "type": "string" } } }
+    },
+    "questions": { "type": "array", "items": { "type": "string" } },
+    "changes": { "type": "array", "items": { "type": "string" }, "description": "pri revízii: čo sa zmenilo oproti predchádzajúcej verzii; pri novom scenári prázdne" }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "description": "Krok B content systému IMPOFAI: z nápadu (mode new) napíše scenár videa formátu A v štýle IMPOFAI Scéna (plugin impofai-reels 0.10: 3 hooky, riadky Titulky/ElevenLabs/Avatar/Scéna/Akcia, popis per platforma, mapa faktov) a založí úlohu v kanbane News posts v etape navrhnute; pri revízii (mode revision, spúšťa content-pipeline) scenár prepíše na novú verziu. Spúšťa ho content-napady. Návrh: ~/.swarm/impofai-content-system/navrh.md §3.",
+  "enabled": true,
+  "schedule": null,
+  "tz": "Europe/Bratislava",
+  "model": "opus",
+  "maxTurns": 120,
+  "timeoutMin": 30,
+  "afterTimeoutMin": 10,
+  "builtinTools": ["Read", "Grep", "WebFetch"],
+  "allowedTools": ["Read", "Grep", "WebFetch", "mcp__claude_ai_KAPSA__pm_get_task", "mcp__claude_ai_KAPSA__pm_list_task_activity", "mcp__claude_ai_KAPSA__pm_search_brain"],
+  "requireTools": ["mcp__claude_ai_KAPSA__pm_get_task"],
+  "keepRuns": 100
+}
