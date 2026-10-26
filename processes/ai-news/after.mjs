@@ -55,7 +55,7 @@ for (const raw of o.items ?? []) {
     facts,
     do_not_claim: [...(raw.do_not_claim ?? []), ...badFacts],
     verification,
-    valid_until: new Date(Date.parse(`${raw.event_date}T00:00:00Z`) + 72 * 3600_000).toISOString(), // event day + 48 h, rounded up to the end of the day
+    valid_until: new Date(Date.parse(`${raw.event_date}T00:00:00Z`) + 96 * 3600_000).toISOString(), // end of event day + 72 h: covers the Monday window over the weekend
     primary_url,
     duplicate_of: null,
   };

@@ -1,0 +1,65 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "ideas", "skipped", "notes_sk"],
+  "properties": {
+    "ok": { "type": "boolean" },
+    "notes_sk": { "type": "string" },
+    "skipped": { "type": "array", "items": { "type": "string" } },
+    "ideas": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "type", "pillar", "format", "cta_type", "slot_pref", "core", "for_whom_why_now", "impofai_link", "facts", "do_not_claim", "eu_availability", "visual_assets", "recording", "creator", "valid_until", "dedup_key", "angle", "details", "inputs"],
+        "properties": {
+          "name": { "type": "string", "maxLength": 140, "description": "jadro nápadu jednou vetou" },
+          "type": { "enum": ["novinka", "tutorial", "tip-claude", "pripadova-studia", "nazor", "tyzdenny-suhrn"] },
+          "pillar": { "type": "string" },
+          "format": { "enum": ["A", "B", "C", "D", "E"] },
+          "cta_type": { "enum": ["workshop", "konzultacia", "klucove-slovo", "diskusia-web"] },
+          "slot_pref": { "enum": ["rano", "vecer", "linkedin", "bez-preferencie"] },
+          "core": { "type": "string", "description": "čo sa divák dozvie / odnesie" },
+          "for_whom_why_now": { "type": "string" },
+          "impofai_link": { "type": "string" },
+          "facts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["text", "sources", "date"],
+              "properties": {
+                "text": { "type": "string" },
+                "sources": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+                "date": { "type": "string" }
+              }
+            }
+          },
+          "do_not_claim": {
+            "type": "array",
+            "items": { "type": "object", "additionalProperties": false, "required": ["text", "reason"], "properties": { "text": { "type": "string" }, "reason": { "type": "string" } } }
+          },
+          "eu_availability": { "type": "string" },
+          "visual_assets": { "type": "string", "description": "reálne screenshoty/nahrávky (URL) alebo „treba nasnímať: …“; čo sa nesmie ukázať" },
+          "recording": { "type": "string", "description": "nikto (formát A) | doplní človek" },
+          "creator": {
+            "type": ["object", "null"],
+            "additionalProperties": false,
+            "required": ["handle", "title", "url", "taken", "credit"],
+            "properties": { "handle": { "type": "string" }, "title": { "type": "string" }, "url": { "type": "string" }, "taken": { "type": "string" }, "credit": { "type": "boolean" } }
+          },
+          "valid_until": { "type": ["string", "null"] },
+          "dedup_key": { "type": "string" },
+          "angle": { "enum": ["novinka", "navod", "nazor", "suhrn", "pripadovka"] },
+          "details": {
+            "type": "array",
+            "description": "typový blok: pole riadkov {label, text} podľa typu (napr. tutoriál: Cieľ, Predpoklady, Presné kroky, Časté chyby, Overené v IMPOFAI)",
+            "items": { "type": "object", "additionalProperties": false, "required": ["label", "text"], "properties": { "label": { "type": "string" }, "text": { "type": "string" } } }
+          },
+          "inputs": { "type": "array", "items": { "type": "string" }, "description": "id zdrojov z index.jsonl (news:…, yt:…)" }
+        }
+      }
+    }
+  }
+}

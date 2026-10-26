@@ -1,0 +1,20 @@
+{
+  "description": "Krok A content systému IMPOFAI: z nových zdrojov (zdroje/index.jsonl: AI novinky, prepisy YouTube) a pravidiel značky z pluginu navrhne 5–8 detailných obsahových nápadov bez hookov. after.mjs ich overí, odstráni duplicity a založí ako úlohy „Nápad: …“ (label napad) a pre každý nápad formátu A spustí krok B (content-scenare). Spúšťa ho ai-news. Návrh: ~/.swarm/impofai-content-system/navrh.md §3.",
+  "enabled": false,
+  "schedule": null,
+  "tz": "Europe/Bratislava",
+  "model": "opus",
+  "maxTurns": 150,
+  "timeoutMin": 30,
+  "afterTimeoutMin": 10,
+  "builtinTools": ["Read", "Grep", "WebSearch", "WebFetch"],
+  "allowedTools": [
+    "Read", "Grep", "WebSearch", "WebFetch",
+    "mcp__claude_ai_KAPSA__pm_list_tasks",
+    "mcp__claude_ai_KAPSA__pm_get_task",
+    "mcp__claude_ai_KAPSA__pm_search_brain",
+    "mcp__claude_ai_KAPSA__pm_read_brain_note"
+  ],
+  "firstSinceHours": 48,
+  "keepRuns": 60
+}
