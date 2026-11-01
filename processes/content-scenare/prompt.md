@@ -7,7 +7,7 @@ Vstup: {{input}}
 Nič nezapisuješ do KAPSA. Úlohu založí alebo upraví kód z tvojho JSON výstupu.
 
 ## 1. Načítaj
-- Nápad cez `pm_get_task` (description obsahuje fakty, „Netvrdiť“, platnosť, typ CTA a blok ```json idea```).
+- Nápad cez `pm_get_task` (description obsahuje fakty, „Netvrdiť“, platnosť, typ CTA a blok ```json idea```). Nápady z iných zdrojov (YouTube, Instagram, ručne zapísané) blok ```json idea``` nemajú a môžu mať inú štruktúru: vychádzaj z textu description a fakty, ktoré použiješ, over cez WebFetch.
 - Pri revízii: Scenár (strojová časť) čítaj z prílohy úlohy `<slug>_script-vN.json` s najvyšším N: `pm_get_task` → `attachments`, potom `pm_read_task_attachment` s `max_chars` 100000 (obsahuje `script` a `popis`). Description úlohy môže byť v odpovedi skrátený. Prečítaj aj nápad, na ktorý scenár odkazuje (`idea`).
 - Pravidlá z pluginu (nástroj Read, priečinok `/home/marek/impofai-content/plugin/`):
   - `skills/impofai-brand/SKILL.md`, `skills/impofai-brand/references/content-and-hooks.md`, `skills/impofai-brand/references/vyslovnost.md`
@@ -20,7 +20,7 @@ Nič nezapisuješ do KAPSA. Úlohu založí alebo upraví kód z tvojho JSON vý
 
 ## 2. Kedy scenár nepísať (vráť `skip_reason`, prázdne `lines`)
 - nápad je novinka a jeho „Platnosť do“ / `valid_until` už uplynula → `skip_reason: "expirovane"`;
-- formát nápadu nie je A (grafické video) → `skip_reason: "format-nie-A"`;
+- formát nápadu nie je A (grafické video) → `skip_reason: "format-nie-A"`. Neplatí, keď je vo vstupe `picked: true`: vtedy nápad na video vybral človek a scenár formátu A napíšeš aj z nápadu s iným formátom;
 - chýbajú overené fakty potrebné na video → `skip_reason: "chybaju-fakty"` (a do `questions` čo chýba).
 
 ## 3. Scenár (formát A, IMPOFAI Scéna)

@@ -1,4 +1,5 @@
 // content-pipeline: the production poller of the IMPOFAI content system (navrh.md §1, §4). No claude -p.
+// SCRIPT_NEW: ideas with label na-scenar in the ideas list (config ideas_list) get a script (content-scenare, max 3 per tick).
 // Every 5 min it reads the kanban list (config kanban_list), and per task with a stage label:
 //   - stage transitions (label changed by a human): VIDEO_JOB, AUDIO_JOB, FINALIZE, RETURN, invalid jumps (E_STAGE)
 //   - new human comments: SCRIPT_REVISION (navrhnute), VIDEO_REVISION, AUDIO_REVISION, one reply in ready-for-posting
@@ -117,8 +118,19 @@ async function finalize(key) {
   return { ok: true, id: final.id, name: final.file_name, duration: m.durationSec, url: `https://project-managment.impofai.com/api/v1/attachments/${final.id}/download` };
 }
 
+// ---------- SCRIPT_NEW: a human picked an idea (label na-scenar in the ideas list, Marek 2026-11-01) ----------
+const SCRIPT_NEW_PER_TICK = 3;
+const picked = await pm("pm_list_tasks", { task_list: cfg.ideas_list, status: ["to_do", "in_progress", "in_review"], label: ["na-scenar"], limit: 50 });
+for (const t of (picked.items ?? []).slice(0, SCRIPT_NEW_PER_TICK)) {
+  log.push(`${t.key}: spawn content-scenare (SCRIPT_NEW)`);
+  if (dry) continue;
+  await pm("pm_add_task_label", { task: t.key, label: "scenar-bezi" });
+  await pm("pm_remove_task_label", { task: t.key, label: "na-scenar" });
+  spawnProcess("content-scenare", { mode: "new", idea: t.key, picked: true }, { label: `scenar-${t.key}` });
+}
+
 // ---------- main ----------
-const list = await pm("pm_list_tasks", { task_list: cfg.kanban_list, status: ["to_do", "in_progress", "in_review"], label: STAGES, limit: 100 });
+const list =await pm("pm_list_tasks", { task_list: cfg.kanban_list, status: ["to_do", "in_progress", "in_review"], label: STAGES, limit: 100 });
 for (const t of list.items ?? []) {
   const key = t.key;
   const st = readJson(stateFile(key), { key, stage: null, cursor: null, notified: {}, job: null });

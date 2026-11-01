@@ -25,8 +25,8 @@ export function validateScript(s) {
   (s.lines ?? []).forEach((l, i) => {
     const n = i + 1;
     if (!AVATAR_POSES.includes(l.avatar)) errors.push(`riadok ${n}: neznáma póza avatara „${l.avatar}“`);
-    if (!/^S:[a-z0-9-]+$/i.test(l.set)) errors.push(`riadok ${n}: scéna musí byť S:*`);
-    if (!/^V:[a-z0-9-]+$/i.test(l.metaphor)) errors.push(`riadok ${n}: metafora musí byť V:*`);
+    if (!/^S:[a-z0-9-]+(\s*\(.+\))?$/i.test(l.set)) errors.push(`riadok ${n}: scéna musí byť S:*`);
+    if (!/^V:[a-z0-9-]+(\s*\(.+\))?$/i.test(l.metaphor)) errors.push(`riadok ${n}: metafora musí byť V:*`);
     for (const e of l.elements ?? []) if (!ELEMENT_RE.test(e)) errors.push(`riadok ${n}: neznámy prvok „${e}“`);
     if (!String(l.action).trim()) errors.push(`riadok ${n}: chýba akcia na obraze`);
     if (l.t_to <= l.t_from) errors.push(`riadok ${n}: čas ${l.t_from}–${l.t_to}`);

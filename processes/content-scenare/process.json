@@ -1,5 +1,5 @@
 {
-  "description": "Krok B content systému IMPOFAI: z nápadu (mode new) napíše scenár videa formátu A v štýle IMPOFAI Scéna (plugin impofai-reels 0.10: 3 hooky, riadky Titulky/ElevenLabs/Avatar/Scéna/Akcia, popis per platforma, mapa faktov) a založí úlohu v kanbane News posts v etape navrhnute; pri revízii (mode revision, spúšťa content-pipeline) scenár prepíše na novú verziu. Spúšťa ho content-napady. Návrh: ~/.swarm/impofai-content-system/navrh.md §3.",
+  "description": "Krok B content systému IMPOFAI: z nápadu (mode new) napíše scenár videa formátu A v štýle IMPOFAI Scéna (plugin impofai-reels 0.10: 3 hooky, riadky Titulky/ElevenLabs/Avatar/Scéna/Akcia, popis per platforma, mapa faktov) a založí úlohu v kanbane News posts v etape navrhnute; pri revízii (mode revision, spúšťa content-pipeline) scenár prepíše na novú verziu. Spúšťa ho content-pipeline, keď človek dá nápadu label na-scenar. Návrh: ~/.swarm/impofai-content-system/navrh.md §3.",
   "enabled": true,
   "schedule": null,
   "tz": "Europe/Bratislava",

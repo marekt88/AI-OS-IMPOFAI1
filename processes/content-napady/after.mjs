@@ -3,17 +3,14 @@
 // - validates every idea (URLs, forbidden strings, required context), drops invalid ones into the report
 // - deterministic dedup: same dedup_key + angle already in the folder "Internal / Ads and Socials" → skipped
 // - renders the description template (common header + type block + machine block ```json idea```)
-// - creates the task (status to_do, label napad) and, when content-scenare exists and is enabled, starts step B
-//   for every created idea (Marek 2026-10-26: a script for every idea automatically)
+// - creates the task (status to_do, labels napad + zdroj-novinky); step B starts only when a human adds na-scenar
+//   (Marek 2026-11-01, replaces "a script for every idea automatically" from 2026-10-26)
 // RUN_DRY=1: pmTool does not send writes; the rendered tasks are saved in RUN_DIR.
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { hasSecret, pmTool } from "../../runner/pm.mjs";
-import { spawnProcess } from "../../runner/spawn.mjs";
 import { isDry, localParts, readJson, ROOT, writeFileAtomic, writeJson } from "../_lib/zdroje.mjs";
 
-const HERE = path.dirname(fileURLToPath(import.meta.url));
 const RUN_DIR = process.env.RUN_DIR;
 const dry = isDry();
 const now = new Date();
@@ -109,7 +106,7 @@ for (const i of o.ideas ?? []) {
     skipped.push({ why: `rovnaká udalosť a uhol už existuje (${dup})`, text: i.name });
     continue;
   }
-  const task = { task_list: list, name: `Nápad: ${i.name}`, status: "to_do", labels: ["napad"], description: render(i) };
+  const task = { task_list: list, name: `Nápad: ${i.name}`, status: "to_do", labels: ["napad", "zdroj-novinky"], description: render(i) };
   rendered.push(task);
   const res = await pmTool("pm_create_task", task, { tokenEnv });
   created.push({ key: res.key ?? null, name: task.name, format: i.format, dry: Boolean(res.dry_run) });
@@ -134,20 +131,6 @@ if (dry) {
   writeFileAtomic(path.join(ROOT, "zdroje", "napady", `${today}_${process.env.RUN_ID ?? nowIso}_napady-report.md`), report + "\n");
 }
 
-// step B for every created idea (only format A has a path in the kanban for now, navrh.md §1)
-const scenare = path.join(HERE, "..", "content-scenare", "process.json");
-let stepB = "content-scenare neexistuje";
-if (fs.existsSync(scenare)) {
-  const def = JSON.parse(fs.readFileSync(scenare, "utf8"));
-  if (def.enabled === false) stepB = "content-scenare je vypnutý";
-  else if (dry) stepB = "dry-run: content-scenare sa nespúšťa";
-  else {
-    const toScript = created.filter((c) => c.key && c.format === "A");
-    for (const c of toScript) {
-      await pmTool("pm_add_task_label", { task: c.key, label: "scenar-bezi" }, { tokenEnv });
-      spawnProcess("content-scenare", { mode: "new", idea: c.key }, { label: `scenar-${c.key}` });
-    }
-    stepB = `content-scenare spustený pre ${toScript.length} nápadov`;
-  }
-}
+// step B is started by a human: label na-scenar on the idea → content-pipeline spawns content-scenare (Marek 2026-11-01)
+const stepB = "čaká na výber človeka (label na-scenar)";
 console.log(JSON.stringify({ dry, created: created.length, skipped: skipped.length, stepB }));

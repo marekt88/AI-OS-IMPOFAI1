@@ -32,6 +32,14 @@ test("unknown pose, element, missing metaphor and TTS spelling are errors", () =
   for (const m of ["neznáma póza", "neznámy prvok „X99“", "metafora musí byť V:*", "výslovnostný pravopis", "normálny pravopis"]) assert.match(e, new RegExp(m));
 });
 
+test("new set and metaphor may carry a description in parentheses", () => {
+  const s = script();
+  s.lines[0] = line(0, { set: "S:nova-serverovna (tmavá: rad serverových skríň)", metaphor: "V:nova-stit (agent kryje IT)" });
+  assert.deepEqual(validateScript(s).errors, []);
+  s.lines[0] = line(0, { set: "serverovna (tmavá)", metaphor: "V:stit popis bez zátvoriek" });
+  assert.equal(validateScript(s).errors.length, 2);
+});
+
 test("titles, hook count, forbidden text", () => {
   const s = script({ hooks: [], popis: { ...script().popis, youtube: { title: "x".repeat(71), description: "" } } });
   s.cta_text = "Workshop každú sobotu";
