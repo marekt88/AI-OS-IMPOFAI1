@@ -135,6 +135,7 @@ for (const t of list.items ?? []) {
   const cur = stageOf(t);
   if (!cur) continue;
   const st = readJson(stateFile(key), { key, stage: null, cursor: null, notified: {}, job: null });
+  if (st.stage && !STAGES.includes(st.stage)) st.stage = null; // state from the label era (before 2026-11-02) = first seen
   const full = await pm("pm_get_task", { task: key });
   const has = artifacts(full.attachments);
 
