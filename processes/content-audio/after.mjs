@@ -1,6 +1,6 @@
 // content-audio, step 2: final video + cover + popis + manifest → task attachments (in this order; the version is
-// valid only with its manifest <KEY>_result-vN.json). Stage stays schvalene-na-audio, agent run → needs_review;
-// the human then switches to ready-for-posting (FINALIZE in content-pipeline sets previewUrl).
+// valid only with its manifest <KEY>_result-vN.json). The card stays in Ozvučenie, agent run → needs_review;
+// a person then moves it to Hotové (FINALIZE in content-pipeline sets previewUrl and the Socials label).
 import fs from "node:fs";
 import path from "node:path";
 import { pmTool } from "../../runner/pm.mjs";
@@ -13,7 +13,7 @@ const key = input.task;
 const pm = (n, a) => pmTool(n, a, { tokenEnv: "CONTENT_PM_TOKEN" });
 
 const t = await pm("pm_get_task", { task: key });
-if (!(t.labels ?? []).some((l) => l.name === "schvalene-na-audio") || t.status === "cancelled") {
+if (t.custom_status?.name !== "Ozvučenie") {
   await pm("pm_add_task_comment", { task: key, body: `**E_STATE_CHANGED:** počas ozvučenia sa etapa zmenila, nič som nenahral. Súbory ostávajú na serveri: ${o.final_file ?? "—"}.` });
   process.exit(0);
 }
@@ -46,7 +46,7 @@ await pm("pm_update_task_status", { task: key, status: "in_review" });
 await pm("pm_update_agent_run", { task: key, agent_run_status: problems.length ? "failed" : "needs_review" });
 await pm("pm_add_task_comment", {
   task: key,
-  body: `**Finálne video v${n}** (${o.duration_s} s, ${(o.size_bytes / 1048576).toFixed(1)} MB, ${o.lufs} LUFS): ${key}_final-v${n}.mp4 + cover + popis.\nElevenLabs: odoslaných ${o.tts_characters_sent} znakov, z cache ${o.tts_cache_hits} take.\n\n${o.notes_sk}${problems.length ? `\n\n**Kontrola neprešla:** ${problems.join("; ")}` : "\n\nZmeny napíš sem, alebo prepni etapu na **ready-for-posting**."}`,
+  body: `**Finálne video v${n}** (${o.duration_s} s, ${(o.size_bytes / 1048576).toFixed(1)} MB, ${o.lufs} LUFS): ${key}_final-v${n}.mp4 + cover + popis.\nElevenLabs: odoslaných ${o.tts_characters_sent} znakov, z cache ${o.tts_cache_hits} take.\n\n${o.notes_sk}${problems.length ? `\n\n**Kontrola neprešla:** ${problems.join("; ")}` : "\n\nZmeny napíš sem, alebo presuň kartu do **Hotové** a pôjde do Socials."}`,
   ...(up.final.id ? { attachment_ids: [up.final.id] } : {}),
 });
 const sf = path.join(ROOT, "state", "pipeline", `${key}.json`);

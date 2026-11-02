@@ -3,8 +3,8 @@
 // - validates every idea (URLs, forbidden strings, required context), drops invalid ones into the report
 // - deterministic dedup: same dedup_key + angle already in the folder "Internal / Ads and Socials" → skipped
 // - renders the description template (common header + type block + machine block ```json idea```)
-// - creates the task (status to_do, labels napad + zdroj-novinky); step B starts only when a human adds na-scenar
-//   (Marek 2026-11-01, replaces "a script for every idea automatically" from 2026-10-26)
+// - creates the card in the board "Obsah" (first custom status Nápad, label = source: zdroj-novinky or
+//   zdroj-pripadovka); the script starts only when a person moves the card to Scenár (Marek 2026-11-02)
 // RUN_DRY=1: pmTool does not send writes; the rendered tasks are saved in RUN_DIR.
 import fs from "node:fs";
 import path from "node:path";
@@ -106,7 +106,7 @@ for (const i of o.ideas ?? []) {
     skipped.push({ why: `rovnaká udalosť a uhol už existuje (${dup})`, text: i.name });
     continue;
   }
-  const task = { task_list: list, name: `Nápad: ${i.name}`, status: "to_do", labels: ["napad", "zdroj-novinky"], description: render(i) };
+  const task = { task_list: list, name: `Nápad: ${i.name}`, status: "to_do", labels: [i.type === "pripadova-studia" ? "zdroj-pripadovka" : "zdroj-novinky"], description: render(i) };
   rendered.push(task);
   const res = await pmTool("pm_create_task", task, { tokenEnv });
   created.push({ key: res.key ?? null, name: task.name, format: i.format, dry: Boolean(res.dry_run) });
@@ -131,6 +131,6 @@ if (dry) {
   writeFileAtomic(path.join(ROOT, "zdroje", "napady", `${today}_${process.env.RUN_ID ?? nowIso}_napady-report.md`), report + "\n");
 }
 
-// step B is started by a human: label na-scenar on the idea → content-pipeline spawns content-scenare (Marek 2026-11-01)
-const stepB = "čaká na výber človeka (label na-scenar)";
+// step B is started by a person: card moved to Scenár → content-pipeline spawns content-scenare (Marek 2026-11-02)
+const stepB = "čaká na výber človeka (presun karty do Scenár)";
 console.log(JSON.stringify({ dry, created: created.length, skipped: skipped.length, stepB }));

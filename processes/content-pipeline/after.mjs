@@ -1,11 +1,13 @@
 // content-pipeline: the production poller of the IMPOFAI content system (navrh.md §1, §4). No claude -p.
-// SCRIPT_NEW: ideas with label na-scenar in the ideas list (config ideas_list) get a script (content-scenare, max 3 per tick).
-// Every 5 min it reads the kanban list (config kanban_list), and per task with a stage label:
-//   - stage transitions (label changed by a human): VIDEO_JOB, AUDIO_JOB, FINALIZE, RETURN, invalid jumps (E_STAGE)
-//   - new human comments: SCRIPT_REVISION (navrhnute), VIDEO_REVISION, AUDIO_REVISION, one reply in ready-for-posting
-// Heavy jobs run as separate runner processes (content-scenare, content-video, content-audio) started with
-// spawnProcess; they wait in agent run "queued" until their process exists and is enabled, the tools are installed
-// (ffmpeg with libx264) and disk/RAM are above the thresholds. Every blocker is commented once, not every tick.
+// Every 5 min it reads the board "Obsah" (config kanban_list) whose custom statuses are the stages
+// Nápad → Scenár → Video → Ozvučenie → Hotové (Marek 2026-11-02; until then stage labels). Per task:
+//   - a person moved the card one column forward: SCRIPT_NEW (Scenár), VIDEO_JOB (Video), AUDIO_JOB (Ozvučenie),
+//     FINALIZE (Hotové: checks the final, sets previewUrl and the label ready-for-posting that Socials publishes);
+//     back = RETURN (no job); a jump over columns is moved back with a comment (E_STAGE)
+//   - new human comments: SCRIPT_REVISION, VIDEO_REVISION, AUDIO_REVISION, one reply in Hotové
+// Jobs run as separate runner processes (content-scenare, content-video, content-audio) started with spawnProcess;
+// heavy ones wait in agent run "queued" until their process is enabled, ffmpeg with libx264 is installed and
+// disk/RAM are above the thresholds. Every blocker is commented once, not every tick.
 // State: /home/marek/impofai-content/state/pipeline/<KEY>.json. All writes go through CONTENT_PM_TOKEN as agent
 // "Socials", so the poller never mistakes its own comments for a human's.
 // RUN_DRY=1: reads only, decisions are printed, nothing is written or spawned.
@@ -17,7 +19,7 @@ import { fileURLToPath } from "node:url";
 import { hasSecret, pmTool } from "../../runner/pm.mjs";
 import { spawnProcess } from "../../runner/spawn.mjs";
 import { isDry, readJson, ROOT, writeJson } from "../_lib/zdroje.mjs";
-import { commentJob, humanComments, resourceGate, stageOf, STAGES, transition } from "./lib.mjs";
+import { artifacts, commentJob, humanComments, resourceGate, stageOf, STAGES, transition } from "./lib.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const dry = isDry();
@@ -90,8 +92,16 @@ async function agentRun(task, status) {
 function jobBusy(st) {
   return st.job && Date.now() - Date.parse(st.job.started_at) < JOB_STALE_MIN * 60_000 && !st.job.done;
 }
+const READY_LABEL = "ready-for-posting"; // Socials contract: IN_REVIEW (= Hotové) + this label
+const SCRIPT_JOBS = new Set(["SCRIPT_NEW", "SCRIPT_REVISION"]);
+const SCRIPT_NEW_PER_TICK = 3;
+let scriptNewStarted = 0;
+async function moveTo(task, stage) {
+  log.push(`${task}: -> ${stage}`);
+  if (!dry) await pm("pm_update_task_status", { task, custom_status: stage });
+}
 function start(task, st, job, input) {
-  const proc = job === "SCRIPT_REVISION" ? "content-scenare" : gate(job).proc;
+  const proc = SCRIPT_JOBS.has(job) ? "content-scenare" : gate(job).proc;
   log.push(`${task}: spawn ${proc} (${job})`);
   if (!dry) spawnProcess(proc, input, { label: `${job.toLowerCase()}-${task}` });
   st.job = { kind: job, started_at: nowIso, input_comment_ids: input.comments?.map((c) => c.id) ?? [] };
@@ -118,29 +128,15 @@ async function finalize(key) {
   return { ok: true, id: final.id, name: final.file_name, duration: m.durationSec, url: `https://project-managment.impofai.com/api/v1/attachments/${final.id}/download` };
 }
 
-// ---------- SCRIPT_NEW: a human picked an idea (label na-scenar in the ideas list, Marek 2026-11-01) ----------
-const SCRIPT_NEW_PER_TICK = 3;
-const picked = await pm("pm_list_tasks", { task_list: cfg.ideas_list, status: ["to_do", "in_progress", "in_review"], label: ["na-scenar"], limit: 50 });
-for (const t of (picked.items ?? []).slice(0, SCRIPT_NEW_PER_TICK)) {
-  log.push(`${t.key}: spawn content-scenare (SCRIPT_NEW)`);
-  if (dry) continue;
-  await pm("pm_add_task_label", { task: t.key, label: "scenar-bezi" });
-  await pm("pm_remove_task_label", { task: t.key, label: "na-scenar" });
-  spawnProcess("content-scenare", { mode: "new", idea: t.key, picked: true }, { label: `scenar-${t.key}` });
-}
-
 // ---------- main ----------
-const list =await pm("pm_list_tasks", { task_list: cfg.kanban_list, status: ["to_do", "in_progress", "in_review"], label: STAGES, limit: 100 });
+const list = await pm("pm_list_tasks", { task_list: cfg.kanban_list, custom_status: STAGES.filter((x) => x !== "Nápad"), limit: 100 });
 for (const t of list.items ?? []) {
   const key = t.key;
+  const cur = stageOf(t);
+  if (!cur) continue;
   const st = readJson(stateFile(key), { key, stage: null, cursor: null, notified: {}, job: null });
-  const s = stageOf(t.labels);
-  if (s.error) {
-    await comment(key, st, `E_STAGE:${s.error}`, `**E_STAGE:** ${s.error}. Nechaj na úlohe práve jeden etapový label (navrhnute → schvalene-na-video → pripravene-na-audio → schvalene-na-audio → ready-for-posting).`);
-    if (!dry) writeJson(stateFile(key), st);
-    continue;
-  }
-  const cur = s.stage;
+  const full = await pm("pm_get_task", { task: key });
+  const has = artifacts(full.attachments);
 
   // finished jobs: the job process sets the agent run itself (needs_review / failed)
   if (st.job && !st.job.done && ["needs_review", "failed", null].includes(t.agent_run_status) && Date.now() - Date.parse(st.job.started_at) > 60_000) st.job.done = nowIso;
@@ -153,37 +149,52 @@ for (const t of list.items ?? []) {
   const fresh = humanComments(items, { ownAgentNames: [me], afterId: st.cursor === "start" ? null : st.cursor });
 
   // 1. stage transition
-  const tr = transition(st.stage, cur);
+  const tr = transition(st.stage, cur, has);
   if (tr.kind === "invalid") {
-    await comment(key, st, `E_STAGE:${st.stage}->${cur}`, `**E_STAGE:** prechod ${st.stage} → ${cur} nie je povolený (etapy idú po jednej). Vráť label na ${st.stage} alebo nasledujúcu etapu.`);
+    await comment(key, st, `E_STAGE:${st.stage}->${cur}`, `**E_STAGE:** z ${st.stage} rovno do ${cur} sa nedá, etapy idú po jednej. Karta je späť v ${st.stage}.`);
+    await moveTo(key, st.stage);
   } else if (tr.kind === "return") {
     log.push(`${key}: RETURN ${st.stage} -> ${cur}`);
     if (!dry) {
-      await pm("pm_update_agent_run", { task: key, preview_url: null, agent_run_status: cur === "navrhnute" ? null : "needs_review" });
-      await pm("pm_add_task_comment", { task: key, body: `Vrátené z etapy ${st.stage} na ${cur}.${st.stage === "ready-for-posting" ? " Publikovanie musí zrušiť naplánované posty." : ""} Ďalší krok: komentár so zmenami alebo nové schválenie.` });
+      await pm("pm_update_agent_run", { task: key, preview_url: null, agent_run_status: cur === "Nápad" ? null : "needs_review" });
+      if (st.stage === "Hotové") await pm("pm_remove_task_label", { task: key, label: READY_LABEL }); // Socials cancels unpublished posts
+      await pm("pm_add_task_comment", { task: key, body: `Vrátené z ${st.stage} do ${cur}.${st.stage === "Hotové" ? " Nepublikované posty sa zrušia." : ""} Ďalší krok: komentár so zmenami alebo posun ďalej.` });
     }
     st.stage = cur;
     st.job = null;
+    st.pending = null;
   } else if (tr.kind === "job") {
     if (tr.job === "FINALIZE") {
       const f = await finalize(key);
       log.push(`${key}: FINALIZE ${f.ok ? f.name : f.why}`);
-      if (!dry) {
-        if (f.ok) {
+      if (f.ok) {
+        if (!dry) {
           await pm("pm_update_agent_run", { task: key, preview_url: f.url, agent_run_status: null });
-          await pm("pm_add_task_comment", { task: key, body: `**Finál:** ${f.name} (príloha ${f.id}, ${f.duration} s). Úloha je pripravená na publikovanie.` });
-        } else {
-          await pm("pm_update_agent_run", { task: key, preview_url: null, agent_run_status: "failed" });
-          await pm("pm_add_task_comment", { task: key, body: `**E_FINAL:** ${f.why} Publikovanie úlohu nevezme. Vráť etapu na schvalene-na-audio.` });
+          await pm("pm_add_task_label", { task: key, label: READY_LABEL });
+          await pm("pm_add_task_comment", { task: key, body: `**Finál:** ${f.name} (príloha ${f.id}, ${f.duration} s). Video je pripravené na publikovanie v Socials.` });
         }
+        st.stage = cur;
+      } else {
+        if (!dry) await pm("pm_add_task_comment", { task: key, body: `**E_FINAL:** ${f.why} Karta je späť v Ozvučení.` });
+        await moveTo(key, "Ozvučenie");
+        st.stage = "Ozvučenie";
       }
-      st.stage = cur;
+    } else if (tr.job === "SCRIPT_NEW") {
+      if (scriptNewStarted >= SCRIPT_NEW_PER_TICK) {
+        log.push(`${key}: SCRIPT_NEW next tick`); // stage stays unprocessed, the next tick starts it
+      } else if (!jobBusy(st)) {
+        start(key, st, "SCRIPT_NEW", { mode: "new", idea: key, picked: true });
+        scriptNewStarted++;
+        await agentRun(key, "running");
+        st.stage = cur;
+      }
     } else {
       const g = gate(tr.job);
       if (!g.ok) {
         await comment(key, st, `${tr.job}:${g.code}:${g.why}`, `**${tr.job} čaká (${g.code}):** ${g.why}. Spustí sa samo, keď to bude vyriešené.`);
         await agentRun(key, "queued");
-        st.pending = tr.job; // stage stays the previous one until the job really starts
+        st.pending = tr.job;
+        st.stage = cur;
       } else if (!jobBusy(st)) {
         start(key, st, tr.job, { mode: "new", task: key, stage: cur });
         await agentRun(key, "running");
@@ -196,15 +207,15 @@ for (const t of list.items ?? []) {
   }
 
   // 2. human comments (only when no transition consumed this tick)
-  if (fresh.length && tr.kind !== "job" && tr.kind !== "return") {
-    const job = commentJob(cur, t.agent_run_status);
+  if (fresh.length && tr.kind !== "job" && tr.kind !== "return" && tr.kind !== "invalid" && !st.pending) {
+    const job = commentJob(cur, t.agent_run_status, has);
     const payload = fresh.map((c) => ({ id: c.id, author: c.author?.name ?? c.agent_name ?? "?", at: c.created_at, body: c.body }));
     if (job === "REPLY") {
-      if (!dry) await pm("pm_add_task_comment", { task: key, body: "Úloha je v etape ready for posting, tu sa už nič nemení. Na úpravu vráť etapu na schvalene-na-audio, pripravene-na-audio alebo navrhnute a napíš zmenu znova." });
+      if (!dry) await pm("pm_add_task_comment", { task: key, body: "Karta je v Hotové, tu sa už nič nemení. Na úpravu ju presuň späť (Ozvučenie, Video alebo Scenár) a napíš zmenu znova." });
       st.cursor = fresh[fresh.length - 1].id;
-    } else if (job === "SCRIPT_REVISION") {
+    } else if (job === "SCRIPT_NEW" || job === "SCRIPT_REVISION") {
       if (!jobBusy(st)) {
-        start(key, st, job, { mode: "revision", task: key, comments: payload });
+        start(key, st, job, job === "SCRIPT_NEW" ? { mode: "new", idea: key, picked: true, comments: payload } : { mode: "revision", task: key, comments: payload });
         await agentRun(key, "running");
         st.cursor = fresh[fresh.length - 1].id; // comments written during the run start exactly one more revision
       }
@@ -216,18 +227,17 @@ for (const t of list.items ?? []) {
         await agentRun(key, "running");
         st.cursor = fresh[fresh.length - 1].id;
       }
-    } else {
-      st.cursor = fresh[fresh.length - 1].id;
+    } else if (!(t.agent_run_status === "running" || t.agent_run_status === "queued")) {
+      st.cursor = fresh[fresh.length - 1].id; // Nápad: notes only
     }
   }
 
-  // 3. a queued job whose blocker is gone
+  // 3. a queued heavy job whose blocker is gone
   if (st.pending && !jobBusy(st)) {
     const g = gate(st.pending);
     if (g.ok) {
       start(key, st, st.pending, { mode: "new", task: key, stage: cur });
       await agentRun(key, "running");
-      st.stage = cur;
       st.pending = null;
     }
   }

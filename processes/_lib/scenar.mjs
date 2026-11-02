@@ -47,7 +47,7 @@ export function validateScript(s) {
 
 const cell = (v) => String(v ?? "").replace(/\|/g, "\\|").replace(/\n/g, " ");
 
-/** Description of the kanban task (stage navrhnute). */
+/** Script part of the card description (stage Scenár). */
 export function renderScript(s, { idea, version, projectDate, changes = [], warnings = [] }) {
   const h = s.hooks;
   const lines = [
