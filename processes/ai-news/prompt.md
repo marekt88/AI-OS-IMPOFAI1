@@ -16,11 +16,13 @@ Firmy, ktoré sleduješ vždy: Anthropic / Claude, OpenAI / ChatGPT, Google / Ge
 Kde hľadať: oficiálne blogy, newsroomy, changelogy a dokumentácia týchto firiem (primárny zdroj), potom tech médiá (TechCrunch, The Verge, 9to5Mac, CNBC, Reuters a pod.).
 Prednosť majú veci použiteľné v malej firme (agenti, automatizácia, kancelárske nástroje, hlasoví agenti, tvorba obsahu).
 
-Postup (povinný, nevynechaj žiadnu firmu):
-1. Pre **každú** zo 6 sledovaných firiem urob aspoň jedno hľadanie novinek za okno a otvor jej newsroom alebo changelog.
-2. Potom jedno-dve všeobecné hľadania („AI news this week“, „new AI model released“) a skontroluj ostatné veľké firmy.
-3. Ku každej kandidátskej novinke hľadaj druhý nezávislý zdroj, kým ju nezaradíš.
-4. V `notes_sk` vymenuj, ktoré firmy si prešiel a pri ktorých si nič nové nenašiel.
+Postup (povinný, nevynechaj žiadnu firmu; Marek 2026-11-22: hľadaj dôkladne, pravidlo 2 zdrojov a okno sa nemenia):
+1. **Primárne zdroje.** Pre **každú** zo 6 sledovaných firiem otvor (WebFetch) jej newsroom/blog a changelog alebo release notes a urob aspoň **2 hľadania** s rôznym znením (napr. „<firma> announces“, „<firma> launches“, „<produkt> update“, „<firma> news <mesiac rok>“). Keď stránka nejde (403, prázdna), skús náhradu: release notes v dokumentácii alebo help centre, stránku produktu, oficiálne fórum, status/changelog, GitHub releases.
+2. **Ďalšie firmy.** Meta, xAI, Microsoft, Apple, Mistral: pre každú aspoň 1 hľadanie a otvorenie newsroomu.
+3. **Médiá.** Otvor AI rubriky aspoň 4 médií (napr. TechCrunch AI, The Verge AI, VentureBeat AI, The Decoder, Reuters Technology, Ars Technica) a prejdi ich články z okna. Urob aj 3–4 všeobecné hľadania („AI news this week“, „new AI model released“, „AI agents launch“, „AI for small business“).
+4. **Druhý zdroj ku každému kandidátovi.** Kandidát, ktorý má zatiaľ jeden zdroj, nevzdávaj: urob aspoň **3 cielené hľadania** druhého nezávislého zdroja (iné znenie, názov produktu v úvodzovkách, `site:` na veľké médiá, aj jazyky ako nemčina či čeština) a otvor aspoň 2 výsledky. Až potom ho môžeš nechať ako `iba-primarny`. Primárny zdroj firmy + nezávislé médium je najlepšia kombinácia; dva články, ktoré len preberajú ten istý text, nie sú nezávislé.
+5. **Viac zdrojov, keď je novinka veľká.** Pri dôležitých novinkách (nový model, cena, dostupnosť v EÚ) zbieraj 3+ zdroje a fakty, ktoré sa v nich líšia, daj do `conflicts_sk`.
+6. V `notes_sk` vymenuj, ktoré firmy a médiá si prešiel, koľko hľadaní si spravil, pri ktorých firmách si nič nové nenašiel a ktoré stránky nešli otvoriť.
 
 ## Overovanie (najdôležitejšie)
 - Každé tvrdenie (fakt, číslo, cena, dostupnosť, citát) musí mať URL zdroja, ktorý si naozaj otvoril (WebFetch) alebo videl vo výsledku hľadania.

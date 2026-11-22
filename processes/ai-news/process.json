@@ -3,13 +3,24 @@
   "enabled": true,
   "schedule": "0 6 * * *",
   "tz": "Europe/Bratislava",
-  "model": "sonnet",
-  "maxTurns": 150,
-  "timeoutMin": 25,
+  "model": "opus",
+  "maxTurns": 300,
+  "timeoutMin": 50,
   "afterTimeoutMin": 5,
   "catchUpMin": 60,
-  "builtinTools": ["WebSearch", "WebFetch"],
-  "allowedTools": ["WebSearch", "WebFetch"],
-  "context": [{ "var": "previous", "process": "ai-news" }],
+  "builtinTools": [
+    "WebSearch",
+    "WebFetch"
+  ],
+  "allowedTools": [
+    "WebSearch",
+    "WebFetch"
+  ],
+  "context": [
+    {
+      "var": "previous",
+      "process": "ai-news"
+    }
+  ],
   "keepRuns": 60
 }

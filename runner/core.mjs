@@ -206,10 +206,19 @@ export function acquireLock(key) {
 
 // ---------- auth ----------
 const BILLING_ENV = ["ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_USE_BEDROCK", "CLAUDE_CODE_USE_VERTEX", "CLAUDE_CODE_USE_FOUNDRY", "CLAUDE_CODE_OAUTH_TOKEN"];
+/**
+ * Long-lived subscription token from `claude setup-token` (secrets.env CLAUDE_SETUP_TOKEN, Marek 2026-11-22):
+ * the interactive login in ~/.claude rotates its refresh token and can drop out when many claude processes
+ * refresh at once (18.–22. 11. every claude -p run failed on auth). The setup token is a claude.ai
+ * subscription token (not API billing) and does not rotate.
+ */
+export const SETUP_TOKEN_KEY = "CLAUDE_SETUP_TOKEN";
 export function claudeEnv() {
   const env = { ...process.env, PATH: `${path.dirname(CLAUDE_BIN)}:${process.env.PATH ?? ""}` };
   for (const k of BILLING_ENV) delete env[k]; // always the claude.ai subscription login, never API billing
   for (const k of Object.keys(secrets())) delete env[k]; // secrets.env is for after.mjs only, never for the model
+  const token = secrets()[SETUP_TOKEN_KEY];
+  if (token) env.CLAUDE_CODE_OAUTH_TOKEN = token; // subscription token, set after the cleanup above on purpose
   return env;
 }
 
@@ -222,9 +231,15 @@ export function checkAuth() {
   } catch {
     /* fall through */
   }
-  if (r.status !== 0 || !s.loggedIn) return { ok: false, reason: "Claude Code is not logged in (run `claude` → /login on the server)" };
-  if (s.authMethod !== "claude.ai") return { ok: false, reason: `Claude Code uses "${s.authMethod}" instead of the claude.ai subscription` };
-  return { ok: true, subscription: s.subscriptionType };
+  const viaToken = !!secrets()[SETUP_TOKEN_KEY];
+  if (r.status !== 0 || !s.loggedIn) {
+    return { ok: false, reason: viaToken ? "Claude Code setup token (CLAUDE_SETUP_TOKEN) is not accepted: run `claude setup-token` again" : "Claude Code is not logged in (run `claude` → /login on the server)" };
+  }
+  // the setup token is a subscription token; only an API key / cloud provider login is refused
+  if (viaToken ? /api|bedrock|vertex|foundry/i.test(String(s.authMethod ?? "")) : s.authMethod !== "claude.ai") {
+    return { ok: false, reason: `Claude Code uses "${s.authMethod}" instead of the claude.ai subscription` };
+  }
+  return { ok: true, subscription: s.subscriptionType, method: viaToken ? "setup-token" : "login" };
 }
 
 // ---------- one run ----------

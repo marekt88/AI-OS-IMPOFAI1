@@ -72,6 +72,18 @@ test("OAuth refresh failure twice, then success: 3 attempts logged, dry-run keep
   assert.equal(JSON.parse(fs.readFileSync(path.join(t.fake, "args-3.json"), "utf8")).env.RUN_DRY, "1");
 });
 
+test("CLAUDE_SETUP_TOKEN in secrets.env: claude -p gets the subscription token, never an API key", () => {
+  const t = setup();
+  fs.writeFileSync(path.join(t.home, "secrets.env"), "CLAUDE_SETUP_TOKEN=sk-ant-oat01-test\n");
+  const r = t.run(["run", "t-basic", "--dry-run"], { ANTHROPIC_API_KEY: "sk-ant-api-should-be-dropped" });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  const [id] = t.runs("t-basic");
+  assert.equal(t.runLog("t-basic", id).ok, true);
+  const env = JSON.parse(fs.readFileSync(path.join(t.fake, "args-1.json"), "utf8")).env;
+  assert.equal(env.HAS_OAUTH_TOKEN, true);
+  assert.equal(env.HAS_API_KEY, false);
+});
+
 test("OAuth refresh fails on all 3 attempts → kind auth (not claude-error), reported", () => {
   const t = setup();
   const r = t.run(["run", "t-basic"], { FAKE_PLAN: "oauth" });

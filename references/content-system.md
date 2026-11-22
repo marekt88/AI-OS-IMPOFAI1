@@ -40,5 +40,6 @@ Spoločné knižnice: `processes/_lib/` (`zdroje.mjs`, `scenar.mjs`, `tts.mjs`, 
 - PM MCP skracuje odpovede na 25 000 znakov: strojová verzia scenára je v prílohe `<slug>_script-vN.json`, nie v description.
 
 ## Keď niečo nejde
+- Claude Code na serveri musí byť prihlásený. Trvalo: `claude setup-token` → `~/.aios-runner/secrets.env` `CLAUDE_SETUP_TOKEN=...` (runner ho dá procesom ako predplatné). Výpadok stráži `processes/claude-auth-watch` (úloha v AI Bugs + hovor).
 - Chyby behov idú do AI Bugs (runner). Stav úlohy v pipeline: `/home/marek/impofai-content/state/pipeline/<KEY>.json`.
 - Ručný beh: `node runner/run.mjs run <proces> [--input súbor.json] [--dry-run]`.

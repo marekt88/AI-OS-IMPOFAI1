@@ -10,13 +10,14 @@ import { fileURLToPath } from "node:url";
 const dir = process.env.FAKE_DIR;
 const args = process.argv.slice(2);
 if (args[0] === "auth" && args[1] === "status") {
-  process.stdout.write(process.env.FAKE_AUTH ?? JSON.stringify({ loggedIn: true, authMethod: "claude.ai", subscriptionType: "max" }));
+  const viaToken = !!process.env.CLAUDE_CODE_OAUTH_TOKEN; // long-lived `claude setup-token` token
+  process.stdout.write(process.env.FAKE_AUTH ?? JSON.stringify({ loggedIn: true, authMethod: viaToken ? "oauth_token" : "claude.ai", subscriptionType: "max" }));
   process.exit(0);
 }
 const countFile = path.join(dir, "count");
 const n = (fs.existsSync(countFile) ? Number(fs.readFileSync(countFile, "utf8")) : 0) + 1;
 fs.writeFileSync(countFile, String(n));
-fs.writeFileSync(path.join(dir, `args-${n}.json`), JSON.stringify({ args, env: { RUN_DRY: process.env.RUN_DRY ?? null } }, null, 1));
+fs.writeFileSync(path.join(dir, `args-${n}.json`), JSON.stringify({ args, env: { RUN_DRY: process.env.RUN_DRY ?? null, HAS_OAUTH_TOKEN: !!process.env.CLAUDE_CODE_OAUTH_TOKEN, HAS_API_KEY: !!process.env.ANTHROPIC_API_KEY } }, null, 1));
 fs.writeFileSync(path.join(dir, `prompt-${n}.txt`), args.at(-1));
 const plan = (process.env.FAKE_PLAN ?? "ok").split(",");
 const step = plan[Math.min(n, plan.length) - 1];
