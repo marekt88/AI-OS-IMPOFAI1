@@ -84,6 +84,19 @@ test("CLAUDE_SETUP_TOKEN in secrets.env: claude -p gets the subscription token, 
   assert.equal(env.HAS_API_KEY, false);
 });
 
+test("CLAUDE_SETUP_TOKEN is not used for processes with claude.ai connector tools (the token loads no connectors)", () => {
+  const t = setup();
+  fs.writeFileSync(path.join(t.home, "secrets.env"), "CLAUDE_SETUP_TOKEN=sk-ant-oat01-test\n");
+  const TOOL_AI = "mcp__claude_ai_kapsa__pm_get_current_identity";
+  fs.mkdirSync(path.join(t.procs, "t-conn"));
+  fs.writeFileSync(path.join(t.procs, "t-conn", "process.json"), JSON.stringify({ description: "x", enabled: true, schedule: null, allowedTools: [TOOL_AI], requireTools: [TOOL_AI] }));
+  fs.writeFileSync(path.join(t.procs, "t-conn", "prompt.md"), "x");
+  fs.writeFileSync(path.join(t.procs, "t-conn", "schema.json"), JSON.stringify({ type: "object", properties: { ok: { type: "boolean" } }, required: ["ok"] }));
+  const r = t.run(["run", "t-conn", "--dry-run"], { FAKE_TOOL: TOOL_AI });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(t.fake, "args-1.json"), "utf8")).env.HAS_OAUTH_TOKEN, false);
+});
+
 test("OAuth refresh fails on all 3 attempts → kind auth (not claude-error), reported", () => {
   const t = setup();
   const r = t.run(["run", "t-basic"], { FAKE_PLAN: "oauth" });

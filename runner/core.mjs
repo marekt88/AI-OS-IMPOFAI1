@@ -213,17 +213,27 @@ const BILLING_ENV = ["ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_U
  * subscription token (not API billing) and does not rotate.
  */
 export const SETUP_TOKEN_KEY = "CLAUDE_SETUP_TOKEN";
-export function claudeEnv() {
+/**
+ * The setup token carries inference only: with it claude -p loads NO claude.ai connectors (verified 2026-11-23,
+ * mcp_servers: []). So it is used only for processes without claude.ai connector tools (e.g. ai-news);
+ * processes that need KAPSA, Gmail, Calendar or Fireflies keep the interactive login.
+ */
+export function usesSetupToken(p) {
+  if (!secrets()[SETUP_TOKEN_KEY]) return false;
+  const tools = [...(p?.allowedTools ?? []), ...(p?.requireTools ?? []), ...(p?.dryRunAllowedTools ?? [])];
+  return !!p && !tools.some((t) => String(t).startsWith("mcp__claude_ai_"));
+}
+export function claudeEnv(p = null) {
   const env = { ...process.env, PATH: `${path.dirname(CLAUDE_BIN)}:${process.env.PATH ?? ""}` };
   for (const k of BILLING_ENV) delete env[k]; // always the claude.ai subscription login, never API billing
   for (const k of Object.keys(secrets())) delete env[k]; // secrets.env is for after.mjs only, never for the model
-  const token = secrets()[SETUP_TOKEN_KEY];
-  if (token) env.CLAUDE_CODE_OAUTH_TOKEN = token; // subscription token, set after the cleanup above on purpose
+  if (usesSetupToken(p)) env.CLAUDE_CODE_OAUTH_TOKEN = secrets()[SETUP_TOKEN_KEY]; // subscription token, set after the cleanup above on purpose
   return env;
 }
 
-export function checkAuth() {
-  const r = spawnSync(CLAUDE_BIN, ["auth", "status"], { env: claudeEnv(), encoding: "utf8", timeout: 60_000 });
+/** p = the process (its auth path: setup token or login); without p the interactive login is checked. */
+export function checkAuth(p = null) {
+  const r = spawnSync(CLAUDE_BIN, ["auth", "status"], { env: claudeEnv(p), encoding: "utf8", timeout: 60_000 });
   if (r.error) return { ok: false, reason: `claude CLI not runnable: ${r.error.message}` };
   let s = {};
   try {
@@ -231,7 +241,7 @@ export function checkAuth() {
   } catch {
     /* fall through */
   }
-  const viaToken = !!secrets()[SETUP_TOKEN_KEY];
+  const viaToken = usesSetupToken(p);
   if (r.status !== 0 || !s.loggedIn) {
     return { ok: false, reason: viaToken ? "Claude Code setup token (CLAUDE_SETUP_TOKEN) is not accepted: run `claude setup-token` again" : "Claude Code is not logged in (run `claude` → /login on the server)" };
   }
@@ -486,7 +496,7 @@ export async function runProcess(p, { manual = false, slot = null, noDeliverWait
       for (let i = 0; ; i++) {
         const last = i >= delays.length;
         const at = new Date().toISOString();
-        const auth = checkAuth();
+        const auth = checkAuth(p);
         log.steps.auth = auth;
         if (!auth.ok) {
           attempts.push({ attempt: i + 1, at, phase: "auth-status", ok: false, transient: !last, message: redact(auth.reason).slice(0, 300) });
@@ -590,7 +600,7 @@ export async function runProcess(p, { manual = false, slot = null, noDeliverWait
 
 function runClaude(args, p, transcriptFile) {
   return new Promise((resolve) => {
-    const child = spawn(CLAUDE_BIN, args, { cwd: p.cwd, env: claudeEnv(), stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(CLAUDE_BIN, args, { cwd: p.cwd, env: claudeEnv(p), stdio: ["ignore", "pipe", "pipe"] });
     const transcript = fs.createWriteStream(transcriptFile, { mode: 0o600 });
     let buf = "", stderr = "", result = null, timedOut = false, apiError = null, connectors = null;
     const toolNames = new Map(), toolCalls = [], toolErrors = [], toolOk = [];
