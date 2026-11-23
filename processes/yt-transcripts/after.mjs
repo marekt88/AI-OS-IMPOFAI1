@@ -1,8 +1,11 @@
 // YouTube transcripts collector (IMPOFAI content system, navrh.md §2). No claude -p ("claude": false).
 // 1. New videos per creator from the channel RSS feed (no key, no quota).
-// 2. Transcript per new video: youtube-transcript-api through a proxy (WEBSHARE_PROXY_USERNAME/PASSWORD or YT_PROXY_URL
-//    in secrets.env; the server IP itself is blocked by YouTube, checked 2026-10-26). Supadata (SUPADATA_API_KEY) stays
-//    supported when "supadata" is listed in creators.json settings.providers (Marek chose a proxy, 2026-10-26).
+// 2. Transcript per new video, providers in the order of creators.json settings.providers:
+//    - "apify" (APIFY_TOKEN, Apify MCP server heyitsgautham/video-transcripts, $0.003/transcript; Marek 2026-11-23),
+//      fetched in batches of 25 before the loop (apify.mjs);
+//    - "youtube-transcript-api" through a proxy (WEBSHARE_PROXY_USERNAME/PASSWORD or YT_PROXY_URL; the server IP itself
+//      is blocked by YouTube, checked 2026-10-26);
+//    - "supadata" (SUPADATA_API_KEY).
 // 3. One immutable file per video in zdroje/youtube/<handle>/, one line in zdroje/index.jsonl, and a run-complete
 //    line at the end. Videos without a transcript are retried 6/24/72 h after first seen, then written with
 //    transcript_status none/blocked (metadata only).
@@ -12,6 +15,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { reportIssue } from "../../runner/pm.mjs";
+import { createApifyClient } from "./apify.mjs";
 import {
   appendIndex, isDry, localParts, nextAttemptAt, parseFeed, PATHS, readJson, ROOT, slugify, transcriptFile,
   writeFileAtomic, writeJson,
@@ -85,12 +89,16 @@ function youtubeTranscriptApi(videoId) {
   }
 }
 
+let apifyResults = new Map(); // videoId → provider result, filled in batches before the transcript loop
 let freeBlockedInRow = 0; // circuit breaker: after 3 blocks in a row the free provider is not called again this run
 async function getTranscript(videoId) {
   const providers = settings.providers ?? ["supadata", "youtube-transcript-api"];
   let res = { status: "failed", error: "no provider available" };
   for (const p of providers) {
-    if (p === "supadata") {
+    if (p === "apify") {
+      if (!apifyResults.has(videoId)) continue;
+      res = apifyResults.get(videoId);
+    } else if (p === "supadata") {
       if (!process.env.SUPADATA_API_KEY) continue;
       res = await supadata(videoId).catch((err) => ({ status: "failed", error: `supadata: ${err.message}` }));
     } else if (p === "youtube-transcript-api") {
@@ -162,6 +170,14 @@ const writeVideo = (id, v, res, finalStatus) => {
   return rel;
 };
 
+if ((settings.providers ?? []).includes("apify") && process.env.APIFY_TOKEN && due.length) {
+  try {
+    apifyResults = await createApifyClient({ token: process.env.APIFY_TOKEN }).transcripts(due.map(([id]) => id), { language: settings.language ?? "en" });
+  } catch (err) {
+    errors.push(`apify: ${String(err.message).slice(0, 300)}`); // the next provider in the list is tried per video
+  }
+}
+
 for (const [id, v] of due) {
   const res = await getTranscript(id);
   v.attempts++;
@@ -201,7 +217,8 @@ for (const c of cfg.creators) {
 const attempts = due.length;
 if (attempts >= 4 && (stats.blocked + stats.failed) / attempts > 0.5) {
   const proxy = process.env.WEBSHARE_PROXY_USERNAME || process.env.YT_PROXY_URL;
-  const why = proxy ? "aj cez proxy" : "proxy nie je nastavené (WEBSHARE_PROXY_USERNAME/PASSWORD alebo YT_PROXY_URL), YouTube blokuje IP servera";
+  const apify = (settings.providers ?? []).includes("apify") && process.env.APIFY_TOKEN;
+  const why = apify ? "cez Apify, skontroluj kredit a stav na console.apify.com" : proxy ? "aj cez proxy" : "proxy nie je nastavené (WEBSHARE_PROXY_USERNAME/PASSWORD alebo YT_PROXY_URL), YouTube blokuje IP servera";
   issues.push({ fingerprint: "content:yt-transcripts:blocked", title: `Prepisy YouTube: ${stats.blocked + stats.failed}/${attempts} zlyhalo (${why})`, details: due.map(([id, v]) => `${id} ${v.status} ${v.last_error ?? ""}`).join("\n") });
 }
 const newest = Math.max(0, ...Object.values(state.videos).map((v) => Date.parse(v.published_at) || 0));

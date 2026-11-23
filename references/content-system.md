@@ -6,7 +6,7 @@ Návrh a rozhodnutia: `/home/marek/.swarm/impofai-content-system/navrh.md`, prie
 ```
 ai-news (06:00) → content-napady → karta „Nápad: …“ na boarde Internal / Ads and Socials / Obsah, stav Nápad, label zdroj-novinky / zdroj-pripadovka
 Claude Desktop scheduled task (YouTube) → tiež karta v stave Nápad, label zdroj-youtube
-yt-transcripts (vypnuté: čaká na proxy KYC) → zdroje/index.jsonl
+yt-transcripts (4× denne, prepisy cez Apify, aj shorts) → zdroje/index.jsonl
 
 Board Obsah = vlastné stavy listu (KAPSA, od 2026-11-02; predtým labely etáp):
   Nápad ─(človek)→ Scenár ─(človek)→ Video ─(človek)→ Ozvučenie ─(človek)→ Hotové ─(človek)→ Naplánované ─(Socials + Postiz)→ Publikované   (+ Zrušené)
@@ -26,7 +26,7 @@ Board Obsah = vlastné stavy listu (KAPSA, od 2026-11-02; predtým labely etáp)
 ## Procesy (`processes/`)
 | Proces | Typ | Čo robí |
 |---|---|---|
-| `yt-transcripts` | bez LLM | RSS 11 creatorov, prepisy cez `youtube-transcript-api` s proxy (`YT_PROXY_URL`), súbory v `zdroje/youtube/` |
+| `yt-transcripts` | bez LLM | RSS 11 creatorov (videá aj shorts), prepisy cez Apify MCP server `heyitsgautham/video-transcripts` (`APIFY_TOKEN`, $0.003/prepis, dávky po 25, `processes/yt-transcripts/apify.mjs`), súbory v `zdroje/youtube/`. Záložne vie `youtube-transcript-api` s proxy alebo Supadata (`settings.providers` v `zdroje/config/creators.json`) |
 | `ai-news` | claude -p (WebSearch, WebFetch) | overené novinky, `zdroje/ai-news/<dátum>_ai-news.{json,md}` |
 | `content-napady` | claude -p (opus, len čítanie) | 5–8 nápadov, zápis robí `after.mjs` s `CONTENT_PM_TOKEN` |
 | `content-scenare` | claude -p (opus, len čítanie) | scenár vo formáte plugin 0.10 (avatar, scény, výslovnosť) do tej istej karty, validácia `_lib/scenar.mjs` |
@@ -37,7 +37,7 @@ Spoločné knižnice: `processes/_lib/` (`zdroje.mjs`, `scenar.mjs`, `tts.mjs`, 
 
 ## Súbory a tajomstvá
 - Dáta: `/home/marek/impofai-content/` (`zdroje/`, `state/pipeline/<KEY>.json`, `reels/`, `cache/tts/`, `assets/brand/`, `config/content.json`).
-- `~/.aios-runner/secrets.env`: `CONTENT_PM_TOKEN` (KAPSA, Internal / Ads and Socials), `YT_PROXY_URL` (Bright Data), `ELEVENLABS_API_KEY`.
+- `~/.aios-runner/secrets.env`: `CONTENT_PM_TOKEN` (KAPSA, Internal / Ads and Socials), `APIFY_TOKEN` (prepisy YouTube), `YT_PROXY_URL` (Bright Data, nepoužíva sa), `ELEVENLABS_API_KEY`.
 - ElevenLabs volá iba `processes/_lib/tts.mjs` (cache podľa textu, ten istý text sa neplatí dvakrát).
 - PM MCP skracuje odpovede na 25 000 znakov: strojová verzia scenára je v prílohe `<slug>_script-vN.json`, nie v description.
 
