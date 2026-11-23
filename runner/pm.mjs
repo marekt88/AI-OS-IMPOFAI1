@@ -3,7 +3,7 @@
 import fs from "node:fs";
 import { DIRS, isReadOnlyTool, redact, secrets } from "./core.mjs";
 
-const PM_MCP_URL = "https://project-managment.impofai.com/api/mcp";
+const PM_MCP_URL = "https://kapsa.impofai.com/api/mcp";
 export const BUGS_LIST = "cmv0zalyu0009p327hpyvas8d"; // Startups / Projekt Manazment / AI Bugs
 const ISSUES_FILE = () => `${DIRS.state}/issues.json`;
 const QUEUE_FILE = () => `${DIRS.state}/undelivered.jsonl`;

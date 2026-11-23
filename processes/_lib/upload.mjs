@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { secrets } from "../../runner/core.mjs";
 
-const PM_MCP_URL = "https://project-managment.impofai.com/api/mcp";
+const PM_MCP_URL = "https://kapsa.impofai.com/api/mcp";
 export const MAX_BYTES = 25 * 1024 * 1024;
 const MIME = { ".mp4": "video/mp4", ".mp3": "audio/mpeg", ".jpg": "image/jpeg", ".png": "image/png", ".json": "application/json", ".md": "text/markdown" };
 

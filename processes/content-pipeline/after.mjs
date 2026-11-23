@@ -125,7 +125,7 @@ async function finalize(key) {
   if (!final || final.file_name !== `${key}_final-v${n}.mp4`) return { ok: false, why: `manifest v${n} neukazuje na prílohu ${key}_final-v${n}.mp4.` };
   if (m.problems?.length) return { ok: false, why: `finál v${n} neprešiel kontrolou: ${m.problems.join("; ")}.` };
   if (!(m.durationSec >= 3 && m.durationSec <= 90) || final.size_bytes > 25 * 1024 * 1024) return { ok: false, why: `finál v${n}: dĺžka ${m.durationSec} s alebo veľkosť mimo limitov.` };
-  return { ok: true, id: final.id, name: final.file_name, duration: m.durationSec, url: `https://project-managment.impofai.com/api/v1/attachments/${final.id}/download` };
+  return { ok: true, id: final.id, name: final.file_name, duration: m.durationSec, url: `https://kapsa.impofai.com/api/v1/attachments/${final.id}/download` };
 }
 
 // ---------- main ----------
