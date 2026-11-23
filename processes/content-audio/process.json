@@ -27,7 +27,7 @@
     "mcp__claude_ai_kapsa__pm_read_task_attachment"
   ],
   "requireTools": [
-    "mcp__claude_ai_kapsa__pm_get_task"
+    "mcp__claude_ai_kapsa__pm_read_task_attachment"
   ],
   "keepRuns": 60
 }
