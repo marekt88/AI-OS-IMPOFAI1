@@ -4,10 +4,13 @@
 // never generated twice, so retries and revisions without text changes cost no credits.
 // CLI (used by the audio job): node tts.mjs <script.json> <outDir> [--takes 2] [--dry]
 //   script.json = the ```json script``` block (voice_text = ElevenLabs spelling); writes take-N.mp3/.json and tts.json.
+//   The key comes from ~/.aios-runner/secrets.env (the runner never gives secrets to the model, so the audio job's
+//   Bash does not have it in its environment); it is only sent to ElevenLabs, never printed.
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { secrets } from "../../runner/core.mjs";
 
 export const VOICE_ID = "8zZZVbHbPmbH2dgRv87g"; // Brian - Calm & Young (chosen by Marek, plugin voiceover)
 export const MODEL_ID = "eleven_v4";
@@ -91,7 +94,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   fs.mkdirSync(outDir, { recursive: true });
   const result = { voice: VOICE_ID, model: MODEL_ID, takes: [], characters_sent: 0, cache_hits: 0 };
   for (let take = 1; take <= takes; take++) {
-    const r = await synthesize({ text: s.voice_text, take, cacheDir, apiKey: process.env.ELEVENLABS_API_KEY, dry });
+    const r = await synthesize({ text: s.voice_text, take, cacheDir, apiKey: process.env.ELEVENLABS_API_KEY || secrets().ELEVENLABS_API_KEY, dry });
     if (r.dry) {
       result.takes.push({ take, dry: true, characters: r.characters });
       continue;
