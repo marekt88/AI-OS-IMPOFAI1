@@ -14,5 +14,13 @@ Vstup: {{input}} (`mode`: `new` = prvé ozvučenie, `revision` = úprava podľa 
 - Popis: **prevezmi** objekt `popis` z tej istej prílohy (schválený so scenárom) do `popis.json`. Zmeň ho iba vtedy, ak sa zmenil hlas alebo dĺžka, a zmenu uveď v `notes_sk`.
 - Pri revízii meň iba to, čo žiadajú komentáre (hlasitosť, hudba, časovanie, výber take). Text hlasu nemeň; ak to komentár žiada, napíš do `notes_sk`, že treba vrátiť etapu na „navrhnuté“.
 
+## Tempo: rýchlejšie ako v plugine (Marek 2026-11-23, video 30–45 s má pôsobiť akčne)
+Nepridávaj nové animácie ani prvky, iba zrýchli tie z `tempo.md` a `scenes.md`:
+- nový vizuálny event najneskôr každých **1,0 s** (plugin 1,5 s), aspoň **35 eventov za minútu** (plugin 25); prvý event do 0,3 s;
+- vstupy **2–4 snímky** na 12 fps mriežke (plugin 3–6), overshoot ostáva; punch-in sa ustáli za 3 snímky;
+- zmena sady (scény) každé **3–6 s** (plugin 4–8), prechod max. 3 snímky;
+- pokojný beat pred twistom/CTA max. 1 s (plugin ≈1,5 s);
+- pri kontrole `tempo.json` platia tieto hodnoty namiesto pluginových.
+
 ## Výstup (JSON podľa schémy)
 `ok`, cesty `final_file`, `cover_file`, `popis_file`, technické údaje (`duration_s`, `width`, `height`, `fps`, `video_codec`, `audio_codec`, `lufs`, `true_peak`, `size_bytes`), `tts_characters_sent`, `tts_cache_hits`, `error_code`, `notes_sk`.

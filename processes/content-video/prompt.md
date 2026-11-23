@@ -15,6 +15,14 @@ Vstup: {{input}} (`mode`: `new` = prvé video, `revision` = úprava podľa `comm
 - Tempo check (`tempo.json`) urob z časovej osi ešte pred renderom.
 - Nesťahuj nič, čo nie je v plugine alebo v HyperFrames. Nikdy nevymýšľaj fakty ani logá klientov.
 
+## Tempo: rýchlejšie ako v plugine (Marek 2026-11-23, video 30–45 s má pôsobiť akčne)
+Nepridávaj nové animácie ani prvky, iba zrýchli tie z `tempo.md` a `scenes.md`:
+- nový vizuálny event najneskôr každých **1,0 s** (plugin 1,5 s), aspoň **35 eventov za minútu** (plugin 25); prvý event do 0,3 s;
+- vstupy **2–4 snímky** na 12 fps mriežke (plugin 3–6), overshoot ostáva; punch-in sa ustáli za 3 snímky;
+- zmena sady (scény) každé **3–6 s** (plugin 4–8), prechod max. 3 snímky;
+- pokojný beat pred twistom/CTA max. 1 s (plugin ≈1,5 s);
+- pri kontrole `tempo.json` platia tieto hodnoty namiesto pluginových.
+
 ## Výstup (JSON podľa schémy)
 - `ok`: true iba ak existuje hotové MP4.
 - `video_file`: absolútna cesta k MP4, `duration_s`, `size_bytes`.

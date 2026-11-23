@@ -14,6 +14,8 @@ import { secrets } from "../../runner/core.mjs";
 
 export const VOICE_ID = "8zZZVbHbPmbH2dgRv87g"; // Brian - Calm & Young (chosen by Marek, plugin voiceover)
 export const MODEL_ID = "eleven_v4";
+/** Faster, more energetic delivery (Marek 2026-11-23: 30–45 s videos). ElevenLabs speed range 0.7–1.2. Part of the cache key. */
+export const VOICE_SETTINGS = { speed: 1.15 };
 export const API = "https://api.elevenlabs.io";
 
 export const cacheKey = ({ voiceId, modelId, settings, text, take }) =>
@@ -55,7 +57,7 @@ export function mapToCaptions(ttsWords, captionText) {
 }
 
 /** One take, from the cache when possible. fetchImpl is injectable for tests. */
-export async function synthesize({ text, voiceId = VOICE_ID, modelId = MODEL_ID, settings = null, take = 1, cacheDir, apiKey, fetchImpl = fetch, dry = false }) {
+export async function synthesize({ text, voiceId = VOICE_ID, modelId = MODEL_ID, settings = VOICE_SETTINGS, take = 1, cacheDir, apiKey, fetchImpl = fetch, dry = false }) {
   const key = cacheKey({ voiceId, modelId, settings, text, take });
   const mp3 = path.join(cacheDir, `${key}.mp3`);
   const meta = path.join(cacheDir, `${key}.json`);

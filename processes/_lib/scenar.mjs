@@ -19,9 +19,10 @@ export function validateScript(s) {
   if (!s.lines?.length) errors.push("scenár nemá riadky");
   if (s.hooks?.length !== 3) errors.push(`hookov je ${s.hooks?.length ?? 0}, má byť 3`);
   const words = (s.lines ?? []).reduce((n, l) => n + String(l.titulky).trim().split(/\s+/).filter(Boolean).length, 0);
-  if (words < 80 || words > 150) errors.push(`hlas má ${words} slov, má mať ~90–140`);
+  // 30–45 s at the faster voice (speed 1.15 ≈ 2.8 words/s), Marek 2026-11-23
+  if (words < 70 || words > 125) errors.push(`hlas má ${words} slov, má mať ~80–120 (video 30–45 s)`);
   const dur = s.lines?.length ? s.lines[s.lines.length - 1].t_to : 0;
-  if (dur < 30 || dur > 75) errors.push(`dĺžka ${dur} s mimo 30–75 s`);
+  if (dur < 25 || dur > 48) errors.push(`dĺžka ${dur} s mimo 30–45 s (tolerancia 25–48 s)`);
   (s.lines ?? []).forEach((l, i) => {
     const n = i + 1;
     if (!AVATAR_POSES.includes(l.avatar)) errors.push(`riadok ${n}: neznáma póza avatara „${l.avatar}“`);
@@ -30,7 +31,7 @@ export function validateScript(s) {
     for (const e of l.elements ?? []) if (!ELEMENT_RE.test(e)) errors.push(`riadok ${n}: neznámy prvok „${e}“`);
     if (!String(l.action).trim()) errors.push(`riadok ${n}: chýba akcia na obraze`);
     if (l.t_to <= l.t_from) errors.push(`riadok ${n}: čas ${l.t_from}–${l.t_to}`);
-    if (l.t_to - l.t_from > 8.5) warnings.push(`riadok ${n}: ${(l.t_to - l.t_from).toFixed(1)} s v jednej myšlienke (tempo)`);
+    if (l.t_to - l.t_from > 6) warnings.push(`riadok ${n}: ${(l.t_to - l.t_from).toFixed(1)} s v jednej myšlienke (tempo)`);
     if (/ej-áj|klód/i.test(l.titulky)) errors.push(`riadok ${n}: výslovnostný pravopis v titulkoch`);
     if (/\bAI\b|Claude/.test(l.elevenlabs)) errors.push(`riadok ${n}: v ElevenLabs texte ostal normálny pravopis (AI/Claude)`);
     if (/\d/.test(l.titulky) && !l.source_url && !(s.facts ?? []).some((f) => f.line === n)) warnings.push(`riadok ${n}: číslo bez zdroja v mape faktov`);

@@ -24,9 +24,9 @@ Nič nezapisuješ do KAPSA. Úlohu založí alebo upraví kód z tvojho JSON vý
 - chýbajú overené fakty potrebné na video → `skip_reason: "chybaju-fakty"` (a do `questions` čo chýba).
 
 ## 3. Scenár (formát A, IMPOFAI Scéna)
-- Dĺžka 35–55 s, ~2,5 slova za sekundu (90–140 slov hlasu). Štruktúra: hook (0–3 s) → kontext + zdroj → 3–5 vysvetlených myšlienok (každá ako vizuálna metafora v scéne) → twist → payoff → CTA. Slogan na konci pridáva audio krok, ty ho do textu nepíš.
+- Dĺžka **30–45 s**, hlas je zrýchlený (~2,8 slova za sekundu, **80–120 slov hlasu**). Video má pôsobiť akčne: krátke vety, žiadna vata, každá veta posúva príbeh. Štruktúra: hook (0–3 s) → kontext + zdroj → 3–5 vysvetlených myšlienok (každá ako vizuálna metafora v scéne) → twist → payoff → CTA. Slogan na konci pridáva audio krok, ty ho do textu nepíš.
 - **Hooky:** 3 varianty z rôznych archetypov (`content-and-hooks.md`), každý v troch vrstvách: hlas (< 2 s), text na obraze (3–7 slov), frame 0 (scéna + 3D rekvizita + pásik + avatar v póze). Prejdi checklist `viral-hooks`; šokujúci hook musí byť doslova pravdivý. Vyber jeden a zdôvodni.
-- **Riadky (`lines`):** každý riadok = jedna myšlienka, 1,5–8 s.
+- **Riadky (`lines`):** každý riadok = jedna myšlienka, 1,5–5 s (časy počítaj pri ~2,8 slova za sekundu).
   - `titulky`: normálny pravopis (AI, Claude, IMPofAI);
   - `elevenlabs`: rovnaký text vo výslovnostnom pravopise z `vyslovnost.md` (AI → ej-áj, Claude → Klód, čísla slovom), voliteľne emočný tag ako `[confident]`;
   - `avatar`: póza z avatara (presné meno, napr. `happy_point_right`);

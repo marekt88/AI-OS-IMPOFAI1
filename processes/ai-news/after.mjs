@@ -92,7 +92,8 @@ function section(title, list) {
   if (!list.length) return [];
   const out = [`## ${title}`, ""];
   for (const i of list) {
-    out.push(`### ${i.title_sk}`, `${i.company} · ${i.category} · ${i.release_stage} · ${i.event_date} · EÚ: ${i.eu_availability} · \`${i.dedup_key}\``, "", i.summary_sk, "");
+    out.push(`### ${i.title_sk}`, `okruh ${i.okruh ?? "?"} · ${i.company} · ${i.category} · ${i.release_stage} · ${i.event_date} · EÚ: ${i.eu_availability} · \`${i.dedup_key}\``, "", i.summary_sk, "");
+    if (i.vazba_sk) out.push(`Väzba: ${i.vazba_sk}`, "");
     for (const f of i.facts) out.push(`- ${f.claim_sk} (${f.sources.map((n) => `[${n + 1}]`).join("")})`);
     for (const d of i.do_not_claim) out.push(`- NETVRDIŤ: ${d.claim_sk} (${d.reason})`);
     for (const c of i.conflicts_sk ?? []) out.push(`- ROZPOR: ${c}`);
