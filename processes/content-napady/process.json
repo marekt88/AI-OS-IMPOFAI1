@@ -10,10 +10,10 @@
   "builtinTools": ["Read", "Grep", "WebSearch", "WebFetch"],
   "allowedTools": [
     "Read", "Grep", "WebSearch", "WebFetch",
-    "mcp__claude_ai_kapsa__pm_list_tasks",
-    "mcp__claude_ai_kapsa__pm_get_task",
-    "mcp__claude_ai_kapsa__pm_search_brain",
-    "mcp__claude_ai_kapsa__pm_read_brain_note"
+    "mcp__kapsa__pm_list_tasks",
+    "mcp__kapsa__pm_get_task",
+    "mcp__kapsa__pm_search_brain",
+    "mcp__kapsa__pm_read_brain_note"
   ],
   "firstSinceHours": 48,
   "keepRuns": 60

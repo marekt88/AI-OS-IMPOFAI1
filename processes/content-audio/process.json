@@ -22,12 +22,12 @@
     "Bash",
     "Grep",
     "Glob",
-    "mcp__claude_ai_kapsa__pm_get_task",
-    "mcp__claude_ai_kapsa__pm_list_task_attachments",
-    "mcp__claude_ai_kapsa__pm_read_task_attachment"
+    "mcp__kapsa__pm_get_task",
+    "mcp__kapsa__pm_list_task_attachments",
+    "mcp__kapsa__pm_read_task_attachment"
   ],
   "requireTools": [
-    "mcp__claude_ai_kapsa__pm_read_task_attachment"
+    "mcp__kapsa__pm_read_task_attachment"
   ],
   "keepRuns": 60
 }

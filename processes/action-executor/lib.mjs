@@ -3,7 +3,7 @@
 import fs from "node:fs";
 import { APPROVALS_LIST, MAX_ACTIONS } from "../call-followup/lib.mjs";
 
-export const PREFIX = "mcp__claude_ai_kapsa__";
+export const PREFIX = "mcp__kapsa__";
 const READ = new Set(["pm_get_task", "pm_list_task_activity", "pm_list_task_lists", "pm_list_assignable_users"]);
 const NON_PM = new Set(["ToolSearch", "StructuredOutput"]);
 const KEY_RE = /\b[A-Z]{2,}-\d+\b/;

@@ -223,6 +223,22 @@ export function usesSetupToken(p) {
   const tools = [...(p?.allowedTools ?? []), ...(p?.requireTools ?? []), ...(p?.dryRunAllowedTools ?? [])];
   return !!p && !tools.some((t) => String(t).startsWith("mcp__claude_ai_"));
 }
+/**
+ * KAPSA straight over its MCP server with a server token (Marek 2026-11-23), not through the claude.ai connector:
+ * works with the setup token (no claude.ai login needed) and does not break when the connector is renamed.
+ * Tools are mcp__kapsa__pm_*. Token: secrets.env KAPSA_MCP_TOKEN, else PM_ACTIONS_TOKEN (full read_write).
+ */
+export const KAPSA_MCP_URL = "https://kapsa.impofai.com/api/mcp";
+export const KAPSA_PREFIX = "mcp__kapsa__";
+export function kapsaMcpConfig(tools) {
+  if (!tools.some((t) => String(t).startsWith(KAPSA_PREFIX))) return null;
+  const token = secrets().KAPSA_MCP_TOKEN || secrets().PM_ACTIONS_TOKEN;
+  if (!token) throw new RunError("input", "KAPSA_MCP_TOKEN (or PM_ACTIONS_TOKEN) missing in ~/.aios-runner/secrets.env");
+  const file = path.join(HOME, "mcp-kapsa.json"); // next to secrets.env, 0600, never in a run folder
+  fs.writeFileSync(file, JSON.stringify({ mcpServers: { kapsa: { type: "http", url: KAPSA_MCP_URL, headers: { Authorization: `Bearer ${token}` } } } }), { mode: 0o600 });
+  fs.chmodSync(file, 0o600);
+  return file;
+}
 export function claudeEnv(p = null) {
   const env = { ...process.env, PATH: `${path.dirname(CLAUDE_BIN)}:${process.env.PATH ?? ""}` };
   for (const k of BILLING_ENV) delete env[k]; // always the claude.ai subscription login, never API billing
@@ -484,6 +500,8 @@ export async function runProcess(p, { manual = false, slot = null, noDeliverWait
         "--tools", p.builtinTools.join(",")];
       if (p.effort) args.push("--effort", p.effort);
       if (tools.allowed.length) args.push("--allowedTools", ...tools.allowed);
+      const kapsaConfig = kapsaMcpConfig([...tools.allowed, ...tools.require]);
+      if (kapsaConfig) args.push("--mcp-config", kapsaConfig);
       if (p.system) args.push("--append-system-prompt", render(fs.readFileSync(p.system, "utf8"), vars));
       if (p.schema) args.push("--json-schema", fs.readFileSync(p.schema, "utf8"));
       args.push("--", prompt);
