@@ -16,14 +16,14 @@
     "Read",
     "Grep",
     "WebFetch",
-    "mcp__claude_ai_KAPSA__pm_get_task",
-    "mcp__claude_ai_KAPSA__pm_list_task_activity",
-    "mcp__claude_ai_KAPSA__pm_search_brain",
-    "mcp__claude_ai_KAPSA__pm_list_task_attachments",
-    "mcp__claude_ai_KAPSA__pm_read_task_attachment"
+    "mcp__claude_ai_kapsa__pm_get_task",
+    "mcp__claude_ai_kapsa__pm_list_task_activity",
+    "mcp__claude_ai_kapsa__pm_search_brain",
+    "mcp__claude_ai_kapsa__pm_list_task_attachments",
+    "mcp__claude_ai_kapsa__pm_read_task_attachment"
   ],
   "requireTools": [
-    "mcp__claude_ai_KAPSA__pm_get_task"
+    "mcp__claude_ai_kapsa__pm_get_task"
   ],
   "keepRuns": 100
 }
