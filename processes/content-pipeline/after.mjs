@@ -1,10 +1,11 @@
 // content-pipeline: the production poller of the IMPOFAI content system (navrh.md §1, §4). No claude -p.
 // Every 5 min it reads the board "Obsah" (config kanban_list) whose custom statuses are the stages
-// Nápad → Scenár → Video → Ozvučenie → Hotové (Marek 2026-11-02; until then stage labels). Per task:
-//   - a person moved the card one column forward: SCRIPT_NEW (Scenár), VIDEO_JOB (Video), AUDIO_JOB (Ozvučenie),
+// Nápad → Video → Ozvučenie → Hotové (Marek 2026-11-23: Nápad and Scenár merged, the idea carries its script). Per task:
+//   - Nápad with agent run "queued" and no script (queued by content-napady): SCRIPT_NEW, one script at a time
+//   - a person moved the card one column forward: VIDEO_JOB (Video, needs the script), AUDIO_JOB (Ozvučenie),
 //     FINALIZE (Hotové: checks the final, sets previewUrl and the label ready-for-posting that Socials publishes);
 //     back = RETURN (no job); a jump over columns is moved back with a comment (E_STAGE)
-//   - new human comments: SCRIPT_REVISION, VIDEO_REVISION, AUDIO_REVISION, one reply in Hotové
+//   - new human comments: SCRIPT_NEW / SCRIPT_REVISION (Nápad), VIDEO_REVISION, AUDIO_REVISION, one reply in Hotové
 // Jobs run as separate runner processes (content-scenare, content-video, content-audio) started with spawnProcess;
 // heavy ones wait in agent run "queued" until their process is enabled, ffmpeg with libx264 is installed and
 // disk/RAM are above the thresholds. Every blocker is commented once, not every tick.
@@ -19,7 +20,7 @@ import { fileURLToPath } from "node:url";
 import { hasSecret, pmTool } from "../../runner/pm.mjs";
 import { spawnProcess } from "../../runner/spawn.mjs";
 import { isDry, readJson, ROOT, writeJson } from "../_lib/zdroje.mjs";
-import { artifacts, commentJob, humanComments, resourceGate, stageOf, STAGES, transition } from "./lib.mjs";
+import { artifacts, commentJob, humanComments, LEGACY_STAGE, resourceGate, stageOf, STAGES, transition } from "./lib.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const dry = isDry();
@@ -69,14 +70,15 @@ function gate(job) {
   const r = resources();
   return r.ok ? { ok: true, proc } : r;
 }
-function heavyRunning() {
+function runningOf(kinds) {
   if (!fs.existsSync(STATE_DIR)) return null;
   for (const f of fs.readdirSync(STATE_DIR)) {
     const st = readJson(path.join(STATE_DIR, f), null);
-    if (st?.job && HEAVY.has(st.job.kind) && !st.job.done && Date.now() - Date.parse(st.job.started_at) < JOB_STALE_MIN * 60_000) return st.key;
+    if (st?.job && kinds.has(st.job.kind) && !st.job.done && Date.now() - Date.parse(st.job.started_at) < JOB_STALE_MIN * 60_000) return st.key;
   }
   return null;
 }
+const heavyRunning = () => runningOf(HEAVY);
 
 // ---------- helpers ----------
 const stateFile = (key) => path.join(STATE_DIR, `${key}.json`);
@@ -94,8 +96,9 @@ function jobBusy(st) {
 }
 const READY_LABEL = "ready-for-posting"; // Socials contract: IN_REVIEW (= Hotové) + this label
 const SCRIPT_JOBS = new Set(["SCRIPT_NEW", "SCRIPT_REVISION"]);
-const SCRIPT_NEW_PER_TICK = 3;
+const SCRIPT_NEW_PER_TICK = 3; // scripts a person asked for (comment)
 let scriptNewStarted = 0;
+let autoScriptStarted = false; // queued scripts of new ideas: one at a time (process lock waits max 30 min)
 async function moveTo(task, stage) {
   log.push(`${task}: -> ${stage}`);
   if (!dry) await pm("pm_update_task_status", { task, custom_status: stage });
@@ -129,15 +132,20 @@ async function finalize(key) {
 }
 
 // ---------- main ----------
-const list = await pm("pm_list_tasks", { task_list: cfg.kanban_list, custom_status: STAGES.filter((x) => x !== "Nápad"), limit: 100 });
-for (const t of list.items ?? []) {
+const tasks = [];
+for (let offset = 0; ; ) {
+  const page = await pm("pm_list_tasks", { task_list: cfg.kanban_list, custom_status: STAGES, limit: 100, offset });
+  tasks.push(...(page.items ?? []));
+  if (!page.has_more || !page.next_offset) break;
+  offset = page.next_offset;
+}
+for (const t of tasks) {
   const key = t.key;
   const cur = stageOf(t);
   if (!cur) continue;
   const st = readJson(stateFile(key), { key, stage: null, cursor: null, notified: {}, job: null });
+  if (st.stage && LEGACY_STAGE[st.stage]) st.stage = LEGACY_STAGE[st.stage]; // Scenár merged into Nápad (2026-11-23)
   if (st.stage && !STAGES.includes(st.stage)) st.stage = null; // state from the label era (before 2026-11-02) = first seen
-  const full = await pm("pm_get_task", { task: key });
-  const has = artifacts(full.attachments);
 
   // finished jobs: the job process sets the agent run itself (needs_review / failed)
   if (st.job && !st.job.done && ["needs_review", "failed", null].includes(t.agent_run_status) && Date.now() - Date.parse(st.job.started_at) > 60_000) st.job.done = nowIso;
@@ -149,9 +157,25 @@ for (const t of list.items ?? []) {
   if (st.cursor === null) st.cursor = lastId ?? "start";
   const fresh = humanComments(items, { ownAgentNames: [me], afterId: st.cursor === "start" ? null : st.cursor });
 
+  // attachments only when needed (an idea in Nápad without news is skipped cheaply; ~50 ideas every 5 min)
+  const quiet = cur === "Nápad" && st.stage === "Nápad" && !fresh.length && t.agent_run_status !== "queued" && !(st.job && !st.job.done);
+  if (quiet) {
+    st.updated_at = nowIso;
+    if (!dry) writeJson(stateFile(key), st);
+    continue;
+  }
+  const full = await pm("pm_get_task", { task: key });
+  const has = artifacts(full.attachments);
+
   // 1. stage transition
   const tr = transition(st.stage, cur, has);
-  if (tr.kind === "invalid") {
+  if (tr.kind === "no_script") {
+    const writing = t.agent_run_status === "running" || t.agent_run_status === "queued";
+    await comment(key, st, `E_SCRIPT:${nowIso.slice(0, 13)}`, writing
+      ? "**Scenár sa ešte píše.** Karta je späť v Nápade, presuň ju do Video, keď bude scenár hotový."
+      : "**Chýba scenár.** Karta je späť v Nápade. Napíš do karty komentár (napr. „scenár“) a scenár sa napíše; potom ju presuň do Video.");
+    await moveTo(key, "Nápad");
+  } else if (tr.kind === "invalid") {
     await comment(key, st, `E_STAGE:${st.stage}->${cur}`, `**E_STAGE:** z ${st.stage} rovno do ${cur} sa nedá, etapy idú po jednej. Karta je späť v ${st.stage}.`);
     await moveTo(key, st.stage);
   } else if (tr.kind === "return") {
@@ -180,15 +204,6 @@ for (const t of list.items ?? []) {
         await moveTo(key, "Ozvučenie");
         st.stage = "Ozvučenie";
       }
-    } else if (tr.job === "SCRIPT_NEW") {
-      if (scriptNewStarted >= SCRIPT_NEW_PER_TICK) {
-        log.push(`${key}: SCRIPT_NEW next tick`); // stage stays unprocessed, the next tick starts it
-      } else if (!jobBusy(st)) {
-        start(key, st, "SCRIPT_NEW", { mode: "new", idea: key, picked: true });
-        scriptNewStarted++;
-        await agentRun(key, "running");
-        st.stage = cur;
-      }
     } else {
       const g = gate(tr.job);
       if (!g.ok) {
@@ -208,14 +223,14 @@ for (const t of list.items ?? []) {
   }
 
   // 2. human comments (only when no transition consumed this tick)
-  if (fresh.length && tr.kind !== "job" && tr.kind !== "return" && tr.kind !== "invalid" && !st.pending) {
+  if (fresh.length && ["none", "first"].includes(tr.kind) && !st.pending) {
     const job = commentJob(cur, t.agent_run_status, has);
     const payload = fresh.map((c) => ({ id: c.id, author: c.author?.name ?? c.agent_name ?? "?", at: c.created_at, body: c.body }));
     if (job === "REPLY") {
-      if (!dry) await pm("pm_add_task_comment", { task: key, body: "Karta je v Hotové, video sa tu už nemení. Na publikovanie ju presuň do Naplánované; na úpravu späť (Ozvučenie, Video alebo Scenár) a napíš zmenu znova." });
+      if (!dry) await pm("pm_add_task_comment", { task: key, body: "Karta je v Hotové, video sa tu už nemení. Na publikovanie ju presuň do Naplánované; na úpravu späť (Ozvučenie, Video alebo Nápad pre scenár) a napíš zmenu znova." });
       st.cursor = fresh[fresh.length - 1].id;
     } else if (job === "SCRIPT_NEW" || job === "SCRIPT_REVISION") {
-      if (!jobBusy(st)) {
+      if (!jobBusy(st) && (job === "SCRIPT_REVISION" || scriptNewStarted++ < SCRIPT_NEW_PER_TICK)) {
         start(key, st, job, job === "SCRIPT_NEW" ? { mode: "new", idea: key, picked: true, comments: payload } : { mode: "revision", task: key, comments: payload });
         await agentRun(key, "running");
         st.cursor = fresh[fresh.length - 1].id; // comments written during the run start exactly one more revision
@@ -228,8 +243,17 @@ for (const t of list.items ?? []) {
         await agentRun(key, "running");
         st.cursor = fresh[fresh.length - 1].id;
       }
-    } else if (!(t.agent_run_status === "running" || t.agent_run_status === "queued")) {
-      st.cursor = fresh[fresh.length - 1].id; // Nápad: notes only
+    }
+  }
+
+  // 2b. a new idea queued by content-napady gets its script (one at a time, video and audio never start by themselves)
+  if (cur === "Nápad" && t.agent_run_status === "queued" && !has.script && !jobBusy(st) && !autoScriptStarted) {
+    const other = runningOf(SCRIPT_JOBS);
+    if (other) log.push(`${key}: script waits (${other})`);
+    else {
+      start(key, st, "SCRIPT_NEW", { mode: "new", idea: key, picked: true });
+      await agentRun(key, "running");
+      autoScriptStarted = true;
     }
   }
 
@@ -245,4 +269,4 @@ for (const t of list.items ?? []) {
   st.updated_at = nowIso;
   if (!dry) writeJson(stateFile(key), st);
 }
-console.log(JSON.stringify({ dry, tasks: list.items?.length ?? 0, log }));
+console.log(JSON.stringify({ dry, tasks: tasks.length, log }));

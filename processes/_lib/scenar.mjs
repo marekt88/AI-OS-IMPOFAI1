@@ -43,27 +43,47 @@ export function validateScript(s) {
   // only audience-facing text (the brand check itself says "never 'každú sobotu'")
   const shown = JSON.stringify([s.hooks, s.cta_text, s.cover_text, s.popis, (s.lines ?? []).map((l) => [l.titulky, l.elevenlabs, l.on_screen])]);
   for (const re of FORBIDDEN) if (re.test(shown)) errors.push(`zakázaný text ${re}`);
+  // card summary for a 30 s decision (Marek 2026-11-23): what it is about and how the video looks, max 5 sentences
+  const summary = String(s.summary ?? "").trim();
+  if (!summary) errors.push("chýba zhrnutie (summary)");
+  else if (sentences(summary) > 5) errors.push(`zhrnutie má ${sentences(summary)} viet, max. 5`);
+  if (s.okruh != null && ![1, 2, 3, 4, 5].includes(s.okruh)) errors.push(`okruh ${s.okruh} mimo 1–5`);
+  if (s.idea_source?.url && !/^https?:\/\//.test(s.idea_source.url)) errors.push("zdroj nápadu nemá platnú URL");
   return { errors, warnings, words, duration: dur };
 }
 
+/** Sentences of a short text (., ! or ? followed by a space or the end; numbers like 2.5 do not split). */
+export function sentences(text) {
+  return String(text).trim().split(/(?<=[.!?…])\s+(?=\S)/).filter((x) => x.trim()).length;
+}
+export const OKRUH_NAME = {
+  1: "AI agenti a automatizácia práce",
+  2: "Hlasoví a chatovací asistenti",
+  3: "Nové nástroje v Claude, ChatGPT, Gemini a Copilote",
+  4: "AI v obchode, financiách a dátach",
+  5: "Regulácia, peniaze a dopad na SK firmu",
+};
+
 const cell = (v) => String(v ?? "").replace(/\|/g, "\\|").replace(/\n/g, " ");
 
-/** Script part of the card description (stage Scenár). */
+/**
+ * Card description of an idea with its script (Marek 2026-11-23: decide in 30 s). Order: summary (max 5 sentences),
+ * then hooks (variants + chosen), the full script, CTA, takeaway, idea source, okruh; then the rest for production.
+ */
 export function renderScript(s, { idea, version, projectDate, changes = [], warnings = [] }) {
   const h = s.hooks;
+  const src = s.idea_source;
   const lines = [
-    `**Nápad:** ${idea} · **Slug:** ${s.slug} · **Dátum projektu:** ${projectDate}`,
-    `**Verzia:** v${version} · **Zmeny oproti v${version - 1}:** ${version > 1 && changes.length ? changes.join("; ") : "—"}`,
-    `**Formát:** A grafické video (IMPOFAI Scéna) · **Dĺžka:** ${s.duration_s} s · **Slová hlasu:** ${s._words ?? "?"}`,
-    `**CTA (${CTA_LABEL[s.cta_type] ?? s.cta_type}):** „${s.cta_text}“ · **Platnosť do:** ${s.valid_until ?? "bez expirácie"}`,
+    "## Zhrnutie",
+    String(s.summary ?? "").trim() || "—",
     "",
-    "## Pointa",
-    `${s.pointa} · **Open loop:** ${s.open_loop}`,
+    `**Dĺžka:** ${s.duration_s} s · **Slová hlasu:** ${s._words ?? "?"} · **Okruh:** ${s.okruh ? `${s.okruh} – ${OKRUH_NAME[s.okruh]}` : "—"} · **Verzia scenára:** v${version}`,
     "",
-    "## Hooky (3 varianty)",
+    "## Hooky",
     "| # | Archetyp | Hlas (< 2 s) | Text na obraze | Frame 0 |",
     "|---|---|---|---|---|",
-    ...h.map((x, i) => `| ${i + 1} | ${cell(x.archetype)} | ${cell(x.voice)} | ${cell(x.on_screen)} | ${cell(x.frame0)} |`),
+    ...h.map((x, i) => `| ${i + 1}${i + 1 === s.chosen_hook ? " ✓" : ""} | ${cell(x.archetype)} | ${cell(x.voice)} | ${cell(x.on_screen)} | ${cell(x.frame0)} |`),
+    "",
     `**Vybraný:** #${s.chosen_hook} – ${s.hook_why}`,
     "",
     "## Scenár",
@@ -71,8 +91,19 @@ export function renderScript(s, { idea, version, projectDate, changes = [], warn
     "|---|---|---|---|---|---|---|---|---|",
     ...s.lines.map((l) => `| ${l.t_from}–${l.t_to} s | ${cell(l.titulky)} | ${cell(l.elevenlabs)} | ${cell(l.avatar)} | ${cell(l.set)} | ${cell(l.metaphor)}: ${cell(l.action)}${l.on_screen ? ` · „${cell(l.on_screen)}“` : ""}${l.highlight ? ` · zvýraznené: ${cell(l.highlight)}` : ""} | ${cell(l.elements.join(", "))} | ${cell(l.sound)} | ${l.source_url ? cell(l.source_url) : "—"} |`),
     "",
-    "## Cover",
-    `Frame 0 = hook #${s.chosen_hook}: ${s.cover_text} · thumb_offset_ms: 0`,
+    "## CTA",
+    `„${s.cta_text}“ (${CTA_LABEL[s.cta_type] ?? s.cta_type})`,
+    "",
+    "## Čo si divák odnesie",
+    `${s.pointa} · **Open loop:** ${s.open_loop}`,
+    "",
+    "## Zdroj nápadu",
+    src?.url ? `[${cell(src.label || src.url)}](${src.url})` : src?.label ? cell(src.label) : "—",
+    "",
+    "## Okruh",
+    s.okruh ? `${s.okruh} – ${OKRUH_NAME[s.okruh]}` : "—",
+    "",
+    "---",
     "",
     "## Popis pre platformy (návrh, schvaľuje sa so scenárom)",
     `- **Instagram:** ${s.popis.instagram}`,
@@ -81,6 +112,9 @@ export function renderScript(s, { idea, version, projectDate, changes = [], warn
     `- **LinkedIn:** ${s.popis.linkedin}`,
     `- **TikTok:** ${s.popis.tiktok.title} · ${s.popis.tiktok.text}`,
     `- **Prvý komentár:** ${s.popis.first_comment ?? "—"}`,
+    "",
+    "## Cover",
+    `Frame 0 = hook #${s.chosen_hook}: ${s.cover_text} · thumb_offset_ms: 0`,
     "",
     "## Potrebné podklady",
     ...(s.assets.length ? ["| ID | Čo | Stav | URL |", "|---|---|---|---|", ...s.assets.map((a) => `| ${cell(a.id)} | ${cell(a.what)} | ${a.status} | ${a.url ?? "—"} |`)] : ["—"]),
@@ -98,7 +132,10 @@ export function renderScript(s, { idea, version, projectDate, changes = [], warn
     "## Otvorené otázky",
     ...(s.questions.length ? s.questions.map((q) => `- ${q}`) : ["—"]),
     "",
-    "Zmeny píš do komentára, scenár prepíše nová verzia. Description ručne neupravuj.",
+    `**Nápad:** ${idea} · **Slug:** ${s.slug} · **Dátum projektu:** ${projectDate} · **Verzia:** v${version} · **Zmeny oproti v${version - 1}:** ${version > 1 && changes.length ? changes.join("; ") : "—"}`,
+    `**Formát:** A grafické video (IMPOFAI Scéna) · **Platnosť do:** ${s.valid_until ?? "bez expirácie"}`,
+    "",
+    "Zmeny píš do komentára, scenár prepíše nová verzia. Description ručne neupravuj. Video sa spustí presunom karty do **Video**.",
     "",
     "<!-- strojová časť, generuje krok B; ručne neupravovať -->",
     "```json script",
@@ -114,6 +151,7 @@ export function renderScript(s, { idea, version, projectDate, changes = [], warn
 export function machineScript(s, { idea, version, projectDate }) {
   return {
     script_version: version, idea, slug: s.slug, project_date: projectDate, format: "A", style: "impofai-scena-0.10",
+    summary: s.summary ?? null, okruh: s.okruh ?? null, idea_source: s.idea_source ?? null,
     cta_type: s.cta_type, cta_text: s.cta_text, valid_until: s.valid_until, duration_s: s.duration_s,
     hook: { chosen: s.chosen_hook, variants: s.hooks },
     beats: s.lines,

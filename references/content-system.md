@@ -4,23 +4,27 @@ Návrh a rozhodnutia: `/home/marek/.swarm/impofai-content-system/navrh.md`, prie
 
 ## Tok
 ```
-ai-news (06:00) → content-napady → karta „Nápad: …“ na boarde Internal / Ads and Socials / Obsah, stav Nápad, label zdroj-novinky / zdroj-pripadovka
+ai-news (06:00, iba 5 okruhov) → content-napady → karta „Nápad: …“ na boarde Internal / Obsah a sociálne siete / Obsah, stav Nápad,
+  labely zdroj-novinky / zdroj-pripadovka + okruh-1..5 (okruh 5 = priorita Vysoká), agent run Queued
+  → content-pipeline hneď napíše scenár do tej istej karty (content-scenare, po jednom); video a hlas nikdy samé
 Claude Desktop scheduled task (YouTube) → tiež karta v stave Nápad, label zdroj-youtube
 yt-transcripts (4× denne, prepisy cez Apify, aj shorts) → zdroje/index.jsonl
 
-Board Obsah = vlastné stavy listu (KAPSA, od 2026-11-02; predtým labely etáp):
-  Nápad ─(človek)→ Scenár ─(človek)→ Video ─(človek)→ Ozvučenie ─(človek)→ Hotové ─(človek)→ Naplánované ─(Socials + Postiz)→ Publikované   (+ Zrušené)
+Board Obsah = vlastné stavy listu (KAPSA, od 2026-11-02; Nápad a Scenár zlúčené 2026-11-23):
+  Nápad (so scenárom) ─(človek)→ Video ─(človek)→ Ozvučenie ─(človek)→ Hotové ─(človek)→ Naplánované ─(Socials + Postiz)→ Publikované   (+ Zrušené)
   Naplánované: Socials (KAPSA) zaradí kartu do najbližšieho voľného slotu 8:00 / 12:00 / 20:00 (max 3 denne na sieť, Socials → Nastavenia → Ciele),
   3 h pred slotom nahrá video do Postiz a založí post; po zverejnení karta → Publikované. Kľúč Postiz: Socials → Nastavenia → Účty.
-  content-pipeline (*/5) pri presune karty o jeden stĺpec spustí: Scenár = content-scenare, Video = content-video,
+  content-pipeline (*/5): scenár pre nové nápady (Queued) a na komentár v Nápade; pri presune karty o jeden stĺpec spustí:
+  Video = content-video (iba keď karta má scenár, inak ju vráti do Nápadu),
   Ozvučenie = content-audio, Hotové = FINALIZE (kontrola finálu, previewUrl, label ready-for-posting pre Socials)
 ```
 
 ## Ako s tým pracuje človek
-- Video z nápadu: presuň kartu z **Nápad** do **Scenár** (Board view alebo stav v detaile). Do 5 min sa spustí scenár a zapíše sa do tej istej karty (description = scenár + pôvodný nápad, príloha `<slug>_script-vN.json`, pôvodný nápad aj v `<KEY>_napad.md`).
+- Nápad prichádza rovno so scenárom. Description: **Zhrnutie** (max. 5 viet, rozhodnutie za 30 s), hooky (vybraný ✓), scenár, CTA, čo si divák odnesie, zdroj nápadu, okruh; nižšie popisy pre siete, podklady, fakty a pôvodný nápad. Príloha `<slug>_script-vN.json`, pôvodný nápad v `<KEY>_napad.md`.
+- Video z nápadu: presuň kartu z **Nápad** do **Video**. Zmena scenára: komentár v Nápade (nová verzia). Starší nápad bez scenára: komentár (napr. „scenár“) ho napíše.
 - Kým job beží, karta má agent run Running. Keď skončí, Needs review: pozri výsledok a buď napíš **komentár** (revízia v tom istom stĺpci), alebo kartu posuň o stĺpec ďalej (schválenie).
 - Späť sa dá kedykoľvek (bez jobu). Preskočiť stĺpec sa nedá: pipeline kartu vráti s komentárom E_STAGE.
-- Labely na boarde = iba zdroj nápadu: `zdroj-novinky`, `zdroj-youtube`, `zdroj-instagram`, `zdroj-pripadovka`. Labely publikovania (`ready-for-posting`, `naplanovane`, `publikovane`, …) nastavuje automat a Socials.
+- Labely na boarde = zdroj nápadu (`zdroj-novinky`, `zdroj-youtube`, `zdroj-instagram`, `zdroj-pripadovka`) a okruh (`okruh-1` … `okruh-5`). Labely publikovania (`ready-for-posting`, `naplanovane`, `publikovane`, …) nastavuje automat a Socials.
 - Description scenára ručne neupravuj, zmeny píš do komentára.
 
 ## Procesy (`processes/`)
@@ -37,7 +41,7 @@ Spoločné knižnice: `processes/_lib/` (`zdroje.mjs`, `scenar.mjs`, `tts.mjs`, 
 
 ## Súbory a tajomstvá
 - Dáta: `/home/marek/impofai-content/` (`zdroje/`, `state/pipeline/<KEY>.json`, `reels/`, `cache/tts/`, `assets/brand/`, `config/content.json`).
-- `~/.aios-runner/secrets.env`: `CONTENT_PM_TOKEN` (KAPSA, Internal / Ads and Socials), `APIFY_TOKEN` (prepisy YouTube), `YT_PROXY_URL` (Bright Data, nepoužíva sa), `ELEVENLABS_API_KEY`.
+- `~/.aios-runner/secrets.env`: `CONTENT_PM_TOKEN` (KAPSA, Internal / Obsah a sociálne siete), `APIFY_TOKEN` (prepisy YouTube), `YT_PROXY_URL` (Bright Data, nepoužíva sa), `ELEVENLABS_API_KEY`.
 - ElevenLabs volá iba `processes/_lib/tts.mjs` (cache podľa textu, ten istý text sa neplatí dvakrát).
 - PM MCP skracuje odpovede na 25 000 znakov: strojová verzia scenára je v prílohe `<slug>_script-vN.json`, nie v description.
 

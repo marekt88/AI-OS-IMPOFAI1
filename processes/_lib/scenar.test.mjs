@@ -1,7 +1,7 @@
 // Unit tests of the script helpers: node --test processes/_lib/scenar.test.mjs (no network).
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readBlock, renderScript, validateScript } from "./scenar.mjs";
+import { readBlock, renderScript, sentences, validateScript } from "./scenar.mjs";
 
 const line = (i, o = {}) => ({
   t_from: i * 5, t_to: i * 5 + 5, titulky: "Toto je riadok o AI agentovi pre tvoju firmu dnes", elevenlabs: "Toto je riadok o ej-áj agentovi pre tvoju firmu dnes",
@@ -9,7 +9,8 @@ const line = (i, o = {}) => ({
   highlight: "agent", on_screen: "AI MÁ PRÍSTUP", source_url: null, sound: "cvak", ...o,
 });
 const script = (o = {}) => ({
-  ok: true, skip_reason: null, slug: "test", name: "Test", duration_s: 45, cta_type: "workshop", cta_text: "Prihlás sa na AI workshop · Košice alebo online · impofai.com/workshop",
+  ok: true, skip_reason: null, slug: "test", name: "Test", summary: "Video ukáže AI agenta v praxi. Grafika so 3D rekvizitami, 40 s.", okruh: 1,
+  idea_source: { label: "Anthropic blog", url: "https://www.anthropic.com/news" }, duration_s: 45, cta_type: "workshop", cta_text: "Prihlás sa na AI workshop · Košice alebo online · impofai.com/workshop",
   valid_until: null, pointa: "p", open_loop: "o", chosen_hook: 1, hook_why: "w",
   hooks: [1, 2, 3].map((n) => ({ archetype: `a${n}`, voice: "v", on_screen: "t", frame0: "f" })),
   lines: Array.from({ length: 9 }, (_, i) => line(i)),
@@ -60,4 +61,17 @@ test("render → readBlock round trip", () => {
   assert.match(m.voice_text, /ej-áj/);
   assert.equal(readBlock(d, "popis").youtube.title, "Krátky titul");
   assert.equal(readBlock("bez bloku", "script"), null);
+});
+
+test("summary: required, max 5 sentences; card starts with it, then hooks, script, CTA, takeaway, source, okruh", () => {
+  assert.equal(sentences("Prvá veta. Druhá má 2.5 s! Tretia? Štvrtá… Piata."), 5);
+  assert.match(validateScript(script({ summary: "" })).errors.join("\n"), /chýba zhrnutie/);
+  assert.match(validateScript(script({ summary: "A. B. C. D. E. F." })).errors.join("\n"), /6 viet/);
+  const d = renderScript(script(), { idea: "IMP-1", version: 1, projectDate: "2026-11-23" });
+  assert.ok(d.startsWith("## Zhrnutie\nVideo ukáže AI agenta"));
+  const order = ["## Zhrnutie", "## Hooky", "## Scenár", "## CTA", "## Čo si divák odnesie", "## Zdroj nápadu", "## Okruh", "## Popis pre platformy"].map((h) => d.indexOf(h));
+  assert.deepEqual([...order].sort((a, b) => a - b), order);
+  assert.ok(order.every((i) => i >= 0));
+  assert.match(d, /\[Anthropic blog\]\(https:\/\/www\.anthropic\.com\/news\)/);
+  assert.match(d, /\| 1 ✓ \|/);
 });

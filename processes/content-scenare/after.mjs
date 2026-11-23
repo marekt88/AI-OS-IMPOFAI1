@@ -1,8 +1,8 @@
 // Step B of the IMPOFAI content system (navrh.md §3): script JSON from claude -p → the SAME card on the board "Obsah"
-// (Marek 2026-11-02: one card moves Nápad → Scenár → Video → …; until then a separate kanban task).
+// (Marek 2026-11-23: one card Nápad (with its script) → Video → …; the script is written right after the idea).
 // mode "new":      validate → attachment <slug>_script-v1.json (the machine source of truth; PM MCP cuts long
 //                  descriptions) + the original idea as <KEY>_napad.md → description = script + original idea,
-//                  agent run needs_review (the card stays in Scenár; a person moves it to Video)
+//                  agent run needs_review (the card stays in Nápad; a person moves it to Video)
 // mode "revision": validate → description v(N+1) + attachment <slug>_script-v(N+1).json (the previous version stays as
 //                  its own attachment) → comment with the changes, agent run needs_review
 // A script that fails validation is never written: a comment explains why, the agent run is failed and the run fails.
@@ -95,7 +95,8 @@ async function revise() {
   const description = renderScript(s, { ...meta, changes: s.changes ?? [], warnings: v.warnings });
   if (dry) fs.writeFileSync(path.join(RUN_DIR, "dry-scenar.md"), description);
   await scriptAttachment(key, prev.slug, version, { script: machineScript(s, meta), popis: { ...s.popis, cta_type: s.cta_type, valid_until: s.valid_until } });
-  await pm("pm_update_task", { task: key, description: cardDescription(description, key, await readIdea(await pm("pm_get_task", { task: key }))) });
+  const card = await pm("pm_get_task", { task: key });
+  await pm("pm_update_task", { task: key, name: String(card.name).replace(/^(Nápad|Scenár):\s*/, ""), description: cardDescription(description, key, await readIdea(card)) });
   await pm("pm_add_task_comment", { task: key, body: `**Scenár v${version}.** Zmeny: ${(s.changes ?? []).join("; ") || "—"}${s.questions?.length ? `\n\nOtázky:\n${s.questions.map((q) => `- ${q}`).join("\n")}` : ""}\n\nPredchádzajúca verzia ostáva v prílohe ${prev.slug}_script-v${prev.script_version}.json.` });
   await pm("pm_update_agent_run", { task: key, agent_run_status: "needs_review" });
   return { task: key, version, words: v.words, warnings: v.warnings.length };

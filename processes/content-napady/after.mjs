@@ -1,10 +1,12 @@
 // Step A of the IMPOFAI content system (navrh.md §3): ideas JSON from claude -p → tasks "Nápad: …" in KAPSA.
 // The model has read-only tools; only this script writes, with the content token (config token_env).
 // - validates every idea (URLs, forbidden strings, required context), drops invalid ones into the report
-// - deterministic dedup: same dedup_key + angle already in the folder "Internal / Ads and Socials" → skipped
+// - deterministic dedup: same dedup_key + angle already in the folder of the board (config ideas_list) → skipped
 // - renders the description template (common header + type block + machine block ```json idea```)
-// - creates the card in the board "Obsah" (first custom status Nápad, label = source: zdroj-novinky or
-//   zdroj-pripadovka); the script starts only when a person moves the card to Scenár (Marek 2026-11-02)
+// - creates the card in the board "Obsah" (first custom status Nápad, labels = source zdroj-novinky or
+//   zdroj-pripadovka + okruh-1..5, okruh 5 priority high) with agent run "queued": content-pipeline then writes its
+//   script into the same card, one at a time (Marek 2026-11-23: Nápad and Scenár are one step). Video and audio
+//   start only when a person moves the card.
 // RUN_DRY=1: pmTool does not send writes; the rendered tasks are saved in RUN_DIR.
 import fs from "node:fs";
 import path from "node:path";
@@ -20,6 +22,7 @@ const { output: o } = JSON.parse(fs.readFileSync(process.env.RUN_OUTPUT, "utf8")
 const cfg = readJson(path.join(ROOT, "config", "content.json"), {});
 const list = cfg.ideas_list || (dry ? "(nerozhodnutý list nápadov)" : null);
 const tokenEnv = cfg.token_env || "CONTENT_PM_TOKEN";
+const folder = cfg.content_folder || String(list ?? "").split(" / ").slice(0, -1).join(" / ");
 if (!list) {
   console.error("config/content.json: ideas_list nie je nastavený (rozhodne Marek)");
   process.exit(1);
@@ -42,12 +45,13 @@ function problems(i) {
   if (i.type === "novinka" && !i.facts.length) p.push("novinka bez overených faktov");
   if (i.valid_until && Number.isNaN(Date.parse(i.valid_until))) p.push("neplatné valid_until");
   if (i.valid_until && Date.parse(i.valid_until) < now.getTime()) p.push("novinka už expirovala");
+  if (![1, 2, 3, 4, 5].includes(i.okruh)) p.push("chýba okruh 1–5");
   return p;
 }
 
 function render(i) {
   const lines = [
-    `**Typ:** ${TYPE_LABEL[i.type]} · **Pilier:** ${i.pillar} · **Navrhovaný formát:** ${FORMAT_LABEL[i.format]}`,
+    `**Okruh:** ${i.okruh} · **Typ:** ${TYPE_LABEL[i.type]} · **Pilier:** ${i.pillar} · **Navrhovaný formát:** ${FORMAT_LABEL[i.format]}`,
     `**Typ CTA:** ${i.cta_type} · **Preferencia slotu (nezáväzné):** ${i.slot_pref}`,
     `**Jadro:** ${i.core}`,
     `**Pre koho a prečo teraz:** ${i.for_whom_why_now}`,
@@ -72,7 +76,7 @@ function render(i) {
     "",
     "<!-- strojová časť, generuje krok A; ručne neupravovať -->",
     "```json idea",
-    JSON.stringify({ idea_version: 1, type: i.type, pillar: i.pillar, format: i.format, cta_type: i.cta_type, dedup_key: i.dedup_key, angle: i.angle, valid_until: i.valid_until, facts: i.facts, do_not_claim: i.do_not_claim, creator: i.creator, inputs: i.inputs }),
+    JSON.stringify({ idea_version: 1, okruh: i.okruh, type: i.type, pillar: i.pillar, format: i.format, cta_type: i.cta_type, dedup_key: i.dedup_key, angle: i.angle, valid_until: i.valid_until, facts: i.facts, do_not_claim: i.do_not_claim, creator: i.creator, inputs: i.inputs }),
     "```",
   ];
   return lines.join("\n");
@@ -80,7 +84,7 @@ function render(i) {
 
 async function existing(i) {
   if (!hasSecret(tokenEnv)) return null; // dry-run without the token: dedup is skipped and noted in the report
-  const r = await pmTool("pm_list_tasks", { folder: "Internal / Ads and Socials", query: i.dedup_key, limit: 20 }, { tokenEnv });
+  const r = await pmTool("pm_list_tasks", { folder, query: i.dedup_key, limit: 20 }, { tokenEnv });
   for (const t of r.items ?? []) {
     const full = await pmTool("pm_get_task", { task: t.key }, { tokenEnv });
     if (String(full.description ?? "").includes(`**Uhol:** ${i.angle}`)) return t.key;
@@ -106,10 +110,19 @@ for (const i of o.ideas ?? []) {
     skipped.push({ why: `rovnaká udalosť a uhol už existuje (${dup})`, text: i.name });
     continue;
   }
-  const task = { task_list: list, name: `Nápad: ${i.name}`, status: "to_do", labels: [i.type === "pripadova-studia" ? "zdroj-pripadovka" : "zdroj-novinky"], description: render(i) };
+  const task = {
+    task_list: list,
+    name: `Nápad: ${i.name}`,
+    status: "to_do",
+    priority: i.okruh === 5 ? "high" : "normal",
+    labels: [i.type === "pripadova-studia" ? "zdroj-pripadovka" : "zdroj-novinky", `okruh-${i.okruh}`],
+    description: render(i),
+  };
   rendered.push(task);
   const res = await pmTool("pm_create_task", task, { tokenEnv });
-  created.push({ key: res.key ?? null, name: task.name, format: i.format, dry: Boolean(res.dry_run) });
+  // the script is written right away: content-pipeline starts content-scenare for queued ideas, one at a time
+  if (res.key) await pmTool("pm_update_agent_run", { task: res.key, agent_run_status: "queued" }, { tokenEnv });
+  created.push({ key: res.key ?? null, name: task.name, format: i.format, okruh: i.okruh, dry: Boolean(res.dry_run) });
 }
 
 // report (a file per run, never rewritten)
@@ -120,7 +133,7 @@ const report = [
   "",
   `Vytvorené: ${created.length} · Vynechané: ${skipped.length}${hasSecret(tokenEnv) ? "" : " · dedup proti KAPSA preskočený (chýba token)"}`,
   "",
-  ...created.map((c) => `- ${c.key ?? "(dry-run)"} ${c.name} · formát ${c.format}`),
+  ...created.map((c) => `- ${c.key ?? "(dry-run)"} ${c.name} · okruh ${c.okruh} · formát ${c.format}`),
   "",
   ...(skipped.length ? ["## Vynechané", "", ...skipped.map((s) => `- ${s.text} (${s.why})`)] : []),
 ].join("\n");
@@ -131,6 +144,6 @@ if (dry) {
   writeFileAtomic(path.join(ROOT, "zdroje", "napady", `${today}_${process.env.RUN_ID ?? nowIso}_napady-report.md`), report + "\n");
 }
 
-// step B is started by a person: card moved to Scenár → content-pipeline spawns content-scenare (Marek 2026-11-02)
-const stepB = "čaká na výber človeka (presun karty do Scenár)";
+// step B: every new idea is queued, content-pipeline writes the scripts one by one (Marek 2026-11-23)
+const stepB = `scenár v poradí pre ${created.length} nápadov (content-pipeline)`;
 console.log(JSON.stringify({ dry, created: created.length, skipped: skipped.length, stepB }));

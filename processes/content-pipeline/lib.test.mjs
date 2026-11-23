@@ -11,28 +11,27 @@ test("stageOf: custom status of the list", () => {
 
 test("transition", () => {
   assert.equal(transition(null, "Nápad").kind, "first");
-  assert.deepEqual(transition(null, "Scenár"), { kind: "job", job: "SCRIPT_NEW" }); // moved before the poller saw it
-  assert.equal(transition(null, "Scenár", { script: true }).kind, "first"); // migrated card with a script
   assert.equal(transition(null, "Video", { video: true }).kind, "first");
-  assert.equal(transition("Scenár", "Scenár").kind, "none");
-  assert.deepEqual(transition("Nápad", "Scenár"), { kind: "job", job: "SCRIPT_NEW" });
-  assert.deepEqual(transition("Scenár", "Video"), { kind: "job", job: "VIDEO_JOB" });
+  assert.equal(transition("Nápad", "Nápad").kind, "none");
+  assert.deepEqual(transition("Nápad", "Video", { script: true }), { kind: "job", job: "VIDEO_JOB" });
+  assert.equal(transition("Nápad", "Video", { script: false }).kind, "no_script");
   assert.deepEqual(transition("Video", "Ozvučenie"), { kind: "job", job: "AUDIO_JOB" });
   assert.deepEqual(transition("Ozvučenie", "Hotové"), { kind: "job", job: "FINALIZE" });
   assert.equal(transition("Hotové", "Ozvučenie").kind, "return");
   assert.equal(transition("Video", "Nápad").kind, "return");
-  assert.equal(transition("Nápad", "Video").kind, "invalid");
+  assert.equal(transition("Nápad", "Ozvučenie", { script: true }).kind, "invalid");
 });
 
 test("commentJob", () => {
-  assert.equal(commentJob("Scenár", "needs_review", { script: true }), "SCRIPT_REVISION");
-  assert.equal(commentJob("Scenár", "failed", { script: false }), "SCRIPT_NEW");
-  assert.equal(commentJob("Scenár", "running", { script: true }), null);
+  assert.equal(commentJob("Nápad", "needs_review", { script: true }), "SCRIPT_REVISION");
+  assert.equal(commentJob("Nápad", "failed", { script: false }), "SCRIPT_NEW");
+  assert.equal(commentJob("Nápad", null, { script: false }), "SCRIPT_NEW"); // old idea without a script
+  assert.equal(commentJob("Nápad", "running", { script: true }), null);
+  assert.equal(commentJob("Nápad", "queued", { script: false }), null);
   assert.equal(commentJob("Video", "needs_review"), "VIDEO_REVISION");
   assert.equal(commentJob("Video", "running"), null);
   assert.equal(commentJob("Ozvučenie", null), "AUDIO_REVISION");
   assert.equal(commentJob("Hotové"), "REPLY");
-  assert.equal(commentJob("Nápad"), null);
 });
 
 test("artifacts", () => {

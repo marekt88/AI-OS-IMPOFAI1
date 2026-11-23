@@ -1,12 +1,15 @@
 // Pure decisions of the content-pipeline poller (navrh.md §1, one state machine): no network, unit-tested.
 // Stages = custom statuses of the KAPSA list "Obsah" (Marek 2026-11-02, replaces the stage labels):
-//   Nápad → Scenár → Video → Ozvučenie → Hotové (→ Publikované, set by Socials; Zrušené = cancelled).
+//   Nápad (with its script) → Video → Ozvučenie → Hotové (→ Naplánované, Publikované set by Socials; Zrušené).
+// Marek 2026-11-23: Nápad and Scenár are one step, a new idea gets its script right away (content-napady queues
+// it, the poller starts content-scenare); video and audio start only when a person moves the card.
 // A person moves the card one column forward = approval; the job of that column starts. Back = return, no job.
-export const STAGES = ["Nápad", "Scenár", "Video", "Ozvučenie", "Hotové"];
+export const STAGES = ["Nápad", "Video", "Ozvučenie", "Hotové"];
+/** removed stages → the stage that replaced them (state files and cards from before 2026-11-23) */
+export const LEGACY_STAGE = { Scenár: "Nápad" };
 /** custom statuses of the list, created by pm_set_task_list_statuses (board order) */
 export const LIST_STATUSES = [
   { name: "Nápad", color: "gray", category: "to_do" },
-  { name: "Scenár", color: "blue", category: "in_progress" },
   { name: "Video", color: "purple", category: "in_progress" },
   { name: "Ozvučenie", color: "orange", category: "in_progress" },
   { name: "Hotové", color: "teal", category: "in_review" },
@@ -15,7 +18,7 @@ export const LIST_STATUSES = [
   { name: "Zrušené", color: "gray", category: "cancelled" },
 ];
 const IDX = Object.fromEntries(STAGES.map((s, i) => [s, i]));
-const JOB_OF = { Scenár: "SCRIPT_NEW", Video: "VIDEO_JOB", Ozvučenie: "AUDIO_JOB", Hotové: "FINALIZE" };
+const JOB_OF = { Video: "VIDEO_JOB", Ozvučenie: "AUDIO_JOB", Hotové: "FINALIZE" };
 
 /** Stage of a task (its custom status), null outside the pipeline (Publikované, Zrušené, built-in status). */
 export function stageOf(task) {
@@ -25,20 +28,17 @@ export function stageOf(task) {
 
 /**
  * Transition from the last processed stage to the current one.
- * Returns { kind: "none" | "first" | "job" | "return" | "invalid", job? }.
- * `has` = what already exists on a task seen for the first time ({ script, video }), so a card that a person
- * moved to Scenár before the poller saw it still gets its script, but migrated cards do not redo work.
+ * Returns { kind: "none" | "first" | "job" | "return" | "invalid" | "no_script", job? }.
+ * `has` = what the task has ({ script, video }): Nápad → Video needs a finished script ("no_script" = move back).
  */
 export function transition(prev, cur, has = {}) {
-  if (!prev) {
-    if (cur === "Scenár" && !has.script) return { kind: "job", job: "SCRIPT_NEW" };
-    return { kind: "first" };
-  }
+  if (!prev) return { kind: "first" };
   if (prev === cur) return { kind: "none" };
   const a = IDX[prev];
   const b = IDX[cur];
   if (b < a) return { kind: "return" };
   if (b - a !== 1) return { kind: "invalid" };
+  if (cur === "Video" && !has.script) return { kind: "no_script" };
   return { kind: "job", job: JOB_OF[cur] };
 }
 
@@ -48,11 +48,11 @@ export function transition(prev, cur, has = {}) {
  */
 export function commentJob(stage, agentRunStatus, has = {}) {
   const busy = agentRunStatus === "running" || agentRunStatus === "queued";
-  if (stage === "Scenár") return busy ? null : has.script ? "SCRIPT_REVISION" : "SCRIPT_NEW";
+  if (stage === "Nápad") return busy ? null : has.script ? "SCRIPT_REVISION" : "SCRIPT_NEW"; // comment on an idea = (re)write its script
   if (stage === "Video") return busy ? null : "VIDEO_REVISION";
   if (stage === "Ozvučenie") return busy ? null : "AUDIO_REVISION";
   if (stage === "Hotové") return "REPLY";
-  return null; // Nápad: comments are notes for the idea
+  return null;
 }
 
 /** Comments written by people: user entries, or agent entries from another token (Marek's Claude/voice), never our own. */

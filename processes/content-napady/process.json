@@ -1,5 +1,5 @@
 {
-  "description": "Krok A content systému IMPOFAI: z nových zdrojov (zdroje/index.jsonl: AI novinky, prepisy YouTube) a pravidiel značky z pluginu navrhne 5–8 detailných obsahových nápadov bez hookov. after.mjs ich overí, odstráni duplicity a založí ako úlohy „Nápad: …“ (label napad) a pre každý nápad formátu A spustí krok B (content-scenare). Spúšťa ho ai-news. Návrh: ~/.swarm/impofai-content-system/navrh.md §3.",
+  "description": "Krok A content systému IMPOFAI: z nových zdrojov (zdroje/index.jsonl: AI novinky, prepisy YouTube) a pravidiel značky z pluginu navrhne 5–8 obsahových nápadov v 5 okruhoch. after.mjs ich overí, odstráni duplicity, založí ako karty „Nápad: …“ na boarde Obsah (štítky zdroj-* a okruh-1..5, okruh 5 priorita vysoká) a zaradí im scenár (content-pipeline ho napíše hneď). Spúšťa ho ai-news. Návrh: ~/.swarm/impofai-content-system/navrh.md §3.",
   "enabled": true,
   "schedule": null,
   "tz": "Europe/Bratislava",
@@ -7,9 +7,17 @@
   "maxTurns": 150,
   "timeoutMin": 30,
   "afterTimeoutMin": 10,
-  "builtinTools": ["Read", "Grep", "WebSearch", "WebFetch"],
+  "builtinTools": [
+    "Read",
+    "Grep",
+    "WebSearch",
+    "WebFetch"
+  ],
   "allowedTools": [
-    "Read", "Grep", "WebSearch", "WebFetch",
+    "Read",
+    "Grep",
+    "WebSearch",
+    "WebFetch",
     "mcp__kapsa__pm_list_tasks",
     "mcp__kapsa__pm_get_task",
     "mcp__kapsa__pm_search_brain",
