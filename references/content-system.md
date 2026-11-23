@@ -9,7 +9,9 @@ Claude Desktop scheduled task (YouTube) → tiež karta v stave Nápad, label zd
 yt-transcripts (vypnuté: čaká na proxy KYC) → zdroje/index.jsonl
 
 Board Obsah = vlastné stavy listu (KAPSA, od 2026-11-02; predtým labely etáp):
-  Nápad ─(človek)→ Scenár ─(človek)→ Video ─(človek)→ Ozvučenie ─(človek)→ Hotové ─(Socials)→ Publikované   (+ Zrušené)
+  Nápad ─(človek)→ Scenár ─(človek)→ Video ─(človek)→ Ozvučenie ─(človek)→ Hotové ─(človek)→ Naplánované ─(Socials + Postiz)→ Publikované   (+ Zrušené)
+  Naplánované: Socials (KAPSA) zaradí kartu do najbližšieho voľného slotu 8:00 / 12:00 / 20:00 (max 3 denne na sieť, Socials → Nastavenia → Ciele),
+  3 h pred slotom nahrá video do Postiz a založí post; po zverejnení karta → Publikované. Kľúč Postiz: Socials → Nastavenia → Účty.
   content-pipeline (*/5) pri presune karty o jeden stĺpec spustí: Scenár = content-scenare, Video = content-video,
   Ozvučenie = content-audio, Hotové = FINALIZE (kontrola finálu, previewUrl, label ready-for-posting pre Socials)
 ```

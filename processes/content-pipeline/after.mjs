@@ -172,7 +172,7 @@ for (const t of list.items ?? []) {
         if (!dry) {
           await pm("pm_update_agent_run", { task: key, preview_url: f.url, agent_run_status: null });
           await pm("pm_add_task_label", { task: key, label: READY_LABEL });
-          await pm("pm_add_task_comment", { task: key, body: `**Finál:** ${f.name} (príloha ${f.id}, ${f.duration} s). Video je pripravené na publikovanie v Socials.` });
+          await pm("pm_add_task_comment", { task: key, body: `**Finál:** ${f.name} (príloha ${f.id}, ${f.duration} s). Na publikovanie presuň kartu do **Naplánované**: Socials ju zaradí do najbližšieho voľného slotu (8:00, 12:00, 20:00) a pošle cez Postiz.` });
         }
         st.stage = cur;
       } else {
@@ -212,7 +212,7 @@ for (const t of list.items ?? []) {
     const job = commentJob(cur, t.agent_run_status, has);
     const payload = fresh.map((c) => ({ id: c.id, author: c.author?.name ?? c.agent_name ?? "?", at: c.created_at, body: c.body }));
     if (job === "REPLY") {
-      if (!dry) await pm("pm_add_task_comment", { task: key, body: "Karta je v Hotové, tu sa už nič nemení. Na úpravu ju presuň späť (Ozvučenie, Video alebo Scenár) a napíš zmenu znova." });
+      if (!dry) await pm("pm_add_task_comment", { task: key, body: "Karta je v Hotové, video sa tu už nemení. Na publikovanie ju presuň do Naplánované; na úpravu späť (Ozvučenie, Video alebo Scenár) a napíš zmenu znova." });
       st.cursor = fresh[fresh.length - 1].id;
     } else if (job === "SCRIPT_NEW" || job === "SCRIPT_REVISION") {
       if (!jobBusy(st)) {

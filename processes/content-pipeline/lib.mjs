@@ -10,6 +10,7 @@ export const LIST_STATUSES = [
   { name: "Video", color: "purple", category: "in_progress" },
   { name: "Ozvučenie", color: "orange", category: "in_progress" },
   { name: "Hotové", color: "teal", category: "in_review" },
+  { name: "Naplánované", color: "yellow", category: "in_review" }, // Socials plans and publishes it (Postiz), Marek 2026-11-23
   { name: "Publikované", color: "green", category: "complete" },
   { name: "Zrušené", color: "gray", category: "cancelled" },
 ];
