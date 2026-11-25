@@ -11,7 +11,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { hasSecret, pmTool } from "../../runner/pm.mjs";
 import { isDry, localParts, readJson, ROOT } from "../_lib/zdroje.mjs";
-import { loadScript, machineScript, renderScript, validateScript } from "../_lib/scenar.mjs";
+import { fitSummary, loadScript, machineScript, renderScript, validateScript } from "../_lib/scenar.mjs";
 
 const RUN_DIR = process.env.RUN_DIR;
 const dry = isDry();
@@ -56,7 +56,9 @@ async function createNew() {
     await pm("pm_update_agent_run", { task: key, agent_run_status: "failed" });
     return { idea: key, skipped: s.skip_reason };
   }
+  const cut = fitSummary(s);
   const v = validateScript(s);
+  if (cut) v.warnings.push(`zhrnutie malo o ${cut} ${cut === 1 ? "vetu" : "vety"} viac ako 5, ponechaných prvých 5`);
   if (v.errors.length) {
     await pm("pm_add_task_comment", { task: key, body: `**Scenár neprešiel kontrolou, nič sa nezapísalo:**\n${v.errors.map((e) => `- ${e}`).join("\n")}\n\nNapíš komentár a skúsi sa znova.` });
     await pm("pm_update_agent_run", { task: key, agent_run_status: "failed" });
@@ -83,7 +85,9 @@ async function revise() {
   if (!key) throw new Error("input.task chýba");
   const { script: prev } = await loadScript(pm, key);
   if (!prev) throw new Error(`${key}: scenár sa nedá načítať (chýba príloha *_script-vN.json aj blok json script)`);
+  const cut = fitSummary(s);
   const v = validateScript(s);
+  if (cut) v.warnings.push(`zhrnutie malo o ${cut} ${cut === 1 ? "vetu" : "vety"} viac ako 5, ponechaných prvých 5`);
   if (v.errors.length) {
     await pm("pm_add_task_comment", { task: key, body: `**Revízia scenára neprešla kontrolou, scenár ostáva v${prev.script_version}:**\n${v.errors.map((e) => `- ${e}`).join("\n")}` });
     throw new Error(`validácia: ${v.errors.join("; ")}`);

@@ -1,7 +1,7 @@
 // Unit tests of the script helpers: node --test processes/_lib/scenar.test.mjs (no network).
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readBlock, renderScript, sentences, validateScript } from "./scenar.mjs";
+import { fitSummary, readBlock, renderScript, sentences, validateScript } from "./scenar.mjs";
 
 const line = (i, o = {}) => ({
   t_from: i * 5, t_to: i * 5 + 5, titulky: "Toto je riadok o AI agentovi pre tvoju firmu dnes", elevenlabs: "Toto je riadok o ej-áj agentovi pre tvoju firmu dnes",
@@ -75,4 +75,11 @@ test("summary: required, max 5 sentences; card starts with it, then hooks, scrip
   assert.ok(order.every((i) => i >= 0));
   assert.match(d, /\[Anthropic blog\]\(https:\/\/www\.anthropic\.com\/news\)/);
   assert.match(d, /\| 1 ✓ \|/);
+});
+
+test("fitSummary keeps the first 5 sentences, quotes stay whole", () => {
+  const s = { summary: "Jedna. Hook „Hodina. A nič.“ ide prvý. Tri. Štyri. Päť. Šesť je navyše." };
+  assert.equal(fitSummary(s), 1);
+  assert.equal(s.summary, "Jedna. Hook „Hodina. A nič.“ ide prvý. Tri. Štyri. Päť.");
+  assert.equal(fitSummary(s), 0);
 });

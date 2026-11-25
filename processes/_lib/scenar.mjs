@@ -56,9 +56,32 @@ export function validateScript(s) {
  * Sentences of a short text: ., !, ? or … followed by a space and a capital letter. Quoted text („…“, "…") counts as
  * part of its sentence and abbreviations before a non-capital ("12 mil. €", "napr. v") do not split.
  */
+const SENTENCE_END = /(?<=[.!?…])\s+(?=[A-ZÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽ])/g;
+/** Text split into sentences (quoted text is masked, so a hook quote stays inside its sentence). */
+function splitSentences(text) {
+  const t = String(text).trim();
+  const masked = t.replace(/„[^“]*“|"[^"]*"/g, (m) => "x".repeat(m.length));
+  const out = [];
+  let from = 0;
+  for (const m of masked.matchAll(SENTENCE_END)) {
+    out.push(t.slice(from, m.index));
+    from = m.index + m[0].length;
+  }
+  out.push(t.slice(from));
+  return out.filter((x) => x.trim());
+}
 export function sentences(text) {
-  const plain = String(text).trim().replace(/„[^“]*“|"[^"]*"/g, "Q");
-  return plain.split(/(?<=[.!?…])\s+(?=[A-ZÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽ])/).filter((x) => x.trim()).length;
+  return splitSentences(text).length;
+}
+/**
+ * Summary longer than 5 sentences → its first 5 (one extra sentence must not throw away a whole opus run).
+ * Returns the number of dropped sentences (0 = unchanged). Mutates s.summary.
+ */
+export function fitSummary(s, max = 5) {
+  const parts = splitSentences(s.summary ?? "");
+  if (parts.length <= max) return 0;
+  s.summary = parts.slice(0, max).join(" ");
+  return parts.length - max;
 }
 export const OKRUH_NAME = {
   1: "AI agenti a automatizácia práce",
