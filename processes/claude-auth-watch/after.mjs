@@ -2,6 +2,7 @@
 // Down → once per outage an urgent task for Marek (AI Bugs, assigned, due today) and a call from the assistant
 // (callGuard: no calls in quiet hours; a reminder call at most every REMIND_H hours while it stays down).
 // Up again → comment + complete the task. State: ~/.aios-runner/state/claude-auth-outage.json (state/claude-auth-watch.json belongs to the runner).
+import crypto from "node:crypto";
 import path from "node:path";
 import { checkAuth, markSetupTokenRevoked, probeSetupToken, SETUP_TOKEN_KEY, secrets, setupTokenRevoked } from "../../runner/core.mjs";
 import { BUGS_LIST, pmTool } from "../../runner/pm.mjs";
@@ -20,6 +21,20 @@ if (secrets()[SETUP_TOKEN_KEY] && !setupTokenRevoked() && (!tk.lastProbeAt || no
   tk.lastProbe = pr.ok ? "ok" : pr.reason;
   if (pr.rejected) markSetupTokenRevoked(pr.reason);
   console.log(`setup token probe: ${pr.ok ? "ok" : pr.reason}`);
+}
+// a setup token lives 1 year: remember when this token first appeared and open a renewal task a month before
+if (secrets()[SETUP_TOKEN_KEY]) {
+  const h = crypto.createHash("sha256").update(secrets()[SETUP_TOKEN_KEY]).digest("hex").slice(0, 16);
+  if (tk.hash !== h) Object.assign(tk, { hash: h, firstSeenAt: now.toISOString(), renewTaskKey: null });
+  const ageDays = (now - Date.parse(tk.firstSeenAt)) / 86400_000;
+  if (ageDays >= 330 && !tk.renewTaskKey && !isDry()) {
+    const due = new Date(Date.parse(tk.firstSeenAt) + 350 * 86400_000).toISOString().slice(0, 10);
+    const t = await pmTool("pm_create_task", {
+      task_list: BUGS_LIST, name: "Obnov trvalý token Claude na serveri (o mesiac mu končí platnosť)", priority: "high", assignee: "me", due_date: due,
+      description: `Trvalý token (CLAUDE_SETUP_TOKEN) je na serveri od ${tk.firstSeenAt.slice(0, 10)} a platí približne rok.\n\n**Oprava:** na serveri spusti \`claude setup-token\` a nový token vlož do \`~/.aios-runner/secrets.env\` ako \`CLAUDE_SETUP_TOKEN=...\`.`,
+    }).catch((e) => (console.log(`renew task failed: ${e.message}`), null));
+    if (t?.key) tk.renewTaskKey = t.key;
+  }
 }
 const revoked = setupTokenRevoked();
 if (revoked && !tk.taskKey && !isDry()) {
