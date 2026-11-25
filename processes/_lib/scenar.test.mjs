@@ -65,6 +65,7 @@ test("render → readBlock round trip", () => {
 
 test("summary: required, max 5 sentences; card starts with it, then hooks, script, CTA, takeaway, source, okruh", () => {
   assert.equal(sentences("Prvá veta. Druhá má 2.5 s! Tretia? Štvrtá… Piata."), 5);
+  assert.equal(sentences("Video otvára hook „Hodina s maklérom. A záujemca nemá kapitál.“ s hodinami. Mapa s pečiatkou 12+ mil. € a sito."), 2);
   assert.match(validateScript(script({ summary: "" })).errors.join("\n"), /chýba zhrnutie/);
   assert.match(validateScript(script({ summary: "A. B. C. D. E. F." })).errors.join("\n"), /6 viet/);
   const d = renderScript(script(), { idea: "IMP-1", version: 1, projectDate: "2026-11-23" });

@@ -52,9 +52,13 @@ export function validateScript(s) {
   return { errors, warnings, words, duration: dur };
 }
 
-/** Sentences of a short text (., ! or ? followed by a space or the end; numbers like 2.5 do not split). */
+/**
+ * Sentences of a short text: ., !, ? or … followed by a space and a capital letter. Quoted text („…“, "…") counts as
+ * part of its sentence and abbreviations before a non-capital ("12 mil. €", "napr. v") do not split.
+ */
 export function sentences(text) {
-  return String(text).trim().split(/(?<=[.!?…])\s+(?=\S)/).filter((x) => x.trim()).length;
+  const plain = String(text).trim().replace(/„[^“]*“|"[^"]*"/g, "Q");
+  return plain.split(/(?<=[.!?…])\s+(?=[A-ZÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽ])/).filter((x) => x.trim()).length;
 }
 export const OKRUH_NAME = {
   1: "AI agenti a automatizácia práce",
