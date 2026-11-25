@@ -3,7 +3,7 @@
 // (callGuard: no calls in quiet hours; a reminder call at most every REMIND_H hours while it stays down).
 // Up again → comment + complete the task. State: ~/.aios-runner/state/claude-auth-outage.json (state/claude-auth-watch.json belongs to the runner).
 import path from "node:path";
-import { checkAuth, SETUP_TOKEN_KEY, secrets } from "../../runner/core.mjs";
+import { checkAuth, markSetupTokenRevoked, probeSetupToken, SETUP_TOKEN_KEY, secrets, setupTokenRevoked } from "../../runner/core.mjs";
 import { BUGS_LIST, pmTool } from "../../runner/pm.mjs";
 import { callGuard, isDry, placeCallAndWait, readJson, STATE_DIR, writeJson } from "../../runner/voice-call.mjs";
 
@@ -11,6 +11,36 @@ const REMIND_H = 4;
 const FILE = path.join(STATE_DIR, "claude-auth-outage.json");
 const now = new Date();
 const st = readJson(FILE, { down: false });
+// ---- 1. the setup token (25. 11. 2026: revoked at night, `auth status` still said ok): a real tiny call every hour
+const TOKEN_FILE = path.join(STATE_DIR, "claude-setup-token-watch.json");
+const tk = readJson(TOKEN_FILE, {});
+if (secrets()[SETUP_TOKEN_KEY] && !setupTokenRevoked() && (!tk.lastProbeAt || now - Date.parse(tk.lastProbeAt) >= 60 * 60_000)) {
+  const pr = isDry() ? { ok: true } : probeSetupToken();
+  tk.lastProbeAt = now.toISOString();
+  tk.lastProbe = pr.ok ? "ok" : pr.reason;
+  if (pr.rejected) markSetupTokenRevoked(pr.reason);
+  console.log(`setup token probe: ${pr.ok ? "ok" : pr.reason}`);
+}
+const revoked = setupTokenRevoked();
+if (revoked && !tk.taskKey && !isDry()) {
+  const t = await pmTool("pm_create_task", {
+    task_list: BUGS_LIST,
+    name: "Obnov trvalý token Claude na serveri (CLAUDE_SETUP_TOKEN)",
+    priority: "high",
+    assignee: "me",
+    due_date: now.toISOString().slice(0, 10),
+    description: `Od ${revoked.at} Anthropic odmieta trvalý token (${revoked.reason}).\n\nProcesy zatiaľ bežia cez bežné prihlásenie, ktoré sa môže odhlásiť (tak padali behy 18.–22. 11.).\n\n**Oprava:** na serveri spusti \`claude setup-token\`, nový token vlož do \`~/.aios-runner/secrets.env\` ako \`CLAUDE_SETUP_TOKEN=...\` (nahraď starý). Strážca nový token overí a úlohu dokončí sám.`,
+  }).catch((e) => (console.log(`token task failed: ${e.message}`), null));
+  if (t?.key) tk.taskKey = t.key;
+  console.log(`setup token revoked since ${revoked.at}, task ${t?.key ?? "?"}`);
+} else if (!revoked && tk.taskKey && tk.lastProbe === "ok" && !isDry()) {
+  await pmTool("pm_add_task_comment", { task: tk.taskKey, body: `Nový trvalý token funguje (${now.toISOString()}). Procesy sú znova na trvalom tokene.` }).catch(() => {});
+  await pmTool("pm_update_task_status", { task: tk.taskKey, status: "complete" }).catch(() => {});
+  tk.taskKey = null;
+}
+if (!isDry()) writeJson(TOKEN_FILE, tk);
+
+// ---- 2. the interactive login (fallback, and morning-brief with Gmail/Calendar/Fireflies)
 const auth = checkAuth();
 const fix = secrets()[SETUP_TOKEN_KEY]
   ? "Na serveri spusti `claude setup-token`, nový token vlož do `~/.aios-runner/secrets.env` ako `CLAUDE_SETUP_TOKEN=...`."

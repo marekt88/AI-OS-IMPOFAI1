@@ -1,5 +1,5 @@
 {
-  "description": "Strážca prihlásenia Claude Code na serveri (bez claude -p): každých 10 min `claude auth status` tak, ako ho vidia procesy. Pri výpadku raz za výpadok: urgentná úloha pre Mareka v AI Bugs + hovor asistenta (mimo nočného ticha, pripomenutie najviac každé 4 h). Po obnove úlohu dokončí. Marek 2026-11-22 (výpadok 18.–22. 11. bol ticho).",
+  "description": "Strážca prihlásenia Claude Code na serveri (bez claude -p): každých 10 min `claude auth status` tak, ako ho vidia procesy, a raz za hodinu skutočné krátke volanie s trvalým tokenom (CLAUDE_SETUP_TOKEN; auth status token neoverí). Zrušený token: označí ho (procesy prejdú na bežné prihlásenie) a raz založí úlohu v AI Bugs. Výpadok prihlásenia: urgentná úloha + hovor asistenta (mimo nočného ticha, pripomenutie najviac každé 4 h). Po obnove úlohy dokončí. Marek 2026-11-22, token 2026-11-25.",
   "enabled": true,
   "schedule": "*/10 * * * *",
   "tz": "Europe/Bratislava",

@@ -1,4 +1,5 @@
 // Shared runner core: paths, secrets, process definitions, locking and one `claude -p` run.
+import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -218,8 +219,45 @@ export const SETUP_TOKEN_KEY = "CLAUDE_SETUP_TOKEN";
  * mcp_servers: []). So it is used only for processes without claude.ai connector tools (e.g. ai-news);
  * processes that need KAPSA, Gmail, Calendar or Fireflies keep the interactive login.
  */
+/**
+ * A revoked setup token (25. 11. 2026: "OAuth token revoked", ai-news failed at 05:00 and nobody knew) is remembered
+ * by its hash in state/setup-token-revoked.json: processes then fall back to the interactive login until Marek puts
+ * a NEW token into secrets.env (a different hash clears the mark by itself). claude-auth-watch reports it.
+ */
+const REVOKED_FILE = () => path.join(DIRS.state, "setup-token-revoked.json");
+const tokenHash = (t) => crypto.createHash("sha256").update(String(t)).digest("hex").slice(0, 16);
+export function setupTokenRevoked() {
+  const t = secrets()[SETUP_TOKEN_KEY];
+  if (!t) return null;
+  try {
+    const r = JSON.parse(fs.readFileSync(REVOKED_FILE(), "utf8"));
+    return r.hash === tokenHash(t) ? r : null;
+  } catch {
+    return null;
+  }
+}
+export function markSetupTokenRevoked(reason) {
+  const t = secrets()[SETUP_TOKEN_KEY];
+  if (!t || setupTokenRevoked()) return;
+  fs.mkdirSync(DIRS.state, { recursive: true });
+  fs.writeFileSync(REVOKED_FILE(), JSON.stringify({ hash: tokenHash(t), at: new Date().toISOString(), reason: String(reason).slice(0, 300) }), { mode: 0o600 });
+}
+export const AUTH_REJECTED_RE = /OAuth token (revoked|has expired|expired)|Failed to authenticate|invalid[_ ](api[_ ]key|token|x-api-key)|authentication_error/i;
+/** A real (tiny) call with the setup token: `claude auth status` only reads the token, it does not ask Anthropic. */
+export function probeSetupToken() {
+  const t = secrets()[SETUP_TOKEN_KEY];
+  if (!t) return { ok: false, reason: "no setup token" };
+  const env = claudeEnv(null);
+  env.CLAUDE_CODE_OAUTH_TOKEN = t;
+  const r = spawnSync(CLAUDE_BIN, ["-p", "Reply with: ok", "--model", "haiku", "--max-turns", "1", "--output-format", "json"], { env, encoding: "utf8", timeout: 120_000, cwd: os.tmpdir() });
+  const text = `${r.stdout ?? ""}\n${r.stderr ?? ""}`;
+  if (AUTH_REJECTED_RE.test(text)) return { ok: false, rejected: true, reason: (text.match(AUTH_REJECTED_RE) ?? [""])[0] };
+  if (r.status !== 0) return { ok: false, rejected: false, reason: `exit ${r.status}: ${text.trim().slice(-200)}` };
+  return { ok: true };
+}
 export function usesSetupToken(p) {
   if (!secrets()[SETUP_TOKEN_KEY]) return false;
+  if (setupTokenRevoked()) return false; // fallback: the interactive login
   const tools = [...(p?.allowedTools ?? []), ...(p?.requireTools ?? []), ...(p?.dryRunAllowedTools ?? [])];
   return !!p && !tools.some((t) => String(t).startsWith("mcp__claude_ai_"));
 }
@@ -319,6 +357,7 @@ export function classifyTransient(out) {
   const apiLike = !r || !!out.apiError || r.terminal_reason === "api_error" || r.api_error_status != null;
   let cls = null;
   if (TRANSIENT_AUTH.test(text)) cls = "auth-refresh";
+  else if (AUTH_REJECTED_RE.test(text)) cls = "auth-rejected"; // setup token refused: runClaude marked it, the next attempt uses the login
   else if (apiLike && TRANSIENT_NETWORK.test(text)) cls = "network";
   else if (apiLike && (TRANSIENT_RATE.test(text) || TRANSIENT_STATUS.has(Number(r?.api_error_status)))) cls = "rate";
   else if (r?.terminal_reason === "api_error" && (r.num_turns ?? 0) <= 1 && !(out.toolCalls ?? []).length) cls = "rate"; // API error before any work
@@ -618,6 +657,7 @@ export async function runProcess(p, { manual = false, slot = null, noDeliverWait
 
 function runClaude(args, p, transcriptFile) {
   return new Promise((resolve) => {
+    const viaToken = usesSetupToken(p);
     const child = spawn(CLAUDE_BIN, args, { cwd: p.cwd, env: claudeEnv(p), stdio: ["ignore", "pipe", "pipe"] });
     const transcript = fs.createWriteStream(transcriptFile, { mode: 0o600 });
     let buf = "", stderr = "", result = null, timedOut = false, apiError = null, connectors = null;
@@ -663,6 +703,9 @@ function runClaude(args, p, transcriptFile) {
       clearTimeout(timer);
       if (buf) onLine(buf);
       transcript.end();
+      // the setup token was refused → mark it, the next attempt (and every process) uses the interactive login
+      const said = `${result?.result ?? ""} ${apiError?.text ?? ""} ${stderr}`;
+      if (viaToken && code !== 0 && AUTH_REJECTED_RE.test(said)) markSetupTokenRevoked(said.match(AUTH_REJECTED_RE)[0]);
       resolve({ exitCode: code, timedOut, result, stderr, toolCalls, toolErrors, toolOk, apiError, connectors });
     });
     child.on("error", (err) => {

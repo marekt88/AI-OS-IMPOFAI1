@@ -125,3 +125,20 @@ test("connectorSummary counts only claude.ai connectors", () => {
     { name: "claude.ai Gmail", status: "connected" }, { name: "claude.ai Canva", status: "needs-auth" }] };
   assert.deepEqual(connectorSummary(init), { total: 3, connected: 1, pending: 1, failed: 1 });
 });
+
+test("revoked setup token (2026-11-25) is retried; the next attempt uses the login", async () => {
+  const out = { exitCode: 1, timedOut: false, result: { type: "result", subtype: "success", is_error: true, terminal_reason: "api_error", num_turns: 1,
+    result: "Failed to authenticate: OAuth token revoked. Please log in again or contact your administrator." }, apiError: null, stderr: "", toolCalls: [], toolErrors: [], toolOk: [] };
+  const c = classifyTransient(out);
+  assert.equal(c.cls, "auth-rejected");
+  assert.equal(c.retrySafe, true);
+  const { markSetupTokenRevoked, setupTokenRevoked, usesSetupToken } = await import("../core.mjs");
+  fs.mkdirSync(process.env.AIOS_RUNNER_HOME, { recursive: true });
+  fs.writeFileSync(path.join(process.env.AIOS_RUNNER_HOME, "secrets.env"), "CLAUDE_SETUP_TOKEN=sk-test-1\n", { mode: 0o600 });
+  const p = { allowedTools: ["Read"] };
+  if (usesSetupToken(p)) {
+    markSetupTokenRevoked("OAuth token revoked");
+    assert.ok(setupTokenRevoked());
+    assert.equal(usesSetupToken(p), false);
+  }
+});
