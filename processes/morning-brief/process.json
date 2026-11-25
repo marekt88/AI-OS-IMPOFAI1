@@ -1,5 +1,5 @@
 {
-  "description": "Ranný brief: zber zmien od posledného briefu (všetky aktívne projekty z PM aj bez zmien, AI Bugs, nové úlohy, e-maily s obsahom, kalendár, výsledky hovorov a executora, otvorené otázky), o 9:00 hovor na Linphone mtoth, po hovore call-followup.",
+  "description": "Ranný brief: zber zmien od posledného briefu (všetky aktívne projekty z KAPSA aj bez zmien, AI Bugs, nové úlohy, e-maily s obsahom, kalendár, výsledky hovorov a executora, otvorené otázky), o 9:00 e-mail Marekovi (hovory vypnuté 2026-11-25). Keď Claude na serveri nie je prihlásený, brief pobeží na trvalom tokene bez Gmailu, Kalendára a Fireflies (connectorFallback).",
   "enabled": true,
   "schedule": "30 8 * * *",
   "tz": "Europe/Bratislava",
@@ -56,5 +56,6 @@
       "process": "action-executor",
       "mode": "since"
     }
-  ]
+  ],
+  "connectorFallback": true
 }

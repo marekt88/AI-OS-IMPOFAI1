@@ -82,6 +82,7 @@ export function loadProcess(name) {
     // K2 extension: in dry-run these replace allowedTools / requireTools (missing = same as live)
     dryRunAllowedTools: def.dryRunAllowedTools ?? null,
     dryRunRequireTools: def.dryRunRequireTools ?? null,
+    connectorFallback: def.connectorFallback === true, // login down → run on the setup token without claude.ai connectors
     cwd: def.cwd === "repo" ? REPO : path.join(DIRS.work, name),
     catchUpMin: def.catchUpMin ?? 30,
     firstSinceHours: def.firstSinceHours ?? 24,
@@ -529,7 +530,18 @@ export async function runProcess(p, { manual = false, slot = null, noDeliverWait
       // 1. + 2. login check and claude -p; transient failures (OAuth refresh race, network, 429/overloaded, required
       // tools never called because connectors were not loaded yet) are
       // repeated up to 3 attempts with 60 s and 120 s waits, each attempt logged in log.steps.claudeAttempts
-      const tools = toolsFor(p, dryRun);
+      // connectorFallback (morning-brief, Marek 2026-11-25): the interactive login is down, the setup token works →
+      // run on the token without the claude.ai connector tools (Gmail, Calendar, Fireflies) instead of failing;
+      // the prompt learns it from {{connectors}}
+      let pr = p;
+      vars.connectors = "dostupné (Gmail, Kalendár, Fireflies)";
+      if (p.connectorFallback && !checkAuth(p).ok && secrets()[SETUP_TOKEN_KEY] && !setupTokenRevoked()) {
+        const keep = (list) => (list ?? []).filter((t) => !String(t).startsWith("mcp__claude_ai_"));
+        pr = { ...p, allowedTools: keep(p.allowedTools), requireTools: keep(p.requireTools), dryRunAllowedTools: p.dryRunAllowedTools && keep(p.dryRunAllowedTools), dryRunRequireTools: p.dryRunRequireTools && keep(p.dryRunRequireTools) };
+        vars.connectors = "NEDOSTUPNÉ: Claude na serveri nie je prihlásený, Gmail, Kalendár a Fireflies sa dnes nedajú čítať (uveď to na začiatku)";
+        log.steps.degraded = "login down: setup token without claude.ai connectors";
+      }
+      const tools = toolsFor(pr, dryRun);
       log.tools = { allowed: tools.allowed, require: tools.require };
       const prompt = render(fs.readFileSync(p.prompt, "utf8"), vars);
       const args = ["-p", "--output-format", "stream-json", "--verbose", "--no-session-persistence",
@@ -553,7 +565,7 @@ export async function runProcess(p, { manual = false, slot = null, noDeliverWait
       for (let i = 0; ; i++) {
         const last = i >= delays.length;
         const at = new Date().toISOString();
-        const auth = checkAuth(p);
+        const auth = checkAuth(pr);
         log.steps.auth = auth;
         if (!auth.ok) {
           attempts.push({ attempt: i + 1, at, phase: "auth-status", ok: false, transient: !last, message: redact(auth.reason).slice(0, 300) });
@@ -564,7 +576,7 @@ export async function runProcess(p, { manual = false, slot = null, noDeliverWait
         }
         if (i > 0 && fs.existsSync(transcript)) fs.renameSync(transcript, path.join(runDir, `transcript-attempt${i}.jsonl`));
         const t0 = Date.now();
-        out = await runClaude(args, p, transcript);
+        out = await runClaude(args, pr, transcript);
         const ms = Date.now() - t0;
         msTotal += ms;
         const tr = classifyTransient(out) ?? classifyMissingTools(out, tools.require);
