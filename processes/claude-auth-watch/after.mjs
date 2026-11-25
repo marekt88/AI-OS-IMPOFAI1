@@ -6,7 +6,7 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { checkAuth, markSetupTokenRevoked, probeSetupToken, SETUP_TOKEN_KEY, secrets, setupTokenRevoked } from "../../runner/core.mjs";
 import { BUGS_LIST, pmTool } from "../../runner/pm.mjs";
-import { callGuard, isDry, placeCallAndWait, readJson, STATE_DIR, writeJson } from "../../runner/voice-call.mjs";
+import { CALLS_ENABLED, callGuard, isDry, placeCallAndWait, readJson, STATE_DIR, writeJson } from "../../runner/voice-call.mjs";
 
 const REMIND_H = 4;
 const FILE = path.join(STATE_DIR, "claude-auth-outage.json");
@@ -88,18 +88,18 @@ if (!st.taskKey && !isDry()) {
   if (t?.key) next.taskKey = t.key;
 }
 const due = !st.lastCallAt || now - Date.parse(st.lastCallAt) >= REMIND_H * 3600_000;
-const guard = callGuard({ kind: "alert", now });
+const guard = CALLS_ENABLED ? callGuard({ kind: "alert", now }) : { allowed: true, reason: "e-mail" }; // an e-mail may go at night
 if (due && guard.allowed) {
   const r = await placeCallAndWait(
     {
-      first_message: "Ahoj Marek, tu tvoj asistent. Volám kvôli poruche: Claude na serveri sa odhlásil.",
+      first_message: "Claude Code na serveri nie je prihlásený, procesy s AI nebežia (novinky, nápady, scenáre, videá, ranný brief).",
       call_instructions: "Povedz Marekovi stručne, že Claude Code na serveri nie je prihlásený, preto nebežia procesy s AI (novinky, nápady, videá, ranný brief). Povedz, ako to opraviť (call_content) a že úlohu má v KAPSA v AI Bugs. Nič iné neponúkaj a po potvrdení hovor ukonči.",
       call_content: fix.replace(/`/g, ""),
       call_details: `Výpadok od ${next.since}. Dôvod: ${auth.reason}`,
     },
     { runDir: process.env.RUN_DIR, kind: "alert" },
   ).catch((e) => (log(`call failed: ${e.message}`), null));
-  if (r && !r.dryRun) next.lastCallAt = now.toISOString();
-  log(`call: ${r?.dryRun ? "dry-run" : r?.answered ? "answered" : "not answered"}`);
+  if (r && !r.dryRun && (r.emailed || r.answered || r.attempts?.length)) next.lastCallAt = now.toISOString();
+  log(`alert: ${r?.dryRun ? "dry-run" : r?.emailed ? "e-mailed" : r?.answered ? "answered" : "not delivered"}`);
 } else log(`no call now (${due ? guard.reason : `last call ${st.lastCallAt}`})`);
 if (!isDry()) writeJson(FILE, next);

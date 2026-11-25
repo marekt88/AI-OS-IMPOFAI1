@@ -218,6 +218,14 @@ for (const t of tasks) {
         st.pending = null;
       }
     }
+  } else if (tr.kind === "script_then_video") {
+    // entered Video from outside the pipeline without a script: write it from the card, then the video (section 3)
+    if (!dry) await pm("pm_add_task_comment", { task: key, body: "**Karta prišla do Video bez scenára.** Najprv z nej napíšem scenár, video sa spustí hneď po ňom." });
+    log.push(`${key}: script then video`);
+    start(key, st, "SCRIPT_NEW", { mode: "new", idea: key, picked: true });
+    await agentRun(key, "running");
+    st.stage = cur;
+    st.pending = "VIDEO_JOB";
   } else if (tr.kind === "first") {
     st.stage = cur;
   }
@@ -257,8 +265,18 @@ for (const t of tasks) {
     }
   }
 
-  // 3. a queued heavy job whose blocker is gone
-  if (st.pending && !jobBusy(st)) {
+  // 3. a queued heavy job whose blocker is gone (a video waiting for its script needs the script first)
+  if (st.pending === "VIDEO_JOB" && !has.script && !jobBusy(st)) {
+    const fresh2 = artifacts((await pm("pm_get_task", { task: key })).attachments);
+    if (fresh2.script) has.script = true;
+    else if (st.job?.done && SCRIPT_JOBS.has(st.job.kind)) {
+      await comment(key, st, `E_SCRIPT:${nowIso.slice(0, 13)}`, "**Scenár sa nepodarilo napísať**, video sa nespustilo. Karta je späť v Nápade: napíš do nej komentár so zadaním a scenár sa napíše znova, potom ju presuň do Video.");
+      await moveTo(key, "Nápad");
+      st.stage = "Nápad";
+      st.pending = null;
+    }
+  }
+  if (st.pending && !jobBusy(st) && (st.pending !== "VIDEO_JOB" || has.script)) {
     const g = gate(st.pending);
     if (g.ok) {
       start(key, st, st.pending, { mode: "new", task: key, stage: cur });

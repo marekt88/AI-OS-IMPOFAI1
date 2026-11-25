@@ -92,17 +92,21 @@ async function deliver({ fingerprint, title, details, process: proc, runId, at }
     .filter(Boolean)
     .join("\n");
   if (known?.taskKey) {
-    let open = false;
+    let t = null;
     try {
-      const t = await pmTool("pm_get_task", { task: known.taskKey });
-      open = t?.status && t.status !== "complete";
+      t = await pmTool("pm_get_task", { task: known.taskKey });
     } catch {
-      open = false;
+      t = null;
     }
-    if (open) {
+    const open = t?.status && !["complete", "cancelled"].includes(t.status);
+    // closed by the runner itself after a recovery (not by a person) → reopen the same task instead of a new one
+    const autoClosed = t?.status === "complete" && known.autoClosedAt;
+    if (open || autoClosed) {
+      if (autoClosed) await pmTool("pm_update_task_status", { task: known.taskKey, status: "to_do" });
       await pmTool("pm_add_task_comment", { task: known.taskKey, body: `Znova: ${title}\n\n${where}\n\n${details}`.slice(0, 9500) });
-      issues[fingerprint] = { ...known, count: (known.count ?? 1) + 1, lastAt: at, recoveredAt: null };
+      issues[fingerprint] = { ...known, count: (known.count ?? 1) + 1, lastAt: at, recoveredAt: null, autoClosedAt: null };
       saveIssues(issues);
+      if (autoClosed) await mailIssue({ title: `Znova: ${title}`, details, where, key: known.taskKey });
       return;
     }
   }
@@ -116,17 +120,31 @@ async function deliver({ fingerprint, title, details, process: proc, runId, at }
   const key = task?.key ?? task?.task?.key;
   issues[fingerprint] = { taskKey: key ?? null, count: 1, firstAt: at, lastAt: at };
   saveIssues(issues);
+  await mailIssue({ title, details, where, key });
 }
 
-/** A process that had an open issue succeeded again → note it on the task (the human closes it). */
+/** A new (or reopened) issue → e-mail to Marek (Marek 2026-11-25). Repeats of an open issue are only comments. */
+async function mailIssue({ title, details, where, key }) {
+  const { sendMail } = await import("./mail.mjs");
+  await sendMail({
+    subject: `[AI Bugs] ${title}`.slice(0, 200),
+    text: `${title}\n\n${key ? `Úloha: https://kapsa.impofai.com/t/${key}\n\n` : ""}${details}\n\n${where}\n\nKeď proces znova prebehne, úloha sa zatvorí sama.`.slice(0, 20000),
+  });
+}
+
+/**
+ * A process that had an open issue succeeded again → comment and close the task (Marek 2026-11-25: the list filled up
+ * with recovered issues). A repeat later reopens the same task (deliver).
+ */
 export async function noteRecovered(fingerprintPrefix, message) {
   if (process.env.RUN_DRY === "1") return;
   const issues = loadIssues();
   for (const [fp, info] of Object.entries(issues)) {
     if (!fp.startsWith(fingerprintPrefix) || !info.taskKey || info.recoveredAt) continue;
     try {
-      await pmTool("pm_add_task_comment", { task: info.taskKey, body: message });
-      issues[fp] = { ...info, recoveredAt: new Date().toISOString() };
+      await pmTool("pm_add_task_comment", { task: info.taskKey, body: `${message} Úlohu zatváram, pri ďalšom výskyte sa znova otvorí.` });
+      await pmTool("pm_update_task_status", { task: info.taskKey, status: "complete" });
+      issues[fp] = { ...info, recoveredAt: new Date().toISOString(), autoClosedAt: new Date().toISOString() };
     } catch {
       /* best effort */
     }

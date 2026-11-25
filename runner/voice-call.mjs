@@ -156,6 +156,33 @@ export function callGuard({ kind = "unknown", now = new Date(), retry = false } 
 }
 
 // ---------- outbound call ----------
+/**
+ * Marek 2026-11-25: "Všetky hovory prosím vypni, posielaj mi správu na Gmail." Every outbound call of every process
+ * (morning brief, callback, auth alert, interview, ai-tasks) becomes an e-mail with the same content; result.emailed.
+ * Inbound calls (Marek calls the assistant) are not affected. Set to true to call again.
+ */
+export const CALLS_ENABLED = false;
+const MAIL_SUBJECT = {
+  "morning-brief": "Ranný brief",
+  callback: "Výsledok úlohy od asistenta",
+  alert: "UPOZORNENIE zo servera",
+  interview: "Otázky od asistenta",
+  "ai-tasks": "Správy kódovacieho agenta (AI tasks)",
+};
+async function emailInsteadOfCall(dyn, { runDir, kind }) {
+  const { sendMail } = await import("./mail.mjs");
+  const subject = `${MAIL_SUBJECT[kind] ?? "Správa od asistenta"} · ${dyn.call_date}`;
+  const text = [
+    dyn.first_message,
+    "",
+    dyn.call_content,
+    dyn.call_details && dyn.call_details !== "(žiadne)" && dyn.call_details !== "(žiadne podrobnosti)" ? `\n---\nPodrobnosti:\n${dyn.call_details}` : "",
+  ].join("\n");
+  const r = await sendMail({ subject, text });
+  fs.writeFileSync(path.join(runDir, "call.json"), JSON.stringify({ status: r.sent ? "emailed" : "email-failed", kind, at: new Date().toISOString(), reason: r.reason ?? null }, null, 2));
+  return { attempts: [], answered: false, emailed: r.sent, emailError: r.sent ? null : r.reason, transcript: [], conversationId: null, dryRun: false };
+}
+
 // Every outbound call sends all agent variables: a missing one would fall back to the agent's
 // placeholder, which is written for INBOUND calls ("Marek ti volá…").
 const REQUIRED_VARS = { first_message: "Ahoj Marek, tu tvoj asistent.", call_instructions: "(žiadne)", call_content: "(žiadne)", call_details: "(žiadne)" };
@@ -178,6 +205,7 @@ export async function placeCallAndWait(vars, { runDir, call = {}, kind = "unknow
     console.log(`dry-run: call not placed (${kind}); variables in call-variables.json`);
     return { attempts: [], answered: false, transcript: [], conversationId: null, dryRun: true };
   }
+  if (!CALLS_ENABLED) return emailInsteadOfCall(dyn, { runDir, kind });
   const attempts = [];
   let transcript = [];
   let conversationId = null;

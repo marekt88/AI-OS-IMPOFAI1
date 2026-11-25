@@ -195,6 +195,13 @@ if (DRY || result.dryRun) {
   console.log("dry run: call not placed, no followup, pending callback untouched");
   process.exit(0);
 }
+if (result.emailed) {
+  // calls are off (Marek 2026-11-25): the brief went by e-mail = delivered; the period advances, pending items are sent
+  const left = readPending().filter((i) => !pending.some((p) => p.at === i.at && p.say === i.say));
+  fs.writeFileSync(PENDING, JSON.stringify({ items: left }, null, 2));
+  console.log(`brief sent by e-mail; pending callback items delivered: ${pending.length}`);
+  process.exit(0);
+}
 if (!result.answered) {
   // not answered / unreachable: the run is ok, but the runner keeps lastSuccessAt, so the next brief covers this period
   // again (incl. the followups and executions in it). RUN_ADVANCE_FILE is set by core.mjs (I1).

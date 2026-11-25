@@ -151,3 +151,8 @@ Hlásenie chýb ide do PM cez obyčajné HTTP volanie PM MCP s vlastným tokenom
 - `processes/test-pm-identity/` sa spúšťa len ručne. Cez PM MCP prečíta identitu a zapíše ju do `output.json`. Bez zápisov: `node runner/run.mjs run test-pm-identity --dry-run`.
 - Testy runnera: `node --test 'runner/test/*.test.mjs'`. Bežia s falošným `claude` (`runner/test/fake-claude.mjs`), dočasným `AIOS_RUNNER_HOME` a dočasnými procesmi (`AIOS_PROCESSES_DIR`). Nevolajú Claude, PM ani telefón a nerobia `git pull` (`AIOS_NO_GIT_PULL=1`).
 - Premenné len pre testy: `RUN_RETRY_DELAYS_MS` (napr. `0,0`), `RUN_WAIT_LOCK_MAX_MS`, `RUN_WAIT_LOCK_POLL_MS`.
+
+## Hovory vypnuté, upozornenia e-mailom (Marek 2026-11-25)
+- `runner/voice-call.mjs` `CALLS_ENABLED = false`: každý odchádzajúci hovor (ranný brief, spätný hovor, výpadok Claude, rozhovor, AI tasks) príde ako e-mail s tým istým obsahom. Prichádzajúce hovory (Marek volá asistentovi) fungujú ďalej.
+- E-mail posiela `runner/mail.mjs` priamo cez SMTP, bez Claude (príde aj pri výpadku prihlásenia). `~/.aios-runner/secrets.env`: `ALERT_SMTP_URL=smtps://<gmail>:<heslo aplikácie>@smtp.gmail.com:465`, voliteľne `ALERT_EMAIL_TO`. Bez nastavenia sa e-mail nepošle (iba log) a ranný brief sa zopakuje nasledujúci deň.
+- Chyby procesov: úloha v Startups / KAPSA / AI Bugs + e-mail pri novej chybe. Keď proces znova prebehne, úloha sa zavrie sama; pri ďalšom výskyte sa tá istá úloha znova otvorí (a príde e-mail).

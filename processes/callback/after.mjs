@@ -75,6 +75,8 @@ console.log(`callback: done ${done.length}, skipped ${skipped.length}, questions
 const r = await placeCallAndWait(vars, { runDir: RUN_DIR, kind: "callback" });
 if (r.dryRun) {
   console.log("dry-run: no call, no followup");
+} else if (r.emailed) {
+  console.log("callback sent by e-mail (calls are off)");
 } else if (!r.answered) {
   const file = addPendingCallback(pendingItem("not-answered"), { runDir: RUN_DIR });
   console.log(`callback not answered (logged, not an error); saved for the morning brief in ${file}`);

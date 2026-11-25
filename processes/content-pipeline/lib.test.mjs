@@ -12,6 +12,9 @@ test("stageOf: custom status of the list", () => {
 test("transition", () => {
   assert.equal(transition(null, "Nápad").kind, "first");
   assert.equal(transition(null, "Video", { video: true }).kind, "first");
+  assert.deepEqual(transition(null, "Video", { script: true }), { kind: "job", job: "VIDEO_JOB" });
+  assert.equal(transition(null, "Video", {}).kind, "script_then_video");
+  assert.equal(transition(null, "Ozvučenie", {}).kind, "first");
   assert.equal(transition("Nápad", "Nápad").kind, "none");
   assert.deepEqual(transition("Nápad", "Video", { script: true }), { kind: "job", job: "VIDEO_JOB" });
   assert.equal(transition("Nápad", "Video", { script: false }).kind, "no_script");

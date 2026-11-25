@@ -32,6 +32,10 @@ export function stageOf(task) {
  * `has` = what the task has ({ script, video }): Nápad → Video needs a finished script ("no_script" = move back).
  */
 export function transition(prev, cur, has = {}) {
+  // A card that enters the board straight into Video (from Zrušené, a built-in status or another list, e.g. an old
+  // card from before the pipeline) has no previous stage. It still asks for a video (IMP-1610, 2026-11-25):
+  // with a script the video starts, without one the script is written first and the video follows it.
+  if (!prev && cur === "Video" && !has.video) return has.script ? { kind: "job", job: "VIDEO_JOB" } : { kind: "script_then_video" };
   if (!prev) return { kind: "first" };
   if (prev === cur) return { kind: "none" };
   const a = IDX[prev];
