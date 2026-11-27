@@ -22,7 +22,7 @@
     },
     "ideas": {
       "type": "array",
-      "maxItems": 8,
+      "maxItems": 12,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -47,7 +47,11 @@
           "dedup_key",
           "angle",
           "details",
-          "inputs"
+          "inputs",
+          "typ_videa",
+          "obsah",
+          "naucis",
+          "free_value_navrh"
         ],
         "properties": {
           "name": {
@@ -246,6 +250,36 @@
               "type": "string"
             },
             "description": "id zdrojov z index.jsonl (news:…, yt:…)"
+          },
+          "typ_videa": {
+            "enum": [
+              "ukazka-vysledku",
+              "nastroj",
+              "prompt-trik",
+              "x-zabilo-y",
+              "novinka-vysvetlena",
+              "nazor-pre-firmy",
+              "porovnanie"
+            ]
+          },
+          "obsah": {
+            "type": "string",
+            "description": "obsahový scenár: 3–5 viet, čo presne vo videu zaznie (ako skrátený prepis hlasu), nie vizuál"
+          },
+          "naucis": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 4,
+            "items": {
+              "type": "string"
+            }
+          },
+          "free_value_navrh": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "pri CTA s kľúčovým slovom: SLOVO + čo dostane (návod, prompt, skill…)"
           }
         }
       }

@@ -23,7 +23,23 @@ Nič nezapisuješ do KAPSA. Úlohu založí alebo upraví kód z tvojho JSON vý
 - formát nápadu nie je A (grafické video) → `skip_reason: "format-nie-A"`. Neplatí, keď je vo vstupe `picked: true`: vtedy nápad na video vybral človek a scenár formátu A napíšeš aj z nápadu s iným formátom;
 - chýbajú overené fakty potrebné na video → `skip_reason: "chybaju-fakty"` (a do `questions` čo chýba).
 
-## 3. Scenár (formát A, IMPOFAI Scéna)
+## 3. Typ videa a pravidlá z analýzy konkurencie (495 shorts, 18 AI kanálov, 2026-11-25)
+Zdrojové dáta: `/home/marek/impofai-content/zdroje/analyza-shorts/ANALYZA.md` (prečítaj, keď si nie si istý).
+- `typ_videa` (podľa nápadu): `ukazka-vysledku` (prvá sekunda = hotový výsledok, potom 2–3 kroky, ako vznikol; najviac hitov), `nastroj` (jeden konkrétny nástroj/funkcia: názov, problém, čo robí, ako začať), `prompt-trik` (presný prompt alebo nastavenie na skopírovanie), `x-zabilo-y` (tvrdé tvrdenie o peniazoch alebo profesii, potom postup; najviac komentárov, tvrdenie musí video doslova dokázať, inak „AI slop“ v komentároch), `novinka-vysvetlena` (veľká novinka vysvetlená za minútu s ukážkou; nikdy holá správa), `nazor-pre-firmy` (čo udalosť znamená pre slovenskú firmu), `porovnanie`.
+- **Prvá veta hlasu:** sociálny dôkaz („má 130 000 hviezdičiek“, „firma X ušetrila…“), hotový výsledok alebo „X práve vydal Y“. **Nikdy nezačínaj otázkou** (najslabší háčik) ani sľubom zoznamu.
+- Video musí **naučiť jednu konkrétnu vec**: divák po ňom niečo urobí.
+- CTA podľa typu (`cta_type`):
+  - `ukazka-vysledku`, `nastroj`, `prompt-trik` → `klucove-slovo`: „Napíš do komentára SLOVO a pošlem ti …“ (návod / prompt / balíček). Kľúčové slovo krátke, jedno, VEĽKÝMI písmenami bez diakritiky, súvisí s témou.
+  - `x-zabilo-y` → `workshop` (znenie z brand SKILL.md).
+  - `nazor-pre-firmy` → `konzultacia` (znenie z brand SKILL.md).
+  - `novinka-vysvetlena`, `porovnanie` → `diskusia-web` alebo bez predaja (jedna veta „Viac na impofai.com.“).
+  - Ak nápad určuje CTA inak, nápad má prednosť.
+- **Free value (`free_value`, povinné pri `klucove-slovo`, inak null):** balíček, ktorý pošleme tomu, kto napíše kľúčové slovo. Musí naozaj obsahovať, čo video sľúbilo (diváci konkurencie sa sťažujú „nikdy nič nepošleš“).
+  - `files`: 1–6 súborov `.md` po slovensky, „ty“: vždy `navod.md` (cieľ, čo treba + cena, presné kroky s tým, kde kliknúť a čo napísať, očakávaný výsledok, časté chyby, zdroje s URL); podľa témy aj `prompt.md` (presné prompty na skopírovanie), `odkazy.md` (nástroje, repo, dokumentácia), `SKILL.md` (Claude skill s frontmatter `name`/`description`, keď sa to oplatí). Iba overené fakty a funkčné kroky; čo si neoveril cez WebFetch, nepíš.
+  - Na konci `navod.md` jedna veta: „Chceš to nasadiť vo firme? AI workshop: impofai.com/workshop“.
+  - `overenie`: ako AI agent v testovacom prostredí overí, že návod funguje (príkazy alebo kroky + očakávaný výsledok).
+
+## 4. Scenár (formát A, IMPOFAI Scéna)
 - Dĺžka **30–45 s**, hlas je zrýchlený (~2,8 slova za sekundu, **80–120 slov hlasu**). Video má pôsobiť akčne: krátke vety, žiadna vata, každá veta posúva príbeh. Štruktúra: hook (0–3 s) → kontext + zdroj → 3–5 vysvetlených myšlienok (každá ako vizuálna metafora v scéne) → twist → payoff → CTA. Slogan na konci pridáva audio krok, ty ho do textu nepíš.
 - **Hooky:** 3 varianty z rôznych archetypov (`content-and-hooks.md`), každý v troch vrstvách: hlas (< 2 s), text na obraze (3–7 slov), frame 0 (scéna + 3D rekvizita + pásik + avatar v póze). Prejdi checklist `viral-hooks`; šokujúci hook musí byť doslova pravdivý. Vyber jeden a zdôvodni.
 - **Riadky (`lines`):** každý riadok = jedna myšlienka, 1,5–5 s (časy počítaj pri ~2,8 slova za sekundu).
@@ -38,14 +54,17 @@ Nič nezapisuješ do KAPSA. Úlohu založí alebo upraví kód z tvojho JSON vý
   - `on_screen`: text pásika/pečiatky (krátko);
   - `source_url`: pri každom fakte alebo čísle URL zdroja (K7 v tej istej scéne), inak null;
   - `sound`: zvukový efekt (whoosh, slap, pop, stamp, cvak…).
+- **Štýl Scéna 2.0** (`skills/impofai-video-style/references/scena-2.md`, predvolený od 2026-11-27): aspoň 40 % riadkov má v `action` **dôkaz** (presný prompt, odpoveď, rozhranie nástroja, hotový výsledok; iba texty zo scenára a mapy faktov), riadok 1 = dôkaz + 3–6 slov na páse; `on_screen` max. 3 slová; pri krokoch „KROK 1/3“, pri zoznamoch ✔/✘; na konci návrat k obrazu z frame 0. Avatar nemá stôl.
 - **Tempo:** nový vizuálny event aspoň každú 1 s; scéna 3–6 s; najviac jeden krátky (≤ 1 s) pokojnejší beat pred twistom alebo CTA.
-- **CTA:** presne jedno znenie z `impofai-brand/SKILL.md` podľa typu CTA nápadu. Nikdy „každú sobotu“.
+- **CTA:** presne jedno, podľa sekcie 3 (workshop a konzultácia presným znením z `impofai-brand/SKILL.md`). Nikdy „každú sobotu“.
 - **Cover:** frame 0 = vybraný hook.
 - **Popis pre každú platformu** (`viral-captions-and-ctas`, pravidlá značky): Instagram a Facebook (prvý riadok = hook, 2–4 vety hodnoty, 1 CTA, zdroj pri novinke, max. 2 emoji, 3–5 hashtagov), YouTube Shorts (title ≤ 70 znakov + krátky popis), LinkedIn (profesionálny „ty“, max. 1 riadok hashtagov), TikTok (title ≤ 90 znakov + text). `first_comment` iba pri CTA s kľúčovým slovom, inak null.
 - **Podklady:** čo treba (screenshoty, logá, reálne nahrávky) so stavom `mame` (URL) alebo `treba-nasnimat`. Klientske dáta iba verejné z impofai.com.
 - **Mapa faktov:** každé tvrdenie a číslo z hlasu alebo obrazu → URL → riadok scenára.
 - **Kontrola značky:** prejdi body (slovenčina a „ty“, žiadne vymyslené čísla, jedna CTA, frame 0 nie je logo, iba katalógové prvky, avatar vľavo dole, žiadna zmienka o Vyral, kredit creatora pri inšpirácii) a pri každom napíš ok/nie.
-- **Zhrnutie (`summary`), najdôležitejšie pole:** človek sa podľa neho za 30 s rozhodne, či z nápadu bude video. **3 až 5 viet, nikdy viac** (pred odoslaním ich spočítaj; vety nad 5 kód zahodí), bez odrážok: o čom nápad je a prečo to divák chce vidieť, potom ako bude video vyzerať (hook, hlavné scény a metafory, payoff). Konkrétne, žiadne všeobecné frázy.
+- **Obsahový scenár (`summary`), najdôležitejšie pole:** človek sa podľa neho rozhodne, či z nápadu bude video. **3 až 5 viet, nikdy viac**, bez odrážok: čo presne vo videu zaznie, v poradí ako to zaznie (ako skrátený prepis hlasu), aby bolo jasné, čo sa divák dozvie. **Nie vizuál** (žiadne scény, metafory, rekvizity, avatar).
+- **Čo sa divák naučí (`naucis`):** 2–4 konkrétne body, ktoré po videu vie alebo urobí (napr. „kde v Claude zapne Projekty“, „presný prompt na …“). Žiadne všeobecné „pochopí AI“.
+- **Podmienky (`podmienky`):** čo treba (plán a jeho cena, jazyk, krajina, obmedzenia, riziká ako ban účtu alebo cena tokenov). Diváci konkurencie to v komentároch vždy vytknú, keď chýba. Povedz to aj krátko vo videu.
 - **Okruh (`okruh`):** prevezmi z nápadu (riadok „Okruh“ alebo `okruh` v bloku ```json idea```). Ak ho nápad nemá, urč ho podľa obsahu: 1 AI agenti a automatizácia práce, 2 hlasoví a chatovací asistenti, 3 nové nástroje a funkcie v Claude/ChatGPT/Gemini/Copilote, 4 AI v obchode, financiách a dátach, 5 regulácia, peniaze a dopad na SK firmu. Prípadovka klienta podľa toho, čo riešenie robí.
 - **Zdroj nápadu (`idea_source`):** hlavný zdroj, z ktorého nápad vznikol: `label` (napr. „Anthropic blog“, „YouTube @creator“, „impofai.com – prípadová štúdia“) a `url` (primárny zdroj z nápadu; null, ak nápad nemá URL).
 - `slug`: krátky ASCII bez diakritiky (napr. `plus-reality-bazos`), pri revízii prevezmi existujúci.

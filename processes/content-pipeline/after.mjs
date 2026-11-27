@@ -110,6 +110,23 @@ function start(task, st, job, input) {
   st.job = { kind: job, started_at: nowIso, input_comment_ids: input.comments?.map((c) => c.id) ?? [] };
 }
 
+/** After FINALIZE: the render work files of the project go (Marek 2026-11-27, disk). Kept: final.mp4, cover, script, tts,
+ * index.html, assets. output/ holds drafts, snapshots and Docker work dirs owned by root, so it is removed in a container. */
+function cleanRender(key) {
+  const reels = path.join(ROOT, "reels");
+  for (const d of fs.existsSync(reels) ? fs.readdirSync(reels) : []) {
+    if (!(d.endsWith(`-${key}`) || d.includes(`-${key}-`))) continue;
+    const out = path.join(reels, d, "output");
+    if (!fs.existsSync(out) || !fs.existsSync(path.join(reels, d, "final.mp4"))) continue;
+    try {
+      execFileSync("docker", ["run", "--rm", "-v", `${path.join(reels, d)}:/p`, "alpine:3", "rm", "-rf", "/p/output"], { timeout: 120_000 });
+      log.push(`${key}: cleaned ${d}/output`);
+    } catch (e) {
+      log.push(`${key}: clean ${d} failed: ${String(e.message).slice(0, 120)}`);
+    }
+  }
+}
+
 /** FINALIZE (no LLM): the newest <KEY>_result-vN.json must point at an existing <KEY>_final-vN.mp4 without problems. */
 async function finalize(key) {
   const t = await pm("pm_get_task", { task: key });
@@ -188,6 +205,7 @@ for (const t of tasks) {
     st.stage = cur;
     st.job = null;
     st.pending = null;
+    st.needScript = false;
   } else if (tr.kind === "job") {
     if (tr.job === "FINALIZE") {
       const f = await finalize(key);
@@ -196,6 +214,7 @@ for (const t of tasks) {
         if (!dry) {
           await pm("pm_update_agent_run", { task: key, preview_url: f.url, agent_run_status: null });
           await pm("pm_add_task_label", { task: key, label: READY_LABEL });
+          cleanRender(key);
           await pm("pm_add_task_comment", { task: key, body: `**Finál:** ${f.name} (príloha ${f.id}, ${f.duration} s). Na publikovanie presuň kartu do **Naplánované**: Socials ju zaradí do najbližšieho voľného slotu (8:00, 12:00, 20:00) a pošle cez Postiz.` });
         }
         st.stage = cur;
@@ -219,13 +238,17 @@ for (const t of tasks) {
       }
     }
   } else if (tr.kind === "script_then_video") {
-    // entered Video from outside the pipeline without a script: write it from the card, then the video (section 3)
-    if (!dry) await pm("pm_add_task_comment", { task: key, body: "**Karta prišla do Video bez scenára.** Najprv z nej napíšem scenár, video sa spustí hneď po ňom." });
+    // picked idea (or a card from outside) in Video without a script: write it from the card, then the video (section 3)
     log.push(`${key}: script then video`);
-    start(key, st, "SCRIPT_NEW", { mode: "new", idea: key, picked: true });
-    await agentRun(key, "running");
     st.stage = cur;
     st.pending = "VIDEO_JOB";
+    if (!(jobBusy(st) && SCRIPT_JOBS.has(st.job.kind))) {
+      // scripts run one at a time: the others wait in the queue (section 3 starts them)
+      st.needScript = true;
+      st.scriptRetried = false;
+      if (!dry) await pm("pm_add_task_comment", { task: key, body: "**Vybrané na video.** Najprv napíšem scenár, video sa spustí hneď po ňom." });
+      await agentRun(key, "queued");
+    }
   } else if (tr.kind === "first") {
     st.stage = cur;
   }
@@ -266,10 +289,26 @@ for (const t of tasks) {
   }
 
   // 3. a queued heavy job whose blocker is gone (a video waiting for its script needs the script first)
-  if (st.pending === "VIDEO_JOB" && !has.script && !jobBusy(st)) {
+  if (st.needScript && !has.script && !jobBusy(st) && !autoScriptStarted && !runningOf(SCRIPT_JOBS)) {
+    start(key, st, "SCRIPT_NEW", { mode: "new", idea: key, picked: true });
+    await agentRun(key, "running");
+    autoScriptStarted = true;
+    st.needScript = false;
+  }
+  if (st.pending === "VIDEO_JOB" && !has.script && !jobBusy(st) && !st.needScript) {
     const fresh2 = artifacts((await pm("pm_get_task", { task: key })).attachments);
     if (fresh2.script) has.script = true;
-    else if (st.job?.done && SCRIPT_JOBS.has(st.job.kind)) {
+    else if (st.job?.done && SCRIPT_JOBS.has(st.job.kind) && !st.scriptRetried) {
+      // one automatic retry: the validation errors go back to the writer as a comment (Marek 2026-11-26, IMP-1916)
+      if (autoScriptStarted || runningOf(SCRIPT_JOBS)) { /* another script is being written: retry next tick */ } else {
+      const fail = [...items].reverse().find((e) => e.kind === "comment" && e.agent_name === me && /^\*\*Scenár neprešiel kontrolou/.test(e.body ?? ""));
+      log.push(`${key}: script retry`);
+      st.scriptRetried = true;
+      start(key, st, "SCRIPT_NEW", { mode: "new", idea: key, picked: true, comments: fail ? [{ id: fail.id, author: "kontrola scenára", at: fail.created_at, body: `Predchádzajúci pokus neprešiel kontrolou, oprav presne toto: ${fail.body}` }] : [] });
+      await agentRun(key, "running");
+      autoScriptStarted = true;
+      }
+    } else if (st.job?.done && SCRIPT_JOBS.has(st.job.kind)) {
       await comment(key, st, `E_SCRIPT:${nowIso.slice(0, 13)}`, "**Scenár sa nepodarilo napísať**, video sa nespustilo. Karta je späť v Nápade: napíš do nej komentár so zadaním a scenár sa napíše znova, potom ju presuň do Video.");
       await moveTo(key, "Nápad");
       st.stage = "Nápad";
@@ -278,6 +317,7 @@ for (const t of tasks) {
   }
   if (st.pending && !jobBusy(st) && (st.pending !== "VIDEO_JOB" || has.script)) {
     const g = gate(st.pending);
+    if (!g.ok) await comment(key, st, `${st.pending}:${g.code}:${g.why}`, `**${st.pending === "VIDEO_JOB" ? "Video" : st.pending} čaká v poradí (${g.code}):** ${g.why}. Spustí sa samo.`);
     if (g.ok) {
       start(key, st, st.pending, { mode: "new", task: key, stage: cur });
       await agentRun(key, "running");

@@ -5,7 +5,7 @@
   "tz": "Europe/Bratislava",
   "model": "opus",
   "maxTurns": 250,
-  "timeoutMin": 60,
+  "timeoutMin": 90,
   "afterTimeoutMin": 15,
   "builtinTools": [
     "Read",

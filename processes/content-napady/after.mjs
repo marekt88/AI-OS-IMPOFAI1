@@ -46,11 +46,28 @@ function problems(i) {
   if (i.valid_until && Number.isNaN(Date.parse(i.valid_until))) p.push("neplatné valid_until");
   if (i.valid_until && Date.parse(i.valid_until) < now.getTime()) p.push("novinka už expirovala");
   if (![1, 2, 3, 4, 5].includes(i.okruh)) p.push("chýba okruh 1–5");
+  if (!String(i.obsah ?? "").trim()) p.push("chýba obsahový scenár");
+  if ((i.naucis ?? []).length < 2) p.push("chýba čo sa divák naučí");
+  if (i.cta_type === "klucove-slovo" && !i.free_value_navrh) p.push("CTA s kľúčovým slovom bez free value");
   return p;
 }
 
+const TYP_VIDEA = { "ukazka-vysledku": "ukážka výsledku", nastroj: "nástroj", "prompt-trik": "prompt / trik", "x-zabilo-y": "X zabilo Y", "novinka-vysvetlena": "novinka vysvetlená", "nazor-pre-firmy": "názor pre firmy", porovnanie: "porovnanie" };
 function render(i) {
   const lines = [
+    // content first (Marek 2026-11-26): what the video says and teaches; the detailed script comes after picking
+    "## Obsahový scenár",
+    i.obsah,
+    "",
+    "**Čo sa divák naučí:**",
+    ...i.naucis.map((x) => `- ${x}`),
+    "",
+    `**Typ videa:** ${TYP_VIDEA[i.typ_videa] ?? i.typ_videa} · **CTA:** ${i.cta_type}${i.free_value_navrh ? ` · **Free value:** ${i.free_value_navrh}` : ""}`,
+    "",
+    "Na video presuň kartu do **Video** (napíše sa detailný scenár a hneď po ňom video). Najprv len scenár: komentár „scenár“.",
+    "",
+    "---",
+    "",
     `**Okruh:** ${i.okruh} · **Typ:** ${TYPE_LABEL[i.type]} · **Pilier:** ${i.pillar} · **Navrhovaný formát:** ${FORMAT_LABEL[i.format]}`,
     `**Typ CTA:** ${i.cta_type} · **Preferencia slotu (nezáväzné):** ${i.slot_pref}`,
     `**Jadro:** ${i.core}`,
@@ -76,7 +93,7 @@ function render(i) {
     "",
     "<!-- strojová časť, generuje krok A; ručne neupravovať -->",
     "```json idea",
-    JSON.stringify({ idea_version: 1, okruh: i.okruh, type: i.type, pillar: i.pillar, format: i.format, cta_type: i.cta_type, dedup_key: i.dedup_key, angle: i.angle, valid_until: i.valid_until, facts: i.facts, do_not_claim: i.do_not_claim, creator: i.creator, inputs: i.inputs }),
+    JSON.stringify({ idea_version: 2, typ_videa: i.typ_videa, okruh: i.okruh, type: i.type, pillar: i.pillar, format: i.format, cta_type: i.cta_type, dedup_key: i.dedup_key, angle: i.angle, valid_until: i.valid_until, facts: i.facts, do_not_claim: i.do_not_claim, creator: i.creator, inputs: i.inputs }),
     "```",
   ];
   return lines.join("\n");
@@ -120,8 +137,7 @@ for (const i of o.ideas ?? []) {
   };
   rendered.push(task);
   const res = await pmTool("pm_create_task", task, { tokenEnv });
-  // the script is written right away: content-pipeline starts content-scenare for queued ideas, one at a time
-  if (res.key) await pmTool("pm_update_agent_run", { task: res.key, agent_run_status: "queued" }, { tokenEnv });
+  // Marek 2026-11-26: no script right away; a person picks the idea (move to Video) and the script + video follow
   created.push({ key: res.key ?? null, name: task.name, format: i.format, okruh: i.okruh, dry: Boolean(res.dry_run) });
 }
 
@@ -145,5 +161,5 @@ if (dry) {
 }
 
 // step B: every new idea is queued, content-pipeline writes the scripts one by one (Marek 2026-11-23)
-const stepB = `scenár v poradí pre ${created.length} nápadov (content-pipeline)`;
+const stepB = "scenár sa píše až po výbere (presun do Video)";
 console.log(JSON.stringify({ dry, created: created.length, skipped: skipped.length, stepB }));

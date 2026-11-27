@@ -42,7 +42,8 @@ export function transition(prev, cur, has = {}) {
   const b = IDX[cur];
   if (b < a) return { kind: "return" };
   if (b - a !== 1) return { kind: "invalid" };
-  if (cur === "Video" && !has.script) return { kind: "no_script" };
+  // Marek 2026-11-26: picking an idea = moving it to Video; without a script it is written first, then the video
+  if (cur === "Video" && !has.script) return { kind: "script_then_video" };
   return { kind: "job", job: JOB_OF[cur] };
 }
 

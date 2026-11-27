@@ -26,7 +26,11 @@
     "do_not_claim",
     "brand_check",
     "questions",
-    "changes"
+    "changes",
+    "naucis",
+    "podmienky",
+    "typ_videa",
+    "free_value"
   ],
   "properties": {
     "ok": {
@@ -54,7 +58,7 @@
     },
     "summary": {
       "type": "string",
-      "description": "zhrnutie pre rozhodnutie za 30 s: max. 5 viet, o čom nápad je a ako bude video vyzerať"
+      "description": "obsahový scenár: max. 5 viet, čo presne vo videu zaznie (ako skrátený prepis hlasu) a čo sa divák naučí; NIE vizuál"
     },
     "okruh": {
       "type": [
@@ -394,6 +398,86 @@
         "type": "string"
       },
       "description": "pri revízii: čo sa zmenilo oproti predchádzajúcej verzii; pri novom scenári prázdne"
+    },
+    "naucis": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4,
+      "items": {
+        "type": "string"
+      },
+      "description": "2–4 konkrétne veci, ktoré divák po videu vie alebo urobí"
+    },
+    "podmienky": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "čo treba: plán/predplatné, cena, obmedzenia, riziká (null len ak naozaj nič)"
+    },
+    "typ_videa": {
+      "enum": [
+        "ukazka-vysledku",
+        "nastroj",
+        "prompt-trik",
+        "x-zabilo-y",
+        "novinka-vysvetlena",
+        "nazor-pre-firmy",
+        "porovnanie"
+      ]
+    },
+    "free_value": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "keyword",
+        "nazov",
+        "popis",
+        "files",
+        "overenie"
+      ],
+      "properties": {
+        "keyword": {
+          "type": "string",
+          "description": "kľúčové slovo z CTA, VEĽKÝMI písmenami bez diakritiky"
+        },
+        "nazov": {
+          "type": "string"
+        },
+        "popis": {
+          "type": "string",
+          "description": "1–2 vety, čo v balíčku je"
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "content"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "napr. navod.md, prompt.md, odkazy.md, SKILL.md"
+              },
+              "content": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "overenie": {
+          "type": "string",
+          "description": "ako AI agent v testovacom prostredí overí, že návod funguje (kroky + očakávaný výsledok)"
+        }
+      }
     }
   }
 }

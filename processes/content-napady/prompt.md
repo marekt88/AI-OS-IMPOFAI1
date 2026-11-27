@@ -18,34 +18,37 @@ Plugin je v `/home/marek/impofai-content/plugin/`. Prečítaj:
   - Riadky so `status` iným ako `ok` (`skipped-short`, `none`, `blocked`) sú iba signál témy.
 - Riadky `type: "run-complete"` ti povedia, či zber dobehol. Ak niečo chýba, napíš to do `notes_sk`.
 
+### Režim „analyza-shorts“ (keď vstup obsahuje `"zdroj": "analyza-shorts"`)
+Namiesto nových riadkov z index.jsonl použi zbierku shorts konkurencie v `/home/marek/impofai-content/zdroje/analyza-shorts/`:
+`ANALYZA.md` (zistenia), `spojene.json` a `spojene2.json` (metriky + kategória + háčik + CTA, pole `perf` = výkon voči mediánu kanála), prepisy v `prepisy/` (`<kanal>_<id>.md`) a `prepisy2/` (`<id>.md`). Vyber z videí s najvyšším `perf` témy, ktoré dávajú zmysel pre slovenskú firmu, a prečítaj ich prepisy. Počet nápadov určuje `pocet` vo vstupe. Fakty (čo nástroj robí, cena, plán, dostupnosť) over cez WebSearch/WebFetch u primárneho zdroja: creator je iba inšpirácia.
+
 ## 3. Duplicity
 Pred návrhom skontroluj existujúce nápady a posty v KAPSA: pm_list_tasks s `folder` = `Internal / Obsah a sociálne siete` a `query` = dedup kľúč alebo kľúčové slovo (posledných ~60 dní, aj uzavreté a zrušené). Jedna udalosť smie mať viac **uhlov** (novinka, návod, názor, súhrn, prípadovka), ten istý uhol tej istej udalosti nikdy dvakrát.
 
-## 4. Okruhy (pole `okruh`, povinné)
-Každý nápad patrí do jedného z 5 okruhov. Nápad mimo nich nenavrhuj (daj ho do `skipped`).
-1. **AI agenti a automatizácia práce** (Claude Cowork / Code, agenti OpenAI a Google, n8n, Make, MCP). Väzba: AI automatizácie, Kapsa, workshop (modul Automatizácia).
-2. **Hlasoví a chatovací asistenti** (ElevenLabs, OpenAI Realtime, slovenčina, WhatsApp / Meta business AI). Väzba: prípadovka Ecoprodukt.
-3. **Nové nástroje a funkcie v Claude, ChatGPT, Gemini a Copilote**, ktoré bežný zamestnanec vyskúša hneď. Väzba: tipy na Claude desktop, workshop.
-4. **AI v obchode, financiách a dátach** (AI CFO, Power BI Copilot, Bridgit, faktúry, CRM, leady).
-5. **Regulácia, peniaze a dopad na SK firmu** (AI Act, GDPR pri AI, granty a výzvy, verejné obstarávanie, ceny modelov). **Najvyššia priorita:** ak zdroje obsahujú okruh 5, navrhni ho ako prvý.
+## 4. Okruhy (pole `okruh`, povinné, slúži ako štítok)
+1 AI agenti a automatizácia práce · 2 hlasoví a chatovací asistenti · 3 nové nástroje a funkcie v Claude, ChatGPT, Gemini a Copilote · 4 AI v obchode, financiách a dátach · 5 regulácia, peniaze a dopad na SK firmu. Pri položkách z ai-news prevezmi ich `okruh`.
 
-Filter: slovenská firma to vie použiť do 30 dní a vieme to spojiť s naším klientom alebo modulom workshopu. Pri položkách z ai-news prevezmi ich `okruh`.
+## 5. Nápady: čo funguje (analýza 495 shorts, 18 AI kanálov, 2026-11-25)
+Hlavné meradlo: **čo konkrétne sa divák naučí alebo dozvie**. Nápad, po ktorom divák nevie nič urobiť ani nič nové nevie, nenavrhuj (daj do `skipped`). Divák: majiteľ, manažér alebo zamestnanec slovenskej firmy, ktorý AI používa alebo chce používať.
 
-## 5. Nápady
-Navrhni 5 až 8 nápadov (menej, ak zdroje nestačia; radšej menej a kvalitných). Každý nápad:
-- je pre majiteľa alebo manažéra slovenskej MSP, povie mu, čo z toho má, a vedie na workshop alebo konzultáciu IMPOFAI;
-- má **všetok kontext** potrebný na neskoršie napísanie scenára a popisu postu, bez ďalšieho hľadania:
-  - novinka: čo presne, ako to funguje, čísla so zdrojom, presné citácie, kontext a konkurencia, čo to znamená pre SK firmu, primárny zdroj;
-  - tutoriál: cieľ (výsledok najprv), predpoklady (účty, plán, cena), **presné kroky** (kde kliknúť, čo nastaviť, presný text promptu, očakávaný výsledok), časté chyby, či je to overené v IMPOFAI (inak „nie – pred scenárom treba test“);
-  - tip na Claude: trik jednou vetou, kde v UI / ktorý plán, 2–4 kroky s presným textom, pred/po, zdroj;
-  - prípadová štúdia: iba verejný klient z impofai.com (URL), problém → riešenie → výsledok, čísla iba z webu;
-  - názor / mýtus: téza, 3 argumenty s faktom, najsilnejší protiargument a odpoveď;
-  - týždenný súhrn: 5 noviniek s jednou vetou „prečo ťa to zaujíma“.
-- Každý fakt má aspoň jeden zdroj (URL) a dátum; čo nie je overené v 2 zdrojoch, ide do `do_not_claim`.
-- **Bez hookov** (hooky vznikajú až v scenári).
-- `format`: A grafické video (predvolené), B talking head, C screen recording, D/E obrázok/carousel. Kto má niečo nahrať, nepredpokladaj (nechaj „doplní človek“).
-- `dedup_key`: pre novinku prevezmi `dedup_key` zo zdroja; inak `<subjekt>|<udalosť>|<RRRR-MM-DD>` malými písmenami bez diakritiky.
-- `valid_until`: pri novinke prevezmi `valid_until` zo zdroja; inak null.
+`typ_videa` (povinné) a odporúčaný pomer v jednom behu:
+- **3 z 6** `ukazka-vysledku` (hotový výsledok najprv, potom ako vznikol; najviac hitov), `nastroj` (jeden konkrétny nástroj/funkcia: názov, problém, čo robí, ako začať) alebo `prompt-trik` (presný prompt/nastavenie) → `cta_type: "klucove-slovo"` a `free_value_navrh` („SLOVO: čo dostane“, napr. „PROMPT: 3 prompty na …“).
+- **1 z 6** `x-zabilo-y` (tvrdé tvrdenie o peniazoch/profesii, ktoré video doslova dokáže) → `workshop`.
+- **1 z 6** `nazor-pre-firmy` (čo udalosť znamená pre slovenskú firmu) → `konzultacia`.
+- **1 z 6** `novinka-vysvetlena` (veľká novinka vysvetlená za minútu s ukážkou, nikdy holá správa) alebo `porovnanie` → `diskusia-web`.
+Nenavrhuj ankety, úryvky rozhovorov ani všeobecné biznis rady (najslabšie typy).
+
+Navrhni 5 až 8 nápadov (v režime analyza-shorts presne `pocet`); radšej menej a kvalitných.
+
+Každý nápad:
+- `obsah` (povinné): **obsahový scenár, 3–5 viet**: čo presne vo videu zaznie, v poradí (ako skrátený prepis hlasu). Nie vizuál. Prvá veta = háčik typu sociálny dôkaz, hotový výsledok alebo „X práve vydal Y“, **nikdy otázka**.
+- `naucis` (povinné): 2–4 konkrétne veci, ktoré divák po videu vie alebo urobí.
+- podmienky (plán, cena, jazyk, dostupnosť v SK/EÚ, riziká) patria do `eu_availability` a do `details`; diváci konkurencie ich v komentároch vždy vytknú, keď chýbajú.
+- má **všetok kontext** na neskorší detailný scenár a free value bez ďalšieho hľadania (`details`): presné kroky (kde kliknúť, čo nastaviť, presný text promptu, očakávaný výsledok), čísla so zdrojom, časté chyby. Pri `type` použi najbližší: novinka, tutorial, tip-claude, nazor.
+- `creator`: ak nápad vychádza z videa konkurencie, uveď ho (kredit áno); preberáš iba tému a štruktúru, nikdy text.
+- Každý fakt má zdroj (URL) a dátum; čo nie je overené v primárnom zdroji, ide do `do_not_claim`.
+- **Bez hookov** v ďalších poliach (detailný scenár ich vyberie z `obsah`).
+- `format`: A grafické video. `dedup_key`: pre novinku prevezmi zo zdroja; inak `<subjekt>|<udalosť>|<RRRR-MM-DD>` malými bez diakritiky. `valid_until`: pri novinke zo zdroja, inak null.
 - Píš po slovensky, „ty“, bez korporátnych fráz. Nikdy nepíš „každú sobotu“. Nespomínaj firmu Vyral.
 
 Beh nikto nesleduje: nepýtaj sa, nejasné veci vynechaj a uveď v `skipped`.

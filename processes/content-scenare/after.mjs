@@ -7,11 +7,12 @@
 //                  its own attachment) → comment with the changes, agent run needs_review
 // A script that fails validation is never written: a comment explains why, the agent run is failed and the run fails.
 // RUN_DRY=1: pmTool does not send writes; the rendered description is saved in RUN_DIR.
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { hasSecret, pmTool } from "../../runner/pm.mjs";
 import { isDry, localParts, readJson, ROOT } from "../_lib/zdroje.mjs";
-import { fitSummary, loadScript, machineScript, renderScript, validateScript } from "../_lib/scenar.mjs";
+import { fitSummary, loadScript, machineScript, normalizeIds, renderScript, validateScript } from "../_lib/scenar.mjs";
 
 const RUN_DIR = process.env.RUN_DIR;
 const dry = isDry();
@@ -32,6 +33,23 @@ const SKIP_TEXT = {
 const DESC_MAX = 50000;
 const scriptAttachment = (task, slug, version, script) =>
   pm("pm_upload_task_attachment", { task, file_name: `${slug}_script-v${version}.json`, mime_type: "application/json", content_text: JSON.stringify(script) });
+
+/** Free value pack (Marek 2026-11-26): every file as its own attachment + one zip <KEY>_free-value-vN.zip to send. */
+async function uploadFreeValue(key, version) {
+  const fv = s.free_value;
+  if (!fv?.files?.length) return null;
+  const dir = fs.mkdtempSync(path.join(RUN_DIR ?? "/tmp", "fv-"));
+  const pack = path.join(dir, fv.keyword.toLowerCase());
+  fs.mkdirSync(pack);
+  for (const f of fv.files) {
+    fs.writeFileSync(path.join(pack, path.basename(f.name)), f.content);
+    await pm("pm_upload_task_attachment", { task: key, file_name: `${key}_fv-v${version}_${path.basename(f.name)}`, mime_type: "text/markdown", content_text: f.content });
+  }
+  const zip = path.join(dir, "pack.zip");
+  execFileSync("python3", ["-I", "-c", "import sys,zipfile,os;d=sys.argv[1];z=zipfile.ZipFile(sys.argv[2],'w',zipfile.ZIP_DEFLATED);[z.write(os.path.join(d,f),os.path.join(os.path.basename(d),f)) for f in sorted(os.listdir(d))];z.close()", pack, zip]);
+  const a = await pm("pm_upload_task_attachment", { task: key, file_name: `${key}_free-value-v${version}.zip`, mime_type: "application/zip", content_base64: fs.readFileSync(zip).toString("base64") });
+  return a?.id ?? null;
+}
 
 /** The idea text without its machine block (the block stays in the <KEY>_napad.md attachment). */
 const ideaForHumans = (d) => String(d ?? "").replace(/<!--[^]*?-->\s*/g, "").replace(/```json idea\n[^]*?\n```\s*/g, "").trim();
@@ -56,6 +74,7 @@ async function createNew() {
     await pm("pm_update_agent_run", { task: key, agent_run_status: "failed" });
     return { idea: key, skipped: s.skip_reason };
   }
+  normalizeIds(s);
   const cut = fitSummary(s);
   const v = validateScript(s);
   if (cut) v.warnings.push(`zhrnutie malo o ${cut} ${cut === 1 ? "vetu" : "vety"} viac ako 5, ponechaných prvých 5`);
@@ -74,8 +93,9 @@ async function createNew() {
   const description = cardDescription(renderScript(s, { ...meta, warnings: v.warnings }), key, idea);
   if (dry) fs.writeFileSync(path.join(RUN_DIR, "dry-scenar.md"), description);
   await scriptAttachment(key, s.slug, 1, { script: machineScript(s, meta), popis: { ...s.popis, cta_type: s.cta_type, valid_until: s.valid_until } });
+  if (!dry) await uploadFreeValue(key, 1);
   await pm("pm_update_task", { task: key, name: String(card.name).replace(/^Nápad:\s*/, ""), description });
-  await pm("pm_add_task_comment", { task: key, body: `**Scenár v1** je hotový (${v.words} slov, ${v.duration} s). Zmeny napíš do komentára, alebo presuň kartu do **Video** a spustí sa render.` });
+  await pm("pm_add_task_comment", { task: key, body: card.custom_status?.name === "Video" ? `**Scenár v1** je hotový (${v.words} slov, ${v.duration} s). Video sa spustí samo, hneď ako príde na rad.` : `**Scenár v1** je hotový (${v.words} slov, ${v.duration} s). Zmeny napíš do komentára, alebo presuň kartu do **Video** a spustí sa render.` });
   await pm("pm_update_agent_run", { task: key, agent_run_status: "needs_review" });
   return { idea: key, script: key, words: v.words, duration: v.duration, warnings: v.warnings.length };
 }
@@ -85,6 +105,7 @@ async function revise() {
   if (!key) throw new Error("input.task chýba");
   const { script: prev } = await loadScript(pm, key);
   if (!prev) throw new Error(`${key}: scenár sa nedá načítať (chýba príloha *_script-vN.json aj blok json script)`);
+  normalizeIds(s);
   const cut = fitSummary(s);
   const v = validateScript(s);
   if (cut) v.warnings.push(`zhrnutie malo o ${cut} ${cut === 1 ? "vetu" : "vety"} viac ako 5, ponechaných prvých 5`);
@@ -99,6 +120,7 @@ async function revise() {
   const description = renderScript(s, { ...meta, changes: s.changes ?? [], warnings: v.warnings });
   if (dry) fs.writeFileSync(path.join(RUN_DIR, "dry-scenar.md"), description);
   await scriptAttachment(key, prev.slug, version, { script: machineScript(s, meta), popis: { ...s.popis, cta_type: s.cta_type, valid_until: s.valid_until } });
+  if (!dry) await uploadFreeValue(key, version);
   const card = await pm("pm_get_task", { task: key });
   await pm("pm_update_task", { task: key, name: String(card.name).replace(/^(Nápad|Scenár):\s*/, ""), description: cardDescription(description, key, await readIdea(card)) });
   await pm("pm_add_task_comment", { task: key, body: `**Scenár v${version}.** Zmeny: ${(s.changes ?? []).join("; ") || "—"}${s.questions?.length ? `\n\nOtázky:\n${s.questions.map((q) => `- ${q}`).join("\n")}` : ""}\n\nPredchádzajúca verzia ostáva v prílohe ${prev.slug}_script-v${prev.script_version}.json.` });

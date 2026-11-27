@@ -4,8 +4,8 @@
   "schedule": null,
   "tz": "Europe/Bratislava",
   "model": "opus",
-  "maxTurns": 150,
-  "timeoutMin": 30,
+  "maxTurns": 250,
+  "timeoutMin": 60,
   "afterTimeoutMin": 10,
   "builtinTools": [
     "Read",

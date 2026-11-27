@@ -17,7 +17,7 @@ test("transition", () => {
   assert.equal(transition(null, "Ozvučenie", {}).kind, "first");
   assert.equal(transition("Nápad", "Nápad").kind, "none");
   assert.deepEqual(transition("Nápad", "Video", { script: true }), { kind: "job", job: "VIDEO_JOB" });
-  assert.equal(transition("Nápad", "Video", { script: false }).kind, "no_script");
+  assert.equal(transition("Nápad", "Video", { script: false }).kind, "script_then_video");
   assert.deepEqual(transition("Video", "Ozvučenie"), { kind: "job", job: "AUDIO_JOB" });
   assert.deepEqual(transition("Ozvučenie", "Hotové"), { kind: "job", job: "FINALIZE" });
   assert.equal(transition("Hotové", "Ozvučenie").kind, "return");

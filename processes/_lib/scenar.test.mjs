@@ -1,7 +1,7 @@
 // Unit tests of the script helpers: node --test processes/_lib/scenar.test.mjs (no network).
 import test from "node:test";
 import assert from "node:assert/strict";
-import { fitSummary, readBlock, renderScript, sentences, validateScript } from "./scenar.mjs";
+import { normalizeIds, fitSummary, readBlock, renderScript, sentences, validateScript } from "./scenar.mjs";
 
 const line = (i, o = {}) => ({
   t_from: i * 5, t_to: i * 5 + 5, titulky: "Toto je riadok o AI agentovi pre tvoju firmu dnes", elevenlabs: "Toto je riadok o ej-áj agentovi pre tvoju firmu dnes",
@@ -9,7 +9,7 @@ const line = (i, o = {}) => ({
   highlight: "agent", on_screen: "AI MÁ PRÍSTUP", source_url: null, sound: "cvak", ...o,
 });
 const script = (o = {}) => ({
-  ok: true, skip_reason: null, slug: "test", name: "Test", summary: "Video ukáže AI agenta v praxi. Grafika so 3D rekvizitami, 40 s.", okruh: 1,
+  ok: true, skip_reason: null, slug: "test", name: "Test", summary: "Video ukáže AI agenta v praxi. Grafika so 3D rekvizitami, 40 s.", naucis: ["čo je agent", "kde ho zapneš"], podmienky: "Claude Pro", typ_videa: "nastroj", free_value: null, okruh: 1,
   idea_source: { label: "Anthropic blog", url: "https://www.anthropic.com/news" }, duration_s: 45, cta_type: "workshop", cta_text: "Prihlás sa na AI workshop · Košice alebo online · impofai.com/workshop",
   valid_until: null, pointa: "p", open_loop: "o", chosen_hook: 1, hook_why: "w",
   hooks: [1, 2, 3].map((n) => ({ archetype: `a${n}`, voice: "v", on_screen: "t", frame0: "f" })),
@@ -69,8 +69,9 @@ test("summary: required, max 5 sentences; card starts with it, then hooks, scrip
   assert.match(validateScript(script({ summary: "" })).errors.join("\n"), /chýba zhrnutie/);
   assert.match(validateScript(script({ summary: "A. B. C. D. E. F." })).errors.join("\n"), /6 viet/);
   const d = renderScript(script(), { idea: "IMP-1", version: 1, projectDate: "2026-11-23" });
-  assert.ok(d.startsWith("## Zhrnutie\nVideo ukáže AI agenta"));
-  const order = ["## Zhrnutie", "## Hooky", "## Scenár", "## CTA", "## Čo si divák odnesie", "## Zdroj nápadu", "## Okruh", "## Popis pre platformy"].map((h) => d.indexOf(h));
+  assert.ok(d.startsWith("## Obsahový scenár\nVideo ukáže AI agenta"));
+  assert.ok(d.indexOf("**Čo sa divák naučí:**") < d.indexOf("## Detailný scenár"));
+  const order = ["## Obsahový scenár", "## Detailný scenár", "## Hooky", "## Scenár", "## CTA", "## Čo si divák odnesie", "## Zdroj nápadu", "## Okruh", "## Popis pre platformy"].map((h) => d.indexOf(h));
   assert.deepEqual([...order].sort((a, b) => a - b), order);
   assert.ok(order.every((i) => i >= 0));
   assert.match(d, /\[Anthropic blog\]\(https:\/\/www\.anthropic\.com\/news\)/);
@@ -82,4 +83,19 @@ test("fitSummary keeps the first 5 sentences, quotes stay whole", () => {
   assert.equal(fitSummary(s), 1);
   assert.equal(s.summary, "Jedna. Hook „Hodina. A nič.“ ide prvý. Tri. Štyri. Päť.");
   assert.equal(fitSummary(s), 0);
+});
+
+test("keyword CTA needs a free value pack with the keyword", () => {
+  const e = (o) => validateScript(script({ cta_type: "klucove-slovo", cta_text: "Napíš PROMPT a pošlem ti ho", ...o })).errors.join("\n");
+  assert.match(e({ free_value: null }), /bez free value/);
+  const fv = { keyword: "PROMPT", nazov: "x", popis: "x", overenie: "x", files: [{ name: "prompt.md", content: "x".repeat(250) }] };
+  assert.equal(e({ free_value: fv }), "");
+  assert.match(e({ free_value: { ...fv, keyword: "INY" } }), /nespomína/);
+  assert.match(e({ naucis: [] }), /naučí/);
+});
+
+test("scene and metaphor ids lose diacritics", () => {
+  const s = normalizeIds({ lines: [{ set: "S:šachta (nová, tmavá)", metaphor: "V:nova-prompt-vyletí" }] });
+  assert.equal(s.lines[0].metaphor, "V:nova-prompt-vyleti");
+  assert.equal(s.lines[0].set, "S:sachta (nová, tmavá)");
 });

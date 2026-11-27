@@ -10,9 +10,17 @@ export const AVATAR_POSES = [
 // element IDs of impofai-video-style/references/elements.md (0.10); S:* sets and V:* metaphors may be new
 const ELEMENT_RE = /^(S:[a-z0-9-]+|V:[a-z0-9-]+|L|X(10|[1-9])|A|D|R[12]|K(3|4|5|6|7|8|9|11|13|14)|T[1-3]|M[12]|Z[12])(:[a-z0-9-]+)?$/i;
 const FORBIDDEN = [/každú sobotu/i, /\bvyral\b/i];
+const TYP_LABEL = { "ukazka-vysledku": "ukážka výsledku", nastroj: "nástroj", "prompt-trik": "prompt / trik", "x-zabilo-y": "X zabilo Y", "novinka-vysvetlena": "novinka vysvetlená", "nazor-pre-firmy": "názor pre firmy", porovnanie: "porovnanie" };
 const CTA_LABEL = { workshop: "workshop", konzultacia: "konzultácia", "klucove-slovo": "kľúčové slovo", "diskusia-web": "diskusia/web" };
 
 /** Problems that make a script unusable (empty = ok). Warnings are reported but do not block. */
+/** Scene/metaphor ids are ASCII (S:foo, V:bar): diacritics, spaces and case in the id part are fixed in place. */
+export function normalizeIds(s) {
+  const fix = (v) => String(v ?? "").replace(/^([SV]):\s*([^(]*?)(\s*\(.*)?$/s, (_, p, id, rest = "") => `${p}:${id.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}${rest}`);
+  for (const l of s.lines ?? []) { l.set = fix(l.set); l.metaphor = fix(l.metaphor); }
+  return s;
+}
+
 export function validateScript(s) {
   const errors = [];
   const warnings = [];
@@ -47,6 +55,20 @@ export function validateScript(s) {
   const summary = String(s.summary ?? "").trim();
   if (!summary) errors.push("chýba zhrnutie (summary)");
   else if (sentences(summary) > 5) errors.push(`zhrnutie má ${sentences(summary)} viet, max. 5`);
+  // content first (Marek 2026-11-26): what the viewer learns, conditions, and the free value promised by a keyword CTA
+  if (!Array.isArray(s.naucis) || s.naucis.length < 2) errors.push("chýba „čo sa divák naučí“ (naucis, 2–4 body)");
+  if (s.cta_type === "klucove-slovo") {
+    const fv = s.free_value;
+    if (!fv?.files?.length) errors.push("CTA s kľúčovým slovom bez free value balíčka (free_value.files)");
+    else {
+      if (!/^[A-Z0-9]{2,20}$/.test(fv.keyword ?? "")) errors.push(`kľúčové slovo „${fv.keyword}“: 2–20 znakov A–Z/0–9`);
+      else if (!String(s.cta_text).toUpperCase().includes(fv.keyword)) errors.push(`CTA nespomína kľúčové slovo ${fv.keyword}`);
+      for (const f of fv.files) {
+        if (!/^[a-zA-Z0-9._-]+\.(md|txt|json)$/.test(f.name)) errors.push(`free value: neplatný názov súboru „${f.name}“`);
+        if (String(f.content).trim().length < 200) errors.push(`free value: ${f.name} je takmer prázdny`);
+      }
+    }
+  }
   if (s.okruh != null && ![1, 2, 3, 4, 5].includes(s.okruh)) errors.push(`okruh ${s.okruh} mimo 1–5`);
   if (s.idea_source?.url && !/^https?:\/\//.test(s.idea_source.url)) errors.push("zdroj nápadu nemá platnú URL");
   return { errors, warnings, words, duration: dur };
@@ -100,9 +122,22 @@ const cell = (v) => String(v ?? "").replace(/\|/g, "\\|").replace(/\n/g, " ");
 export function renderScript(s, { idea, version, projectDate, changes = [], warnings = [] }) {
   const h = s.hooks;
   const src = s.idea_source;
+  const fv = s.free_value;
   const lines = [
-    "## Zhrnutie",
+    "## Obsahový scenár",
     String(s.summary ?? "").trim() || "—",
+    "",
+    "**Čo sa divák naučí:**",
+    ...(s.naucis ?? []).map((x) => `- ${x}`),
+    "",
+    `**Podmienky:** ${s.podmienky ?? "—"} · **Typ videa:** ${TYP_LABEL[s.typ_videa] ?? s.typ_videa ?? "—"}`,
+    "",
+    ...(fv
+      ? ["## Free value", `**${cell(fv.nazov)}** · kľúčové slovo **${fv.keyword}** · ${cell(fv.popis)}`, "", `Súbory: ${fv.files.map((f) => f.name).join(", ")} (v prílohe aj ako zip). **Overenie:** ${cell(fv.overenie)}`, ""]
+      : []),
+    "---",
+    "",
+    "## Detailný scenár",
     "",
     `**Dĺžka:** ${s.duration_s} s · **Slová hlasu:** ${s._words ?? "?"} · **Okruh:** ${s.okruh ? `${s.okruh} – ${OKRUH_NAME[s.okruh]}` : "—"} · **Verzia scenára:** v${version}`,
     "",
@@ -178,7 +213,7 @@ export function renderScript(s, { idea, version, projectDate, changes = [], warn
 export function machineScript(s, { idea, version, projectDate }) {
   return {
     script_version: version, idea, slug: s.slug, project_date: projectDate, format: "A", style: "impofai-scena-0.10",
-    summary: s.summary ?? null, okruh: s.okruh ?? null, idea_source: s.idea_source ?? null,
+    summary: s.summary ?? null, naucis: s.naucis ?? [], podmienky: s.podmienky ?? null, typ_videa: s.typ_videa ?? null, free_value_keyword: s.free_value?.keyword ?? null, okruh: s.okruh ?? null, idea_source: s.idea_source ?? null,
     cta_type: s.cta_type, cta_text: s.cta_text, valid_until: s.valid_until, duration_s: s.duration_s,
     hook: { chosen: s.chosen_hook, variants: s.hooks },
     beats: s.lines,
